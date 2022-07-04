@@ -11,12 +11,12 @@ mod flag;
 use std::{rc::Rc, collections::HashMap};
 
 use backend::start_load;
-use common::{LoadMap, NationId, LOCAL_URL};
+use common::{LoadMap};
 use infobox::Infobox;
 use loading::Loading;
 use map::{Map, NationNameId};
 use error::Error;
-use web_sys::{console, Element, Node};
+
 use yew::prelude::*;
 struct App {
     children: Option<Result<Vec<Html>, String>>

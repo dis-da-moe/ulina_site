@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use common::{Nation, NationAll};
+use common::{NationAll};
 use yew::prelude::*;
 use yew_agent::{Bridge, Bridged};
 use crate::flag::Flag;
 
 use crate::{
-    event_bus::{EventBus, Content}, util::log, backend::url
+    event_bus::{EventBus, Content}, util::log
 };
 
 pub enum Msg {

@@ -1,4 +1,4 @@
-use common::{LoadMap, LOCAL_URL, NationAll};
+use common::{LoadMap, LOCAL_URL};
 use reqwasm::http::Request;
 
 macro_rules! debug {

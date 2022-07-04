@@ -11,11 +11,11 @@ extern crate rocket;
 #[macro_use]
 extern crate lazy_static;
 
-use crate::tokio::try_join;
-use database::{db, socials};
-use rocket::{tokio, serde::{json::Json, self}};
-use sqlx::query_as;
-use common::{Nation, NationAll};
+
+
+use rocket::{tokio};
+
+
 
 #[tokio::main]
 async fn main() -> Result<(), String> {

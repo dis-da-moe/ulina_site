@@ -1,9 +1,9 @@
-use common::{NationAll, NationId};
-use web_sys::{Element, MouseEvent, Node};
-use yew::{html, use_node_ref, Callback, Component, NodeRef, Properties};
+
+use web_sys::{Element, MouseEvent};
+use yew::{html, Component, NodeRef, Properties};
 use yew_agent::{Dispatched, Dispatcher};
 
-use crate::{event_bus::{EventBus, Content}, map::NationNameId};
+use crate::{event_bus::{EventBus}, map::NationNameId};
 
 pub struct Nation {
     node_ref: NodeRef,

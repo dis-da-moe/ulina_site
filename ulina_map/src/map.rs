@@ -1,9 +1,9 @@
-use std::rc::Rc;
+
 
 use crate::{nation::Nation, util::{by_id, log}};
-use common::LoadMap;
-use web_sys::Node;
-use yew::{html, html_nested, Children, Component, Html, Properties};
+
+
+use yew::{html, Component, Html, Properties};
 
 use crate::util::get_vec;
 

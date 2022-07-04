@@ -1,5 +1,5 @@
-use crate::{database, nation_id};
-use common::{LoadMap, NationId, NationAll, Nation};
+use crate::{database};
+use common::{LoadMap, NationAll, Nation};
 use lazy_static::initialize;
 use rocket::config::LogLevel;
 use rocket::fs::{FileServer, NamedFile};
@@ -11,7 +11,7 @@ use std::env;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 
-use crate::database::{db, socials, flag_link};
+use crate::database::{db, socials};
 
 const PUBLIC_FOLDER: &str = "public";
 const STATIC_FOLDER: &str = "static";

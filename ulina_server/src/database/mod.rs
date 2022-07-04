@@ -2,7 +2,7 @@ pub use crate::database::models::*;
 use crate::error::Error;
 use common::{Flag, Map, RawMap, Social};
 use once_cell::sync::OnceCell;
-use sqlx::types::chrono;
+
 use sqlx::types::chrono::{TimeZone, Utc};
 use sqlx::{query_as, SqlitePool};
 use std::fs;

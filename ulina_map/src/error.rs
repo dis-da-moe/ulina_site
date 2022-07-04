@@ -1,5 +1,5 @@
 use yew::virtual_dom::AttrValue;
-use yew::{function_component, html, Html, Properties};
+use yew::{function_component, html, Properties};
 
 #[derive(Properties, PartialEq)]
 pub struct ErrorProps {
