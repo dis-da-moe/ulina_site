@@ -1,0 +1,22 @@
+[package]
+name = "ulina_map"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+yew = "0.19"
+serde = "1.0.137"
+common = {path = "../common"}
+reqwasm = "0.2"
+wasm-bindgen-futures = "0.4"
+gloo-utils = "0.1"
+yew-agent = "0.1.0"
+
+[dependencies.web-sys]
+version = "0.3"
+features = ["console", "Document", "Element", "Node", "Window", "SvgElement", "HtmlCollection"]
+
+[build]
+target = "wasm32-unknown-unknown"

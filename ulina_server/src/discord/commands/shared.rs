@@ -1,0 +1,196 @@
+use crate::database::CONTINENTS;
+use crate::discord::commands::commands::build_commands_embed;
+use crate::discord::commands::COMMANDS;
+use crate::discord::helper::is_admin;
+use crate::error::Error;
+use crate::nation_id;
+use common::NationId;
+use serenity::builder::{CreateApplicationCommand, CreateApplicationCommandOption};
+use serenity::http::Http;
+use serenity::model::id::GuildId;
+use serenity::model::interactions::application_command::ApplicationCommandOptionType;
+use serenity::model::prelude::application_command::ApplicationCommandInteraction;
+use std::collections::hash_map::Entry;
+use std::collections::HashMap;
+use std::future::Future;
+use std::pin::Pin;
+use std::usize;
+
+pub struct UlinaCommand {
+    pub data: CommandData,
+    pub create: fn(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
+    pub action: for<'a> fn(
+        &'a Http,
+        &'a ApplicationCommandInteraction,
+    ) -> Pin<Box<dyn Future<Output = Result<(), Error>> + 'a + Send>>,
+}
+
+pub struct CommandData {
+    pub admin_only: bool,
+    pub name: &'static str,
+    pub category: Category,
+}
+
+#[derive(Eq, Hash, PartialEq, Copy, Clone)]
+pub enum Category {
+    ViewNation,
+    Help,
+    EditNation,
+    Time,
+    Misc,
+}
+
+impl ToString for Category {
+    fn to_string(&self) -> String {
+        match self {
+            Category::ViewNation => "View Nation",
+            Category::Help => "Help",
+            Category::EditNation => "Edit Nation",
+            Category::Time => "Time",
+            Category::Misc => "Misc",
+        }
+        .to_string()
+    }
+}
+
+pub type OptionType = ApplicationCommandOptionType;
+pub type CreateCommand = CreateApplicationCommand;
+pub type CreateOption = CreateApplicationCommandOption;
+pub type Interaction = ApplicationCommandInteraction;
+
+pub const NAME: &str = "name";
+pub const CONTINENT: &str = "continent";
+pub const USER: &str = "user";
+
+#[macro_export]
+macro_rules! get_nation {
+    ($interaction: expr, $model: ident, $select: tt) => {{
+        let name_option =
+            crate::get_options!($interaction.data.options, super::shared::NAME, String);
+        let id = $interaction.user.id.0.to_string();
+
+        match name_option {
+            Ok(name) => {
+                find_nation!($model, $select, "name LIKE ? AND removed = false", name)
+                    .fetch_one(crate::database::db())
+                    .await
+            }
+            _ => {
+                { find_nation!($model, $select, "nationId = ? AND removed = false", id) }
+                    .fetch_one(crate::database::db())
+                    .await
+            }
+        }
+    }};
+}
+
+pub fn default_data<'a>(
+    command: &'a mut CreateCommand,
+    data: &CommandData,
+) -> &'a mut CreateCommand {
+    if matches!(data.category, Category::EditNation) {
+        let editing = data.name.replace("edit-", "").replace("-", " ");
+
+        let description = if data.admin_only {
+            format!("admin only - change the {} of a nation", editing)
+        } else {
+            format!("change the {} of your nation", editing)
+        };
+
+        command.description(description);
+        command.create_option(|option| {
+            name_option(option)
+                .description(if data.admin_only {
+                    "the name of the ulina nation"
+                } else {
+                    "admin only - the name of an ulina nation"
+                })
+                .required(data.admin_only)
+        });
+    }
+
+    command.name(data.name);
+
+    command
+}
+
+pub fn name_option(option: &mut CreateOption) -> &mut CreateOption {
+    option.name(NAME).kind(OptionType::String)
+}
+
+pub async fn edit_action(interaction: &Interaction, data: &CommandData) -> Result<NationId, Error> {
+    if data.admin_only && !is_admin(&interaction.user) {
+        return Err(Error::InvalidPermissions(
+            "only an admin can do this - contact one if this is desired".to_string(),
+        ));
+    }
+
+    let nation = nation_id!(interaction)?;
+    if nation.ownerDiscord != interaction.user.id.0.to_string() && !is_admin(&interaction.user) {
+        Err(Error::InvalidPermissions(
+            "this nation does not belong to you - contact an admin if this is a mistake"
+                .to_string(),
+        ))
+    } else {
+        Ok(nation)
+    }
+}
+
+pub async fn create_commands(guild_id: &GuildId, http: &Http) {
+    let mut categorised_commands: HashMap<Category, Vec<(&CommandData, String)>> = HashMap::new();
+
+    let commands = GuildId::set_application_commands(guild_id, http, |commands| {
+        for (name, command) in COMMANDS.iter() {
+            commands.create_application_command(|builder| {
+                let data = (command.create)(builder.name(name));
+
+                let description = data.0.get("description").unwrap().as_str().unwrap();
+
+                let entry = match categorised_commands.entry(command.data.category) {
+                    Entry::Occupied(entry) => entry.into_mut(),
+                    Entry::Vacant(entry) => entry.insert(Vec::new()),
+                };
+
+                entry.push((&command.data, description.to_string()));
+
+                data
+            });
+        }
+
+        commands
+    })
+    .await
+    .expect("error creating slash commands");
+
+    build_commands_embed(categorised_commands);
+
+    println!(
+        "slash commands created for guild {}:\n{}",
+        guild_id.0,
+        commands
+            .iter()
+            .map(|command| format!("\"{}\": {}", command.name, command.description))
+            .collect::<Vec<String>>()
+            .join("\n")
+    );
+}
+
+pub fn continent_option(option: &mut CreateOption) -> &mut CreateOption {
+    option.name("continent").kind(OptionType::Integer);
+
+    for (index, continent) in CONTINENTS.iter().enumerate() {
+        option.add_int_choice(continent, index as i32);
+    }
+
+    option
+}
+
+pub fn get_continent(index: i64) -> Result<&'static str, Error> {
+    CONTINENTS
+        .get(index as usize)
+        .map(|string| *string)
+        .ok_or(Error::InternalError(format!(
+            "continent option has invalid index of {}",
+            index
+        )))
+}
