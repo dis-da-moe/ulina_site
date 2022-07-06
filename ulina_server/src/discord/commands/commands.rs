@@ -5,7 +5,7 @@ use crate::util::ZERO_WIDTH;
 use once_cell::sync::OnceCell;
 use serenity::builder::CreateEmbed;
 use serenity::client::Context;
-use serenity::http::Http;
+
 use std::collections::HashMap;
 
 static NORMAL_COMMANDS: OnceCell<CreateEmbed> = OnceCell::new();

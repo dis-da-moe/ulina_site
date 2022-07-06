@@ -8,7 +8,7 @@ use yew_agent::{Bridge, Bridged};
 
 use crate::{
     event_bus::{Content, EventBus},
-    util::{log, EMPTY_DIV},
+    util::{EMPTY_DIV},
 };
 
 pub enum Msg {

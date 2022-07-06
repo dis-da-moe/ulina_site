@@ -1,12 +1,12 @@
 use super::nation::{Nation, Rect};
 use crate::{
-    util::{by_id, log},
+    util::{by_id},
     viewbox::Viewbox,
 };
 
 use glam::Vec2;
 use gloo_events::EventListener;
-use web_sys::{Element, MouseEvent, WheelEvent};
+use web_sys::{MouseEvent, WheelEvent};
 use yew::{html, Component, Html, NodeRef, Properties};
 
 use crate::util::get_vec;

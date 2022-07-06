@@ -7,7 +7,7 @@ use crate::discord::ids::{CONTINENT, NAME, USER};
 use crate::error::Error;
 use crate::get_options;
 use serenity::client::Context;
-use serenity::http::Http;
+
 use sqlx::query;
 
 pub const DATA: CommandData = CommandData {

@@ -1,13 +1,13 @@
 use serenity::{
     http::Http,
     model::interactions::{
-        message_component::{ActionRowComponent, InputText},
+        message_component::{ActionRowComponent},
         modal::ModalSubmitInteraction,
     },
 };
 use sqlx::{query, query_as};
 
-use crate::{database::db, error::Error, nation_id};
+use crate::{database::db, error::Error};
 use common::NationId;
 
 use super::{

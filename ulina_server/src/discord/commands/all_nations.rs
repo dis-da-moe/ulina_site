@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use serenity::{http::Http, builder::CreateEmbed, collector::{MessageCollector, MessageCollectorBuilder, ComponentInteractionCollectorBuilder}, client::Context};
+use serenity::{builder::CreateEmbed, client::Context};
 use sqlx::query_as;
 
 use crate::{error::Error, get_options, discord::{ids::CONTINENT, helper::{display_user, Helper}}, database::db};
@@ -54,11 +54,11 @@ pub async fn all_nations(ctx: &Context, interaction: &Interaction) -> Result<(),
 
         nations.sort_by(|(_, a), (_, b)| a.len().cmp(&b.len()));
 
-        let nations = nations.into_iter().map(|(continent, nations)| nations_embed(nations, &continent)).collect::<Vec<_>>();
+        let _nations = nations.into_iter().map(|(continent, nations)| nations_embed(nations, &continent)).collect::<Vec<_>>();
         
         let reply = interaction.get_interaction_response(&ctx.http).await.map_err(|err| Error::InternalError(format!("{:?}", err)))?;
         
-        let collector = reply.await_component_interaction(&ctx);
+        let _collector = reply.await_component_interaction(&ctx);
         
         todo!()
     }

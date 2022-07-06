@@ -1,6 +1,6 @@
-use std::{fs::File, path::Path};
+use std::{path::Path};
 
-use serenity::{http::Http, model::interactions::InteractionResponseType, client::Context};
+use serenity::{client::Context};
 
 use crate::{
     database::add_flag,

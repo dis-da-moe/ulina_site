@@ -4,7 +4,7 @@ use crate::discord::commands::shared::{Category, CommandData, CreateCommand, Int
 use crate::discord::helper::Helper;
 use crate::error::Error;
 use serenity::client::Context;
-use serenity::http::Http;
+
 use sqlx::query;
 
 pub const DATA: CommandData = CommandData {

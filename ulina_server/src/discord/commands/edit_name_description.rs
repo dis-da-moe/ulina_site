@@ -1,8 +1,8 @@
 use common::NationDescription;
 use serenity::{
-    builder::CreateInputText, http::Http, model::interactions::message_component::InputTextStyle, client::Context,
+    builder::CreateInputText, model::interactions::message_component::InputTextStyle, client::Context,
 };
-use sqlx::{query, query_as};
+use sqlx::{query_as};
 
 use crate::{
     database::db,

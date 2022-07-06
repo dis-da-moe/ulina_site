@@ -1,4 +1,4 @@
-use serenity::{http::Http, client::Context};
+use serenity::{client::Context};
 use sqlx::query;
 
 use crate::{
