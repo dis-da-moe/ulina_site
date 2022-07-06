@@ -1,11 +1,7 @@
 use common::{LoadMap, LOCAL_URL};
 use reqwasm::http::Request;
 
-macro_rules! debug {
-    () => {
-        |err| format!("{:?}", err)
-    };
-}
+use crate::debug;
 
 pub fn url(endpoint: &str) -> String {
     #[cfg(debug_assertions)]
@@ -18,7 +14,8 @@ pub fn url(endpoint: &str) -> String {
 }
 
 pub async fn request<T>(endpoint: &str) -> Result<T, String>
-where for<'a> T: serde::Deserialize<'a>
+where
+    for<'a> T: serde::Deserialize<'a>,
 {
     let payload: T = Request::get(&url(endpoint))
         .send()
@@ -27,7 +24,7 @@ where for<'a> T: serde::Deserialize<'a>
         .json()
         .await
         .map_err(debug!())?;
-    
+
     Ok(payload)
 }
 

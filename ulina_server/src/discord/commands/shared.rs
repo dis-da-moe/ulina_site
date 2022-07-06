@@ -2,10 +2,12 @@ use crate::database::CONTINENTS;
 use crate::discord::commands::commands::build_commands_embed;
 use crate::discord::commands::COMMANDS;
 use crate::discord::helper::is_admin;
+use crate::discord::ids::NAME;
 use crate::error::Error;
 use crate::nation_id;
 use common::NationId;
 use serenity::builder::{CreateApplicationCommand, CreateApplicationCommandOption};
+use serenity::client::Context;
 use serenity::http::Http;
 use serenity::model::id::GuildId;
 use serenity::model::interactions::application_command::ApplicationCommandOptionType;
@@ -20,7 +22,7 @@ pub struct UlinaCommand {
     pub data: CommandData,
     pub create: fn(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     pub action: for<'a> fn(
-        &'a Http,
+        &'a Context,
         &'a ApplicationCommandInteraction,
     ) -> Pin<Box<dyn Future<Output = Result<(), Error>> + 'a + Send>>,
 }
@@ -58,15 +60,11 @@ pub type CreateCommand = CreateApplicationCommand;
 pub type CreateOption = CreateApplicationCommandOption;
 pub type Interaction = ApplicationCommandInteraction;
 
-pub const NAME: &str = "name";
-pub const CONTINENT: &str = "continent";
-pub const USER: &str = "user";
-
 #[macro_export]
 macro_rules! get_nation {
     ($interaction: expr, $model: ident, $select: tt) => {{
         let name_option =
-            crate::get_options!($interaction.data.options, super::shared::NAME, String);
+            crate::get_options!($interaction.data.options, crate::discord::ids::NAME, String);
         let id = $interaction.user.id.0.to_string();
 
         match name_option {
@@ -76,7 +74,7 @@ macro_rules! get_nation {
                     .await
             }
             _ => {
-                { find_nation!($model, $select, "nationId = ? AND removed = false", id) }
+                { find_nation!($model, $select, "ownerDiscord = ? AND removed = false", id) }
                     .fetch_one(crate::database::db())
                     .await
             }
@@ -89,7 +87,7 @@ pub fn default_data<'a>(
     data: &CommandData,
 ) -> &'a mut CreateCommand {
     if matches!(data.category, Category::EditNation) {
-        let editing = data.name.replace("edit-", "").replace("-", " ");
+        let editing = data.name.replace("edit-", "").replace("-", " and ");
 
         let description = if data.admin_only {
             format!("admin only - change the {} of a nation", editing)

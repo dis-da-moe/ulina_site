@@ -1,11 +1,12 @@
 use crate::database::db;
 use crate::discord::commands::shared::{
     continent_option, get_continent, Category, CommandData, CreateCommand, Interaction, OptionType,
-    CONTINENT, NAME, USER,
 };
 use crate::discord::helper::Helper;
+use crate::discord::ids::{CONTINENT, NAME, USER};
 use crate::error::Error;
 use crate::get_options;
+use serenity::client::Context;
 use serenity::http::Http;
 use sqlx::query;
 
@@ -40,7 +41,7 @@ pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
         })
 }
 
-pub async fn create_nation(http: &Http, interaction: &Interaction) -> Result<(), Error> {
+pub async fn create_nation(ctx: &Context, interaction: &Interaction) -> Result<(), Error> {
     let (name, continent, user) = get_options!(
         interaction.data.options,
         NAME,
@@ -63,7 +64,7 @@ pub async fn create_nation(http: &Http, interaction: &Interaction) -> Result<(),
     .await?;
 
     interaction
-        .message(http, |message| {
+        .message(&ctx.http, |message| {
             message.content(format!("Successfully created {}", name))
         })
         .await;

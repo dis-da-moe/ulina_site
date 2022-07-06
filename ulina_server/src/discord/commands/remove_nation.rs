@@ -3,6 +3,7 @@ use crate::discord::commands::shared::{default_data, edit_action};
 use crate::discord::commands::shared::{Category, CommandData, CreateCommand, Interaction};
 use crate::discord::helper::Helper;
 use crate::error::Error;
+use serenity::client::Context;
 use serenity::http::Http;
 use sqlx::query;
 
@@ -16,7 +17,7 @@ pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
     default_data(command, &DATA).description("admin only - remove a nation")
 }
 
-pub async fn remove_nation(http: &Http, interaction: &Interaction) -> Result<(), Error> {
+pub async fn remove_nation(ctx: &Context, interaction: &Interaction) -> Result<(), Error> {
     let nation = edit_action(interaction, &DATA).await?;
 
     query!(
@@ -27,7 +28,7 @@ pub async fn remove_nation(http: &Http, interaction: &Interaction) -> Result<(),
     .await?;
 
     interaction
-        .message(http, |message| {
+        .message(&ctx.http, |message| {
             message.content(format!("Successfully removed {}", nation.name))
         })
         .await;

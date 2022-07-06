@@ -1,5 +1,5 @@
-use crate::{database};
-use common::{LoadMap, NationAll, Nation};
+use crate::database;
+use common::{LoadMap, Nation, NationAll};
 use lazy_static::initialize;
 use rocket::config::LogLevel;
 use rocket::fs::{FileServer, NamedFile};
@@ -38,38 +38,37 @@ async fn page(path: PathBuf) -> Option<NamedFile> {
 #[get("/load-map")]
 async fn load_map() -> Json<LoadMap> {
     let result: Vec<Nation> = query_as!(Nation, "SELECT * FROM Nation WHERE removed = false")
-        .fetch_all(db()).await.unwrap();
+        .fetch_all(db())
+        .await
+        .unwrap();
 
     let mut nations = vec![];
-    
-    for nation in result{
+
+    for nation in result {
         let socials = socials(nation.nationId).await.unwrap();
 
-        let flag_link = match nation.currentFlagId{
-            Some(id) => {
-                Some(database::flag_link(id).await)
-            },
-            None => None
+        let flag_link = match nation.currentFlagId {
+            Some(id) => Some(database::flag_link(id).await),
+            None => None,
         };
-        nations.push(NationAll{
+        nations.push(NationAll {
             core: nation,
             socials,
-            flag_link
+            flag_link,
         });
     }
-
 
     let map = database::latest_map().await.unwrap();
 
     Json(LoadMap { nations, map })
 }
 
-/* 
+/*
 #[get("/nation-all?<id>")]
 async fn nation_all(id: i64) -> Option<Json<NationAll>>{
-    let nation: Nation = 
+    let nation: Nation =
         find_nation!(Nation, "*", "removed = false AND nationId = ?", id).fetch_one(db()).await.ok()?;
-    
+
     let socials = socials(nation.nationId).await.unwrap();
 
     let flag_link = match nation.currentFlagId{

@@ -1,10 +1,10 @@
 pub use crate::database::models::*;
 use crate::error::Error;
-use common::{Flag, Map, RawMap, Social};
+use common::{Flag, FlagId, Map, RawMap, Social};
 use once_cell::sync::OnceCell;
 
-use sqlx::types::chrono::{TimeZone, Utc};
-use sqlx::{query_as, SqlitePool};
+use sqlx::types::chrono::{self, TimeZone, Utc};
+use sqlx::{query, query_as, SqlitePool};
 use std::fs;
 
 pub mod models;
@@ -17,6 +17,7 @@ pub async fn init() {
     CONNECTION
         .set(SqlitePool::connect(DATABASE_URL).await.unwrap())
         .unwrap();
+    sqlx::migrate!().run(db()).await.unwrap();
 }
 
 pub fn db() -> &'static SqlitePool {
@@ -56,6 +57,48 @@ pub async fn flag_link(id: i64) -> String {
         .await
         .map(|flag: Flag| format!("https://www.ulinaworld.com{}", flag.flagPath))
         .unwrap()
+}
+
+const FLAG_DIR: &str = "./public/flags";
+
+pub async fn add_flag(
+    nation_id: i64,
+    name: &str,
+    extension: &str,
+    buffer: Vec<u8>,
+) -> Result<(), Error> {
+    let date = chrono::Utc::now().naive_utc();
+
+    let file_name = format!(
+        "{}-{}.{}",
+        name.replace(" ", ""),
+        date.format("%Y_%m_%d_%H_%M_%S"),
+        extension
+    );
+
+    fs::write(format!("{}/{}", FLAG_DIR, file_name), buffer)
+        .map_err(|e| Error::InternalError(format!("{:?}", e)))?;
+
+    let path = format!("/flags/{}", file_name);
+
+    let flag: FlagId = query_as!(
+        FlagId,
+        "INSERT INTO Flag (flagPath, nationId) VALUES (?, ?) RETURNING flagId",
+        path,
+        nation_id
+    )
+    .fetch_one(db())
+    .await?;
+
+    query!(
+        "UPDATE Nation SET currentFlagId = ? WHERE nationId = ?",
+        flag.flagId,
+        nation_id
+    )
+    .execute(db())
+    .await?;
+
+    Ok(())
 }
 
 pub const CONTINENTS: [&str; 5] = ["Ripiero", "Kanita", "Zapita", "Ailou", "Sivalat"];

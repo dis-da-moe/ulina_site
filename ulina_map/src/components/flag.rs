@@ -1,25 +1,23 @@
-use yew::{Properties, Component, Html, html, Callback, classes};
+use yew::{classes, html, Callback, Component, Html, Properties};
 
-use crate::backend::url;
-
-
+use crate::{backend::url, util::EMPTY_DIV};
 
 #[derive(PartialEq, Properties)]
-pub struct FlagProps{
+pub struct FlagProps {
     pub flag: Option<String>,
     pub loaded: bool,
-    pub on_load: Callback<()>
+    pub on_load: Callback<()>,
 }
 
 pub struct Flag;
 
-pub enum Msg{
-    Loaded
+pub enum Msg {
+    Loaded,
 }
 
 const CLASS: &str = ".object-scale-down max-h-40 mx-auto p-5";
 
-impl Component for Flag{
+impl Component for Flag {
     type Message = Msg;
 
     type Properties = FlagProps;
@@ -42,15 +40,14 @@ impl Component for Flag{
 
         match (&ctx.props().flag, &ctx.props().loaded) {
             (None, _) => {
-                html!{
-                    <div class="grid place-items-center h-20 text-md italic">
+                html! {
+                    <div class={EMPTY_DIV}>
                         {"no flag"}
                     </div>
                 }
             }
             (Some(flag), false) => {
-
-                html!{
+                html! {
                     <>
                         <img class={classes!(CLASS)} src={url("assets/img/loading.svg")}/>
                         <img class={classes!(CLASS)} src={flag.clone()} onload={onload} style="display:none"/>
@@ -58,12 +55,11 @@ impl Component for Flag{
                 }
             }
             (Some(flag), true) => {
-                html!{
+                html! {
                     <img class={classes!(CLASS)} src={flag.clone()}/>
                 }
             }
         }
-
     }
 
     fn changed(&mut self, _ctx: &yew::Context<Self>) -> bool {

@@ -11,11 +11,7 @@ extern crate rocket;
 #[macro_use]
 extern crate lazy_static;
 
-
-
-use rocket::{tokio};
-
-
+use rocket::tokio::{self, try_join};
 
 #[tokio::main]
 async fn main() -> Result<(), String> {
@@ -25,7 +21,6 @@ async fn main() -> Result<(), String> {
 
     database::init().await;
 
-    /*
     let rocket = tokio::spawn(site::run());
     let discord = tokio::spawn(discord::run());
 
@@ -33,6 +28,6 @@ async fn main() -> Result<(), String> {
 
     discord?;
     rocket
-    */
-    site::run().await
+
+    //site::run().await
 }

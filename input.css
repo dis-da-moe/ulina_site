@@ -17,47 +17,54 @@
   word-break: break-word;
 }
 
-path {
-  stroke: black;
-  stroke-width: 5;
+.cls-1 {
+  fill: #b0b3e3;
 }
 
-.cls-1 {
-        fill: #b0b3e3;
-    }
+.cls-2 {
+  fill: #ffd6a5;
+}
 
-    .cls-2 {
-        fill: #ffd6a5;
-    }
+.cls-3 {
+  fill: #ffd064;
+}
 
-    .cls-3 {
-        fill: #ffd064;
-    }
+.cls-4 {
+  fill: #ff9a7c;
+}
 
-    .cls-4 {
-        fill: #ff9a7c;
-    }
+.cls-5 {
+  fill: #c8e797;
+}
 
-    .cls-5 {
-        fill: #c8e797;
-    }
+.cls-6 {
+  fill: #f3ad72;
+}
 
-    .cls-6 {
-        fill: #f3ad72;
-    }
+.cls-7 {
+  fill: #ffbfb6;
+}
 
-    .cls-7 {
-        fill: #ffbfb6;
-    }
+.cls-8 {
+  fill: #c5c2b5;
+}
 
-    .cls-8 {
-        fill: #c5c2b5;
-    }
+.cls-9 {
+  fill: none;
+}
 
-    .cls-9 {
-        fill: none;
-    }
+.cls-10 {
+  fill: #ffffe8;
+}
 
-    .cls-10 {
-        fill: #ffffe8;
-    }
+.cls2-2 {
+  font-size: 35.5px;
+}
+
+.cls2-6 {
+  font-size: 30.54px;
+}
+
+.cls2-10 {
+  font-size: 31.93px;
+}

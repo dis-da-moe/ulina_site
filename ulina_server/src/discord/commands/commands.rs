@@ -4,6 +4,7 @@ use crate::error::Error;
 use crate::util::ZERO_WIDTH;
 use once_cell::sync::OnceCell;
 use serenity::builder::CreateEmbed;
+use serenity::client::Context;
 use serenity::http::Http;
 use std::collections::HashMap;
 
@@ -47,7 +48,7 @@ pub const DATA: CommandData = CommandData {
     category: Category::Help,
 };
 
-pub async fn commands(http: &Http, interaction: &Interaction) -> Result<(), Error> {
+pub async fn commands(ctx: &Context, interaction: &Interaction) -> Result<(), Error> {
     let embed = if is_admin(&interaction.user) {
         &ADMINS_COMMANDS
     } else {
@@ -58,7 +59,7 @@ pub async fn commands(http: &Http, interaction: &Interaction) -> Result<(), Erro
     .clone();
 
     interaction
-        .message(http, |message| message.add_embed(embed))
+        .message(&ctx.http, |message| message.add_embed(embed))
         .await;
 
     Ok(())

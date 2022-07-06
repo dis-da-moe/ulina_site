@@ -21,6 +21,10 @@ pub struct Nation {
     pub ownerDiscord: String,
     pub description: Option<String>,
     pub currentFlagId: Option<i64>,
+    pub leader: Option<String>,
+    pub capital: Option<String>,
+    pub ideology: Option<String>,
+    pub alliances: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
@@ -36,7 +40,7 @@ pub struct Social {
 pub struct NationAll {
     pub core: Nation,
     pub socials: Vec<Social>,
-    pub flag_link: Option<String>
+    pub flag_link: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -47,12 +51,31 @@ pub struct Flag {
     //pub nation_id: i32
 }
 
+#[allow(non_snake_case)]
+pub struct FlagId {
+    pub flagId: i64,
+    //pub flagPath: String,
+    //pub nationId: i64
+}
+
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[allow(unused, non_snake_case)]
 pub struct NationId {
     pub nationId: i64,
     pub name: String,
     pub ownerDiscord: String,
+}
+
+#[allow(unused, non_snake_case)]
+pub struct NationContinent {
+    pub name: String,
+    pub ownerDiscord: String,
+    pub continentName: String
+}
+
+#[allow(non_snake_case)]
+pub struct NationDescription {
+    pub description: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]

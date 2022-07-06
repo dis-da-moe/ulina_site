@@ -1,6 +1,7 @@
 use crate::discord::commands::shared::{Category, CommandData, CreateCommand, Interaction};
 use crate::discord::helper::Helper;
 use crate::error::Error;
+use serenity::client::Context;
 use serenity::http::Http;
 
 pub const DATA: CommandData = CommandData {
@@ -13,9 +14,9 @@ pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
     command.description("replies with pong")
 }
 
-pub async fn ping(http: &Http, interaction: &Interaction) -> Result<(), Error> {
+pub async fn ping(ctx: &Context, interaction: &Interaction) -> Result<(), Error> {
     interaction
-        .message(http, |data| data.content("pong!"))
+        .message(&ctx.http, |data| data.content("pong!"))
         .await;
 
     Ok(())

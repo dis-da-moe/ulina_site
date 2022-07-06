@@ -4,6 +4,7 @@ use crate::discord::commands::shared::{
 use crate::discord::helper::Helper;
 use crate::error::Error;
 use crate::{database, nation};
+use serenity::client::Context;
 use serenity::http::Http;
 
 pub const DATA: CommandData = CommandData {
@@ -22,7 +23,7 @@ pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
         })
 }
 
-pub async fn nation(http: &Http, interaction: &Interaction) -> Result<(), Error> {
+pub async fn nation(ctx: &Context, interaction: &Interaction) -> Result<(), Error> {
     let nation = nation!(interaction)?;
     let socials = database::socials(nation.nationId).await?;
 
@@ -32,7 +33,7 @@ pub async fn nation(http: &Http, interaction: &Interaction) -> Result<(), Error>
     };
 
     interaction
-        .message(http, |message| {
+        .message(&ctx.http, |message| {
             message.embed(|embed| {
                 embed.title(nation.name);
 
