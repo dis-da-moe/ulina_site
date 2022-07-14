@@ -1,4 +1,4 @@
-use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, TimeZone, Utc};
+use chrono::{Local, NaiveDate, TimeZone};
 use common::to_real;
 use common::{to_ulina, TimeError};
 use gloo::timers::callback::Interval;
@@ -7,7 +7,7 @@ use yew::prelude::*;
 mod local;
 use yew::TargetCast;
 
-use crate::util::log;
+
 
 pub struct App {
     current_real: chrono::DateTime<Local>,

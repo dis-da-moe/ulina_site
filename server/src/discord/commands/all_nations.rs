@@ -1,16 +1,14 @@
-use std::{collections::HashMap, future, time::Duration};
+use std::{collections::HashMap, time::Duration};
 
 use rocket::futures::{StreamExt, TryFutureExt};
 use serenity::{
-    builder::{CreateActionRow, CreateComponents, CreateEmbed, CreateInteractionResponseData},
+    builder::{CreateActionRow, CreateEmbed},
     client::Context,
     collector::ComponentInteractionCollectorBuilder,
     http::CacheHttp,
     model::{
-        guild::Emoji, id::EmojiId, interactions::message_component::ButtonStyle,
-        misc::EmojiIdentifier,
+        interactions::message_component::ButtonStyle,
     },
-    utils::MessageBuilder,
 };
 use sqlx::query_as;
 
