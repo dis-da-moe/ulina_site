@@ -1,8 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./ulina_map/**/*.{html,js,rs}",
-    "./ulina_server/static/**/*.{html,js.rs}"
+    "./tools/**/*.{html,js,rs}",
+    "./server/static/**/*.{html,js.rs}"
   ],
   theme: {
     extend: {},

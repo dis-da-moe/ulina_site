@@ -3,11 +3,11 @@ param(
     [Switch]$release = $false
 )
 
-$build_from = "./ulina_map/index.html"
-$static_dir = "./ulina_server/static/"
+$build_from = "./tools/index.html"
+$static_dir = "./server/static/"
 $map_dir = $static_dir + "map/"
-$html_name = "map.html"
-$public_dir = "./ulina_server/public/"
+$html_name = "tools.html"
+$public_dir = "./server/public/"
 
 
 if ($release){
@@ -30,8 +30,8 @@ npx tailwindcss -i "./input.css" -o ($public_dir + "styles.css")
 Write-Output "Moved Files"
 
 if ($release){
-    cargo run --bin ulina_server --release
+    cargo run --bin server --release
 }
 else{
-    cargo run --bin ulina_server
+    cargo run --bin server
 }

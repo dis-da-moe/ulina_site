@@ -1,5 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+mod time;
+pub use time::*;
 
 pub const LOCAL_IP: &str = "127.0.0.1";
 pub const PORT: u16 = 8000;
@@ -70,7 +72,7 @@ pub struct NationId {
 pub struct NationContinent {
     pub name: String,
     pub ownerDiscord: String,
-    pub continentName: String
+    pub continentName: String,
 }
 
 #[allow(non_snake_case)]

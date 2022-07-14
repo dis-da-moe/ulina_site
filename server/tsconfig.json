@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "System",
+    "target": "es2016",
+    "sourceMap": true,
+    "rootDir": "./public/javascripts/client"
+  },
+  "include": [
+    "./public/javascripts/client/*"
+  ]
+}

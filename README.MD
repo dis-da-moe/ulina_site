@@ -13,4 +13,4 @@ Excluded files:
 - DISCORD_TOKEN: the token of the bot
 - GUILD_ID: the id of the server that the bot operates in
 - SECRET_KEY: the key used for cookies
-- DATABASE_URL: the path to the database, usually "sqlite:ulina_server/data/Ulina.db"
+- DATABASE_URL: the path to the database, usually "sqlite:server/data/Ulina.db"

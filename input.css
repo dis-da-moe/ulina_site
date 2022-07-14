@@ -17,6 +17,10 @@
   word-break: break-word;
 }
 
+body{
+  background-color: #c5e1ef;
+}
+
 .cls-1 {
   fill: #b0b3e3;
 }

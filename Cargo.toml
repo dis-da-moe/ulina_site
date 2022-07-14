@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "ulina_map",
-    "ulina_server",
+    "tools",
+    "server",
     "common"
 ]
