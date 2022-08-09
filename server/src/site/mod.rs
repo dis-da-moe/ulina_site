@@ -12,7 +12,7 @@ mod get;
 mod rendering;
 mod user_data;
 
-use auth::{admin, oauth_redirect, admin_login, discord_login, login_result};
+use auth::{admin, admin_login, discord_login, login_result, oauth_redirect};
 use get::{load_map, page, tools};
 
 use crate::config::CONFIG;

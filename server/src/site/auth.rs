@@ -7,7 +7,10 @@ use crate::util::StandardClient;
 use oauth2::basic::BasicClient;
 use oauth2::reqwest::async_http_client;
 use oauth2::url::Url;
-use oauth2::{AuthUrl, ClientId, ClientSecret, CsrfToken, RedirectUrl, Scope, TokenUrl, AuthorizationCode, TokenResponse};
+use oauth2::{
+    AuthUrl, AuthorizationCode, ClientId, ClientSecret, CsrfToken, RedirectUrl, Scope,
+    TokenResponse, TokenUrl,
+};
 use rocket::form::Form;
 use rocket::response::content::RawHtml;
 use rocket::response::Redirect;
@@ -17,7 +20,7 @@ use sqlx::query;
 use sycamore::view;
 
 use super::rendering::Render;
-use super::user_data::{Login, AdminUser};
+use super::user_data::{AdminUser, Login};
 
 lazy_static! {
     static ref REDIRECT_URL: String = {
@@ -28,7 +31,6 @@ lazy_static! {
 
         format!("{}/oauth-redirect", url)
     };
-
     pub static ref OAUTH_CLIENT: StandardClient = BasicClient::new(
         ClientId::new(CONFIG.client_id.to_string()),
         Some(ClientSecret::new(CONFIG.client_secret.clone())),
@@ -49,8 +51,15 @@ fn oauth_url() -> (Url, CsrfToken) {
 pub async fn discord_login(user_id: UserId) -> RawHtml<String> {
     let (url, token) = oauth_url();
     let token = token.secret();
-    
-    query!("UPDATE User SET pendingAuth = ? WHERE userId = ?", token, user_id.0).execute(db()).await.unwrap();
+
+    query!(
+        "UPDATE User SET pendingAuth = ? WHERE userId = ?",
+        token,
+        user_id.0
+    )
+    .execute(db())
+    .await
+    .unwrap();
 
     view! {
         a(href={url.as_str()}) {"Click here to log in"}
@@ -59,62 +68,78 @@ pub async fn discord_login(user_id: UserId) -> RawHtml<String> {
 }
 
 #[derive(Deserialize)]
-struct DiscordResponse{
+struct DiscordResponse {
     id: String,
-    username: String
+    username: String,
 }
 
 #[get("/oauth-redirect?<code>&<state>")]
-pub async fn oauth_redirect(code: String, state: String, user: UserId) -> RawHtml<String>{
-    let message = |message: String| view!{p{(message)}}.render();
+pub async fn oauth_redirect(code: String, state: String, user: UserId) -> RawHtml<String> {
+    let message = |message: String| view! {p{(message)}}.render();
     println!("{:?}", user);
-    let stored_state = query!("SELECT pendingAuth FROM User WHERE userId = ?", user.0).fetch_one(db()).await.unwrap().pendingAuth;
-    
-    if let Some(stored_state) = stored_state{
-        query!{"UPDATE User SET pendingAuth = NULL WHERE userId = ?", user.0}.execute(db()).await.unwrap();
+    let stored_state = query!("SELECT pendingAuth FROM User WHERE userId = ?", user.0)
+        .fetch_one(db())
+        .await
+        .unwrap()
+        .pendingAuth;
 
-        if stored_state != state{
+    if let Some(stored_state) = stored_state {
+        query! {"UPDATE User SET pendingAuth = NULL WHERE userId = ?", user.0}
+            .execute(db())
+            .await
+            .unwrap();
+
+        if stored_state != state {
             return message("Invalid state".to_string());
         }
-    }
-    else{
+    } else {
         return message("No request made yet".to_string());
     }
 
-    let token_result = 
-        OAUTH_CLIENT
-            .exchange_code(AuthorizationCode::new(code.to_string()))
-            .request_async(async_http_client).await;
+    let token_result = OAUTH_CLIENT
+        .exchange_code(AuthorizationCode::new(code.to_string()))
+        .request_async(async_http_client)
+        .await;
 
-    let auth_code = match token_result{
-        Ok(token) => {
-            token.access_token().secret().clone()
-        },
+    let auth_code = match token_result {
+        Ok(token) => token.access_token().secret().clone(),
         Err(e) => {
             return message(format!("An error occured while exchanging codes: {:?}", e));
-        },
+        }
     };
     let client = reqwest::Client::new();
-    let response = client.get("https://discord.com/api/users/@me").bearer_auth(auth_code).send().await.unwrap().json::<DiscordResponse>().await;
+    let response = client
+        .get("https://discord.com/api/users/@me")
+        .bearer_auth(auth_code)
+        .send()
+        .await
+        .unwrap()
+        .json::<DiscordResponse>()
+        .await;
 
-    match response{
+    match response {
         Ok(response) => {
-            query!("UPDATE User SET discord = ? WHERE userId = ?", response.id, user.0).execute(db()).await.unwrap();
+            query!(
+                "UPDATE User SET discord = ? WHERE userId = ?",
+                response.id,
+                user.0
+            )
+            .execute(db())
+            .await
+            .unwrap();
             message(format!("successfully signed in as {}", response.username))
-        },
-        Err(e) => {
-            message(e.to_string())
-        },
+        }
+        Err(e) => message(e.to_string()),
     }
 }
 
 #[get("/admin", rank = 1)]
-pub async fn admin(user: AdminUser) -> RawHtml<String>{
+pub async fn admin(user: AdminUser) -> RawHtml<String> {
     view! {div{"This is the admin page"}}.render()
 }
 
 #[get("/admin?<error>", rank = 2)]
-pub async fn admin_login(error: Option<String>) -> RawHtml<String>{
+pub async fn admin_login(error: Option<String>) -> RawHtml<String> {
     view! {
         form(action = "/login-result", method="POST"){
             input(name="password", type="password", placeholder="Password", required=true)
@@ -138,21 +163,23 @@ pub async fn login_result(
 ) -> Redirect {
     let success = Redirect::to(uri!(admin));
 
-    if admin.is_some(){
+    if admin.is_some() {
         return success;
     }
 
     let error = |message: &str| Redirect::to(uri!(admin_login(Some(message.to_string()))));
-    
-    if limitguard.is_none(){
+
+    if limitguard.is_none() {
         return error("too many tries");
     }
 
-    if login.password == CONFIG.admin.as_str(){
-        query!("UPDATE User SET isAdmin = true WHERE userId = ?", user.0).execute(db()).await.unwrap();
+    if login.password == CONFIG.admin.as_str() {
+        query!("UPDATE User SET isAdmin = true WHERE userId = ?", user.0)
+            .execute(db())
+            .await
+            .unwrap();
         success
-    }
-    else{
+    } else {
         error("incorrect password")
     }
 }
@@ -163,4 +190,3 @@ impl<'r> RocketGovernable<'r> for LimitLogin {
         Quota::per_hour(Self::nonzero(5))
     }
 }
-
