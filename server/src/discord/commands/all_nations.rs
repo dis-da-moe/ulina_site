@@ -1,14 +1,11 @@
 use std::{collections::HashMap, time::Duration};
 
-use rocket::futures::{StreamExt, TryFutureExt};
+use rocket::futures::StreamExt;
 use serenity::{
     builder::{CreateActionRow, CreateEmbed},
     client::Context,
     collector::ComponentInteractionCollectorBuilder,
-    http::CacheHttp,
-    model::{
-        interactions::message_component::ButtonStyle,
-    },
+    model::interactions::message_component::ButtonStyle,
 };
 use sqlx::query_as;
 

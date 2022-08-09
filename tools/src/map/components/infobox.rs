@@ -43,22 +43,6 @@ fn title(title: &str) -> Html {
     }
 }
 
-fn field(content: &str) -> Html {
-    html! {
-        <span class="infobox-field">
-            {content}
-        </span>
-    }
-}
-
-fn info(message: Html) -> Html {
-    html! {
-        <div class="flex justify-center" style="height:33vh">
-            {message}
-        </div>
-    }
-}
-
 impl Infobox {
     fn show_info(&self, ctx: &Context<Self>, nation: &NationAll) -> Html {
         let socials = nation.socials.iter().map(|social| {

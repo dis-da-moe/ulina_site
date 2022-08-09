@@ -1,13 +1,10 @@
-use chrono::{Local, NaiveDate, TimeZone};
+use chrono::{Local, NaiveDate};
 use common::to_real;
 use common::{to_ulina, TimeError};
 use gloo::timers::callback::Interval;
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
-mod local;
 use yew::TargetCast;
-
-
 
 pub struct App {
     current_real: chrono::DateTime<Local>,
@@ -40,7 +37,7 @@ fn conversion(string: &str, conversion: Converter, result: &mut Option<DateResul
     *result = Some(
         NaiveDate::parse_from_str(string, DATE_INPUT_FORMAT)
             .map_err(|_| TimeError::InvalidDate)
-            .and_then(|date| conversion(date.and_hms(0, 0, 0).timestamp()))
+            .and_then(|date| conversion(date.and_hms(0, 0, 0).timestamp())),
     );
 }
 
@@ -72,7 +69,7 @@ impl Component for App {
                 self.convert_real = None;
                 self.convert_ulina = None;
 
-                if input.is_empty(){
+                if input.is_empty() {
                     return true;
                 }
 

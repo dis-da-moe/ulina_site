@@ -2,6 +2,7 @@ mod error;
 
 #[macro_use]
 mod database;
+mod config;
 mod discord;
 mod site;
 mod util;
@@ -11,13 +12,14 @@ extern crate rocket;
 #[macro_use]
 extern crate lazy_static;
 
+use lazy_static::initialize;
 use rocket::tokio::{self};
 
 #[tokio::main]
 async fn main() -> Result<(), String> {
     std::env::set_current_dir("./server").unwrap();
 
-    dotenv::dotenv().unwrap();
+    initialize(&config::CONFIG);
 
     database::init().await;
 

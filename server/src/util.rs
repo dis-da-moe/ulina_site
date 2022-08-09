@@ -1,3 +1,9 @@
+use oauth2::{
+    basic::{BasicErrorResponseType, BasicTokenType},
+    Client, EmptyExtraTokenFields, RevocationErrorResponseType, StandardErrorResponse,
+    StandardRevocableToken, StandardTokenIntrospectionResponse, StandardTokenResponse,
+};
+
 pub const ZERO_WIDTH: &str = "\u{200B}";
 
 pub fn capitalise(string: &str) -> String {
@@ -17,3 +23,12 @@ pub fn capitalise(string: &str) -> String {
         .collect::<Vec<_>>()
         .join(" ")
 }
+
+pub type StandardClient = Client<
+    StandardErrorResponse<BasicErrorResponseType>,
+    StandardTokenResponse<EmptyExtraTokenFields, BasicTokenType>,
+    BasicTokenType,
+    StandardTokenIntrospectionResponse<EmptyExtraTokenFields, BasicTokenType>,
+    StandardRevocableToken,
+    StandardErrorResponse<RevocationErrorResponseType>,
+>;

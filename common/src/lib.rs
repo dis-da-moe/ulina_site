@@ -98,3 +98,12 @@ pub struct Map {
     pub date: DateTime<Utc>,
     pub file: String,
 }
+
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[allow(unused, non_snake_case)]
+pub struct User {
+    pub userId: i64,
+    pub isAdmin: bool,
+    pub discord: Option<String>,
+    pub pendingAuth: Option<String>,
+}

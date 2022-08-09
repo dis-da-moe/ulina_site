@@ -1,5 +1,6 @@
 use std::env;
 
+use crate::config::CONFIG;
 use crate::discord::helper::Helper;
 use serenity::async_trait;
 use serenity::http::error::DiscordJsonError;
@@ -58,12 +59,7 @@ impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, ready: Ready) {
         println!("logged in as {}", ready.user.name);
 
-        let guild_id = GuildId(
-            env::var(GUILD_ID)
-                .expect("no guild id")
-                .parse()
-                .expect("guild id must be number"),
-        );
+        let guild_id = GuildId(CONFIG.guild_id);
 
         create_commands(&guild_id, &ctx.http).await;
     }
@@ -108,10 +104,9 @@ pub async fn run() -> Result<(), String> {
     lazy_static::initialize(&COMMANDS);
 
     // Login with a bot token from the environment
-    let token = env::var(DISCORD_TOKEN).expect("token");
     let intents =
         GatewayIntents::non_privileged() | GatewayIntents::GUILDS | GatewayIntents::GUILD_MESSAGES;
-    let mut client = Client::builder(token, intents)
+    let mut client = Client::builder(&CONFIG.discord_token, intents)
         .event_handler(Handler)
         .await
         .expect("Error creating client");

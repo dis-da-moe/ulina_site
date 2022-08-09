@@ -5,6 +5,18 @@ pub trait FromTimeStamp<T> {
     fn from_stamp(secs: i64) -> Option<T>;
 }
 
+impl FromTimeStamp<NaiveDateTime> for NaiveDateTime {
+    fn from_stamp(secs: i64) -> Option<NaiveDateTime> {
+        NaiveDateTime::from_timestamp_opt(secs, 0)
+    }
+}
+
+impl FromTimeStamp<NaiveDate> for NaiveDate {
+    fn from_stamp(secs: i64) -> Option<NaiveDate> {
+        NaiveDateTime::from_stamp(secs).map(|x| x.date())
+    }
+}
+
 struct TimePeriod {
     real_time: NaiveDateTime,
     ulina_time: NaiveDateTime,
@@ -36,25 +48,22 @@ pub enum TimeError {
     InvalidDate,
 }
 
-fn time_period_real(real: i64) -> Result<&'static TimePeriod, TimeError> {
-    if real <= OLD_TIME.real_time.timestamp() {
-        Err(TimeError::OutOfRange)
-    } else if real <= NEW_TIME.real_time.timestamp() {
-        Ok(&OLD_TIME)
-    } else {
-        Ok(&NEW_TIME)
-    }
+macro_rules! time_period {
+    ($name: tt, $field: tt) => {
+        fn $name(time: i64) -> Result<&'static TimePeriod, TimeError> {
+            if time <= OLD_TIME.$field.timestamp() {
+                Err(TimeError::OutOfRange)
+            } else if time <= NEW_TIME.$field.timestamp() {
+                Ok(&OLD_TIME)
+            } else {
+                Ok(&NEW_TIME)
+            }
+        }
+    };
 }
 
-fn time_period_ulina(ulina: i64) -> Result<&'static TimePeriod, TimeError> {
-    if ulina <= OLD_TIME.ulina_time.timestamp() {
-        Err(TimeError::OutOfRange)
-    } else if ulina <= NEW_TIME.ulina_time.timestamp() {
-        Ok(&OLD_TIME)
-    } else {
-        Ok(&NEW_TIME)
-    }
-}
+time_period!(time_period_real, real_time);
+time_period!(time_period_ulina, ulina_time);
 
 fn calculate_to_ulina(real: i64, period: &'static TimePeriod) -> Option<i64> {
     let real_time_passed = real.checked_sub(period.real_time.timestamp())?;
@@ -70,36 +79,20 @@ fn calculate_to_real(ulina: i64, period: &'static TimePeriod) -> Option<i64> {
     real_time_passed.checked_add(period.real_time.timestamp())
 }
 
-impl FromTimeStamp<NaiveDateTime> for NaiveDateTime {
-    fn from_stamp(secs: i64) -> Option<NaiveDateTime> {
-        NaiveDateTime::from_timestamp_opt(secs, 0)
-    }
+macro_rules! converter {
+    ($name: tt, $period: tt, $calculate: tt) => {
+        pub fn $name<T>(real: i64) -> Result<T, TimeError>
+        where
+            T: FromTimeStamp<T>,
+        {
+            let period = $period(real)?;
+
+            let ulina_time = $calculate(real, period).ok_or(TimeError::OutOfRange)?;
+
+            T::from_stamp(ulina_time).ok_or(TimeError::InvalidDate)
+        }
+    };
 }
 
-impl FromTimeStamp<NaiveDate> for NaiveDate {
-    fn from_stamp(secs: i64) -> Option<NaiveDate> {
-        NaiveDateTime::from_stamp(secs).map(|x| x.date())
-    }
-}
-
-pub fn to_ulina<T>(real: i64) -> Result<T, TimeError>
-where
-    T: FromTimeStamp<T>,
-{
-    let period = time_period_real(real)?;
-
-    let ulina_time = calculate_to_ulina(real, period).ok_or(TimeError::OutOfRange)?;
-
-    T::from_stamp(ulina_time).ok_or(TimeError::InvalidDate)
-}
-
-pub fn to_real<T>(ulina: i64) -> Result<T, TimeError>
-where
-    T: FromTimeStamp<T>,
-{
-    let period = time_period_ulina(ulina)?;
-
-    let real_time = calculate_to_real(ulina, period).ok_or(TimeError::OutOfRange)?;
-
-    T::from_stamp(real_time).ok_or(TimeError::InvalidDate)
-}
+converter!(to_real, time_period_ulina, calculate_to_real);
+converter!(to_ulina, time_period_real, calculate_to_ulina);
