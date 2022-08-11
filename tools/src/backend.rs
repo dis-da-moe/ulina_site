@@ -1,16 +1,10 @@
-use common::{LoadMap, LOCAL_URL};
+use common::{LoadMap, current_url};
 use reqwasm::http::Request;
 
 use crate::debug;
 
 pub fn url(endpoint: &str) -> String {
-    #[cfg(debug_assertions)]
-    let url = LOCAL_URL.as_str();
-
-    #[cfg(not(debug_assertions))]
-    let url = shared::URL;
-
-    format!("{}/{}", url, endpoint)
+    format!("{}/{}", current_url(), endpoint)
 }
 
 pub async fn request<T>(endpoint: &str) -> Result<T, String>

@@ -1,5 +1,5 @@
 use chrono::{Local, NaiveDate};
-use common::to_real;
+use common::{to_real, DATE_FORMAT};
 use common::{to_ulina, TimeError};
 use gloo::timers::callback::Interval;
 use web_sys::HtmlInputElement;
@@ -15,7 +15,6 @@ pub struct App {
 
 const TIME_SECTION: &str = "grid space-y-2 place-items-center mt-7 border-solid border-slate-600 border-b-4 pb-6 w-[70%] mx-auto";
 
-const DATE_FORMAT: &str = "%A %e %B %Y";
 const TIME_FORMAT: &str = "%H:%M:%S";
 const DATE_INPUT_FORMAT: &str = "%Y-%m-%d";
 

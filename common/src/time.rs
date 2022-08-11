@@ -48,6 +48,15 @@ pub enum TimeError {
     InvalidDate,
 }
 
+impl ToString for TimeError{
+    fn to_string(&self) -> String {
+        match self{
+            TimeError::OutOfRange => "Given time was out of range",
+            TimeError::InvalidDate => "Give date was invalid",
+        }.to_string()
+    }
+}
+
 macro_rules! time_period {
     ($name: tt, $field: tt) => {
         fn $name(time: i64) -> Result<&'static TimePeriod, TimeError> {
@@ -96,3 +105,5 @@ macro_rules! converter {
 
 converter!(to_real, time_period_ulina, calculate_to_real);
 converter!(to_ulina, time_period_real, calculate_to_ulina);
+
+pub const DATE_FORMAT: &str = "%A %e %B %Y";

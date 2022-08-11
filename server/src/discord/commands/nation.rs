@@ -1,10 +1,12 @@
+use crate::database::FlagId;
 use crate::discord::commands::shared::{
     name_option, Category, CommandData, CreateCommand, Interaction,
 };
 use crate::discord::helper::Helper;
 use crate::error::Error;
-use crate::{database, nation};
+use crate::{database, get_nation};
 use serenity::client::Context;
+use common::Nation;
 
 pub const DATA: CommandData = CommandData {
     admin_only: false,
@@ -23,11 +25,12 @@ pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
 }
 
 pub async fn nation(ctx: &Context, interaction: &Interaction) -> Result<(), Error> {
-    let nation = nation!(interaction)?;
+    let nation = get_nation!(interaction, Nation, "*")?;
+
     let socials = database::socials(nation.nationId).await?;
 
     let flag_link = match nation.currentFlagId {
-        Some(flag) => Some(database::flag_link(flag).await),
+        Some(flag) => Some(database::flag_link(FlagId(flag)).await.unwrap()),
         _ => None,
     };
 

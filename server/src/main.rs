@@ -13,7 +13,7 @@ extern crate rocket;
 extern crate lazy_static;
 
 use lazy_static::initialize;
-use rocket::tokio::{self};
+use rocket::tokio::{self, try_join};
 
 #[tokio::main]
 async fn main() -> Result<(), String> {
@@ -23,14 +23,14 @@ async fn main() -> Result<(), String> {
 
     database::init().await;
 
-    /*
+    
     let rocket = tokio::spawn(site::run());
     let discord = tokio::spawn(discord::run());
 
     let (discord, rocket) = try_join!(discord, rocket).unwrap();
 
     discord?;
-    rocket*/
+    rocket
 
-    site::run().await
+    //site::run().await
 }

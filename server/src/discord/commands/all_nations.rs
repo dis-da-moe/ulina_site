@@ -10,7 +10,7 @@ use serenity::{
 use sqlx::query_as;
 
 use crate::{
-    database::db,
+    database::{db, NationContinent},
     discord::{
         helper::{display_user, Helper},
         ids::{CONTINENT, NEXT, PREVIOUS},
@@ -19,12 +19,12 @@ use crate::{
     get_options, internal,
 };
 
-use common::NationContinent;
-
 use super::shared::{
     continent_option, default_data, get_continent, Category, CommandData, CreateCommand,
     Interaction,
 };
+
+
 
 pub const DATA: CommandData = CommandData {
     admin_only: false,

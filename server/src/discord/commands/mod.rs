@@ -6,6 +6,7 @@ mod edit_name_description;
 mod edit_socials;
 mod nation;
 mod ping;
+mod time;
 mod remove_nation;
 mod shared;
 pub use shared::create_commands;
@@ -28,7 +29,7 @@ macro_rules! add_commands {
 lazy_static! {
     pub static ref COMMANDS: HashMap<&'static str, UlinaCommand> = {
         let mut map = HashMap::new();
-        add_commands!(map => ping, nation, remove_nation, commands, create_nation, edit_flag, edit_socials, edit_name_description, all_nations);
+        add_commands!(map => ping, nation, remove_nation, commands, create_nation, edit_flag, edit_socials, edit_name_description, all_nations, time);
         map
     };
 }

@@ -1,4 +1,4 @@
-use crate::database;
+use crate::database::{self, FlagId};
 use crate::database::{db, socials};
 use common::{LoadMap, Nation, NationAll};
 use rocket::fs::NamedFile;
@@ -43,7 +43,7 @@ pub async fn load_map() -> Json<LoadMap> {
         let socials = socials(nation.nationId).await.unwrap();
 
         let flag_link = match nation.currentFlagId {
-            Some(id) => Some(database::flag_link(id).await),
+            Some(id) => Some(database::flag_link(FlagId(id)).await.unwrap()),
             None => None,
         };
         nations.push(NationAll {

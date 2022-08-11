@@ -1,9 +1,8 @@
-use common::NationDescription;
 use serenity::{
     builder::CreateInputText, client::Context,
     model::interactions::message_component::InputTextStyle,
 };
-use sqlx::query_as;
+use sqlx::query;
 
 use crate::{
     database::db,
@@ -29,8 +28,7 @@ pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
 pub async fn edit_name_description(ctx: &Context, interaction: &Interaction) -> Result<(), Error> {
     let nation = edit_action(interaction, &DATA).await?;
 
-    let description: Option<String> = query_as!(
-        NationDescription,
+    let description: Option<String> = query!(
         "SELECT description FROM Nation WHERE nationId = ?",
         nation.nationId
     )

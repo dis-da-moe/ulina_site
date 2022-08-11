@@ -1,3 +1,4 @@
+use common::current_url;
 use oauth2::{
     basic::{BasicErrorResponseType, BasicTokenType},
     Client, EmptyExtraTokenFields, RevocationErrorResponseType, StandardErrorResponse,
@@ -22,6 +23,10 @@ pub fn capitalise(string: &str) -> String {
         })
         .collect::<Vec<_>>()
         .join(" ")
+}
+
+pub fn go_to_site(action: &str, subsection: &str) -> String{
+    format!("to {} go to {}/{}", action, current_url(), subsection)
 }
 
 pub type StandardClient = Client<

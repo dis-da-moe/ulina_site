@@ -1,7 +1,7 @@
-use crate::database::db;
+use crate::database::{db, nation_change, Id, ChangeType};
 use crate::discord::commands::shared::{default_data, edit_action};
 use crate::discord::commands::shared::{Category, CommandData, CreateCommand, Interaction};
-use crate::discord::helper::Helper;
+use crate::discord::helper::{Helper, is_admin};
 use crate::error::Error;
 use serenity::client::Context;
 
@@ -21,11 +21,13 @@ pub async fn remove_nation(ctx: &Context, interaction: &Interaction) -> Result<(
     let nation = edit_action(interaction, &DATA).await?;
 
     query!(
-        "UPDATE Nation SET removed = true WHERE nationId = ?",
+        "UPDATE Nation SET removed = true WHERE nationId = ? AND removed = false",
         nation.nationId
     )
     .execute(db())
     .await?;
+    
+    nation_change(nation.id(), ChangeType::Removed, Some("false".into()), Some("true".into()), is_admin(&interaction.user)).await?;
 
     interaction
         .message(&ctx.http, |message| {

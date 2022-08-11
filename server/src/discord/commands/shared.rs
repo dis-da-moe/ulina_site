@@ -4,8 +4,7 @@ use crate::discord::commands::COMMANDS;
 use crate::discord::helper::is_admin;
 use crate::discord::ids::NAME;
 use crate::error::Error;
-use crate::nation_id;
-use common::NationId;
+use crate::database::NationDiscord;
 use serenity::builder::{CreateApplicationCommand, CreateApplicationCommandOption};
 use serenity::client::Context;
 use serenity::http::Http;
@@ -38,7 +37,6 @@ pub enum Category {
     ViewNation,
     Help,
     EditNation,
-    Time,
     Misc,
 }
 
@@ -48,7 +46,6 @@ impl ToString for Category {
             Category::ViewNation => "View Nation",
             Category::Help => "Help",
             Category::EditNation => "Edit Nation",
-            Category::Time => "Time",
             Category::Misc => "Misc",
         }
         .to_string()
@@ -69,12 +66,12 @@ macro_rules! get_nation {
 
         match name_option {
             Ok(name) => {
-                find_nation!($model, $select, "name LIKE ? AND removed = false", name)
+                sqlx::query_as!($model, "SELECT " + $select + " FROM Nation WHERE name LIKE ? AND removed = false", name)
                     .fetch_one(crate::database::db())
                     .await
             }
             _ => {
-                { find_nation!($model, $select, "ownerDiscord = ? AND removed = false", id) }
+                { sqlx::query_as!($model, "SELECT " + $select + " FROM Nation WHERE ownerDiscord = ? AND removed = false", id) }
                     .fetch_one(crate::database::db())
                     .await
             }
@@ -116,14 +113,15 @@ pub fn name_option(option: &mut CreateOption) -> &mut CreateOption {
     option.name(NAME).kind(OptionType::String)
 }
 
-pub async fn edit_action(interaction: &Interaction, data: &CommandData) -> Result<NationId, Error> {
+pub async fn edit_action(interaction: &Interaction, data: &CommandData) -> Result<NationDiscord, Error> {
     if data.admin_only && !is_admin(&interaction.user) {
         return Err(Error::InvalidPermissions(
             "only an admin can do this - contact one if this is desired".to_string(),
         ));
     }
 
-    let nation = nation_id!(interaction)?;
+    let nation = get_nation!(interaction, NationDiscord, "nationId, name, ownerDiscord")?;
+
     if nation.ownerDiscord != interaction.user.id.0.to_string() && !is_admin(&interaction.user) {
         Err(Error::InvalidPermissions(
             "this nation does not belong to you - contact an admin if this is a mistake"
@@ -159,7 +157,7 @@ pub async fn create_commands(guild_id: &GuildId, http: &Http) {
     })
     .await
     .expect("error creating slash commands");
-
+    
     build_commands_embed(categorised_commands);
 
     println!(

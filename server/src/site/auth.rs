@@ -4,6 +4,7 @@ use crate::config::CONFIG;
 use crate::database::db;
 use crate::site::user_data::UserId;
 use crate::util::StandardClient;
+use common::current_url;
 use oauth2::basic::BasicClient;
 use oauth2::reqwest::async_http_client;
 use oauth2::url::Url;
@@ -24,12 +25,7 @@ use super::user_data::{AdminUser, Login};
 
 lazy_static! {
     static ref REDIRECT_URL: String = {
-        #[cfg(debug_assertions)]
-        let url = common::LOCAL_URL.as_str();
-        #[cfg(not(debug_assertions))]
-        let url = common::URL.as_str();
-
-        format!("{}/oauth-redirect", url)
+        format!("{}/oauth-redirect", current_url())
     };
     pub static ref OAUTH_CLIENT: StandardClient = BasicClient::new(
         ClientId::new(CONFIG.client_id.to_string()),

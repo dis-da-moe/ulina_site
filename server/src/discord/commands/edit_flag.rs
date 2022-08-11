@@ -3,8 +3,8 @@ use std::path::Path;
 use serenity::client::Context;
 
 use crate::{
-    database::add_flag,
-    discord::{helper::Helper, ids::FLAG},
+    database::{add_flag, Id},
+    discord::{helper::{Helper, is_admin}, ids::FLAG},
     error::Error,
     get_options,
 };
@@ -62,7 +62,7 @@ pub async fn edit_flag(ctx: &Context, interaction: &Interaction) -> Result<(), E
         .await
         .map_err(|err| Error::InternalError(format!("{:?}", err)))?;
 
-    add_flag(nation.nationId, &nation.name, extension, buffer).await?;
+    add_flag(nation.id(), &nation.name, extension, buffer, is_admin(&interaction.user)).await?;
 
     interaction
         .follow_up(&ctx.http, |message| {

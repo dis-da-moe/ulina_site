@@ -2,13 +2,12 @@ use serenity::{
     http::Http,
     model::interactions::{message_component::ActionRowComponent, modal::ModalSubmitInteraction},
 };
-use sqlx::{query, query_as};
+use sqlx::query;
 
-use crate::{database::db, error::Error};
-use common::NationId;
+use crate::{database::{db, NationId, nation_change, ChangeType}, error::Error};
 
 use super::{
-    helper::Helper,
+    helper::{Helper, is_admin},
     ids::{DESCRIPTION_INPUT, NAME_INPUT},
 };
 
@@ -31,10 +30,9 @@ pub async fn handle_modal(http: &Http, interaction: ModalSubmitInteraction) {
     }
 }
 
-async fn action(interaction: &ModalSubmitInteraction) -> Result<&str, Error> {
-    let nation: NationId = query_as!(
-        NationId,
-        "SELECT name, ownerDiscord, nationId FROM Nation where nationId = ?",
+async fn action(interaction: &ModalSubmitInteraction) -> Result<String, Error> {
+    let nation = query!(
+        "SELECT ownerDiscord, nationId, name, description FROM Nation where nationId = ?",
         interaction.data.custom_id
     )
     .fetch_one(db())
@@ -74,6 +72,19 @@ async fn action(interaction: &ModalSubmitInteraction) -> Result<&str, Error> {
     )
     .fetch_one(db())
     .await?;
+    
+    let id = NationId(nation.nationId);
+    let admin = is_admin(&interaction.user);
 
-    Ok(name)
+    let change = |change_type, old, new| nation_change(id, change_type, old, new, admin);
+    
+    if &nation.name != name{
+       change(ChangeType::Name, Some(nation.name), Some(name.clone())).await?;
+    }
+
+    if nation.description.as_ref() != description{
+        change(ChangeType::Description, nation.description, description.cloned()).await?;
+    } 
+
+    Ok(name.clone())
 }

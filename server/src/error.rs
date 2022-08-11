@@ -1,3 +1,5 @@
+use common::TimeError;
+
 #[derive(Debug, Clone)]
 pub enum Error {
     NotFound,
@@ -6,6 +8,7 @@ pub enum Error {
     InvalidPermissions(String),
     ExpectedImage(String),
     TooLarge(String),
+    TimeError(TimeError)
 }
 
 impl From<rocket::Error> for Error {
@@ -49,6 +52,9 @@ impl ToString for Error {
             }
             SocialNotFound(platform) => {
                 format!("could not find social on platform \"{}\"", platform)
+            }
+            TimeError(error) => {
+                format!("an error occured while converting time: {}", error.to_string())
             }
         }
     }
