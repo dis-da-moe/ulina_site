@@ -12,7 +12,7 @@ use sqlx::query_as;
 use crate::{
     database::{db, NationContinent},
     discord::{
-        helper::{display_user, Helper},
+        helper::{display_user, embed, Helper},
         ids::{CONTINENT, NEXT, PREVIOUS},
     },
     error::Error,
@@ -20,7 +20,7 @@ use crate::{
 };
 
 use super::shared::{
-    continent_option, default_data, get_continent, Category, CommandData, CreateCommand,
+    create_continent_option, default_data, get_continent, Category, CommandData, CreateCommand,
     Interaction,
 };
 
@@ -33,13 +33,15 @@ pub const DATA: CommandData = CommandData {
 pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
     default_data(command, &DATA)
         .description("view a list of nations")
-        .create_option(|option| {
-            continent_option(option).description("limit nations to a continent")
+        .add_option({
+            let mut option = create_continent_option();
+            option.description("limit nations to a continent");
+            option
         })
 }
 
 fn nations_embed(nations: Vec<NationContinent>, continent: &str) -> CreateEmbed {
-    let mut embed = CreateEmbed::default();
+    let mut embed = embed();
 
     embed.title(continent);
 

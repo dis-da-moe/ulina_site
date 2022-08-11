@@ -16,4 +16,6 @@ id!(
     LINK, "link"
     PREVIOUS, "previous"
     NEXT, "next"
+    GUIDE, "guide"
+    PASTA, "pasta"
 );

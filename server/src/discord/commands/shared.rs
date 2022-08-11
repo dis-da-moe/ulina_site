@@ -3,6 +3,7 @@ use crate::database::CONTINENTS;
 use crate::discord::commands::commands::build_commands_embed;
 use crate::discord::commands::COMMANDS;
 use crate::discord::helper::is_admin;
+use crate::discord::ids::CONTINENT;
 use crate::discord::ids::NAME;
 use crate::error::Error;
 use serenity::builder::{CreateApplicationCommand, CreateApplicationCommandOption};
@@ -15,6 +16,7 @@ use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 use std::future::Future;
 use std::pin::Pin;
+use std::slice::Iter;
 use std::usize;
 
 pub struct UlinaCommand {
@@ -186,22 +188,47 @@ pub async fn create_commands(guild_id: &GuildId, http: &Http) {
     );
 }
 
-pub fn continent_option(option: &mut CreateOption) -> &mut CreateOption {
-    option.name("continent").kind(OptionType::Integer);
-
-    for (index, continent) in CONTINENTS.iter().enumerate() {
-        option.add_int_choice(continent, index as i32);
-    }
-
-    option
-}
-
 pub fn get_continent(index: i64) -> Result<&'static str, Error> {
     CONTINENTS
         .get(index as usize)
         .map(|string| *string)
         .ok_or(Error::InternalError(format!(
-            "continent option has invalid index of {}",
+            "continent of index {} not found",
             index
         )))
+}
+
+#[macro_export]
+macro_rules! index_option {
+    ($options: expr, $name: ident, $array: ident, $string: expr) => {{
+        let option = get_options!($options, $name, Integer)?;
+        let option = usize::try_from(*option).map_err(crate::internal!())?;
+        $array.get(option).ok_or(Error::InternalError(format!(
+            "{} of index {} not found",
+            $string, option
+        )))?
+    }};
+}
+
+pub fn create_index_option<T>(
+    iter: Iter<T>,
+    name: &str,
+    choice: fn(&T) -> String,
+) -> CreateApplicationCommandOption {
+    let mut option = CreateApplicationCommandOption::default();
+
+    iter.enumerate().for_each(|(index, x)| {
+        option.add_int_choice(choice(x), index as i32);
+    });
+
+    option
+        .name(name)
+        .description(format!("the selected {}", name))
+        .kind(OptionType::Integer);
+
+    option
+}
+
+pub fn create_continent_option() -> CreateOption {
+   create_index_option(CONTINENTS.iter(), CONTINENT, |continent| continent.to_string())
 }

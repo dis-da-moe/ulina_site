@@ -12,7 +12,7 @@ use super::shared::{default_data, edit_action, OptionType};
 pub const DATA: CommandData = CommandData {
     admin_only: true,
     name: "edit-discord-user",
-    category: Category::Misc,
+    category: Category::EditNation,
 };
 
 pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {

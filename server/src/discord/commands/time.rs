@@ -1,5 +1,5 @@
 use crate::discord::commands::shared::{Category, CommandData, CreateCommand, Interaction};
-use crate::discord::helper::Helper;
+use crate::discord::helper::{embed, Helper};
 use crate::error::Error;
 use crate::util::{go_to_site, ZERO_WIDTH};
 use chrono::NaiveDate;
@@ -20,7 +20,7 @@ pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
 pub async fn time(ctx: &Context, interaction: &Interaction) -> Result<(), Error> {
     let now = chrono::Utc::now();
     let ulina_time = to_ulina::<NaiveDate>(now.timestamp()).map_err(|e| Error::TimeError(e))?;
-    let mut embed = CreateEmbed::default();
+    let mut embed = embed();
 
     embed
         .title("Ulina Time")

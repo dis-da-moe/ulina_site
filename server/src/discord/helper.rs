@@ -1,8 +1,11 @@
-use serenity::builder::{CreateInteractionResponseData, CreateInteractionResponseFollowup};
+use serenity::builder::{
+    CreateEmbed, CreateInteractionResponseData, CreateInteractionResponseFollowup,
+};
 use serenity::http::Http;
 use serenity::model::interactions::modal::ModalSubmitInteraction;
 use serenity::model::prelude::application_command::*;
 use serenity::model::prelude::*;
+use serenity::utils::Colour;
 
 type Response<'a> = CreateInteractionResponseData<'a>;
 type FollowUp<'a> = CreateInteractionResponseFollowup<'a>;
@@ -22,6 +25,12 @@ macro_rules! get_options {
 
 pub fn display_user(id: &str) -> String {
     format!("<@{}>", id)
+}
+
+pub fn embed() -> CreateEmbed {
+    let mut embed = CreateEmbed::default();
+    embed.colour(Colour::from_rgb(15, 66, 114));
+    embed
 }
 
 pub fn option<'a>(

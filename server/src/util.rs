@@ -7,7 +7,6 @@ use oauth2::{
 
 pub const ZERO_WIDTH: &str = "\u{200B}";
 
-#[allow(unused)]
 pub fn capitalise(string: &str) -> String {
     string
         .trim()

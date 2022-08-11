@@ -102,7 +102,8 @@ pub async fn nation_change(
 ) -> Result<(), Error> {
     let now = Utc::now();
     let change_type = change_type.to_string();
-
+    let old_value = old_value.unwrap_or("".to_string());
+    let new_value = new_value.unwrap_or("".to_string());
     query!("INSERT INTO NationChange (nationId, type, oldValue, newValue, admin, timeStamp) VALUES (?, ?, ?, ?, ?, ?)",
         nation_id.0,
         change_type,

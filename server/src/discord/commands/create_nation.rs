@@ -1,6 +1,6 @@
-use crate::database::{db, nation_change, ChangeType, NationId};
+use crate::database::{db, nation_change, ChangeType, NationId, CONTINENTS};
 use crate::discord::commands::shared::{
-    continent_option, get_continent, Category, CommandData, CreateCommand, Interaction, OptionType,
+    create_continent_option, get_continent, Category, CommandData, CreateCommand, Interaction, OptionType,
 };
 use crate::discord::helper::Helper;
 use crate::discord::ids::{CONTINENT, NAME, USER};
@@ -27,10 +27,10 @@ pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
                 .kind(OptionType::String)
                 .required(true)
         })
-        .create_option(|option| {
-            continent_option(option)
-                .description("continent of the new nation")
-                .required(true)
+        .add_option({
+            let mut option = create_continent_option();
+            option.description("continent of the new nation").required(true);
+            option
         })
         .create_option(|option| {
             option

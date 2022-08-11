@@ -1,5 +1,5 @@
 use crate::discord::commands::shared::{Category, CommandData, CreateCommand, Interaction};
-use crate::discord::helper::{is_admin, Helper};
+use crate::discord::helper::{embed, is_admin, Helper};
 use crate::error::Error;
 use crate::util::ZERO_WIDTH;
 use once_cell::sync::OnceCell;
@@ -12,7 +12,7 @@ static NORMAL_COMMANDS: OnceCell<CreateEmbed> = OnceCell::new();
 static ADMINS_COMMANDS: OnceCell<CreateEmbed> = OnceCell::new();
 
 pub fn build_commands_embed(categorised_commands: HashMap<Category, Vec<(&CommandData, String)>>) {
-    let mut normal_embed = CreateEmbed::default();
+    let mut normal_embed = embed();
 
     normal_embed
         .title("Moley Commands")
