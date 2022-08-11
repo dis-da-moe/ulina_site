@@ -23,7 +23,6 @@ async fn main() -> Result<(), String> {
 
     database::init().await;
 
-    
     let rocket = tokio::spawn(site::run());
     let discord = tokio::spawn(discord::run());
 

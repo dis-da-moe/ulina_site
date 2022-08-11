@@ -5,8 +5,8 @@ use crate::discord::commands::shared::{
 use crate::discord::helper::Helper;
 use crate::error::Error;
 use crate::{database, get_nation};
-use serenity::client::Context;
 use common::Nation;
+use serenity::client::Context;
 
 pub const DATA: CommandData = CommandData {
     admin_only: false,

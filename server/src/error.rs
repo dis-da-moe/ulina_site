@@ -8,7 +8,7 @@ pub enum Error {
     InvalidPermissions(String),
     ExpectedImage(String),
     TooLarge(String),
-    TimeError(TimeError)
+    TimeError(TimeError),
 }
 
 impl From<rocket::Error> for Error {
@@ -54,7 +54,10 @@ impl ToString for Error {
                 format!("could not find social on platform \"{}\"", platform)
             }
             TimeError(error) => {
-                format!("an error occured while converting time: {}", error.to_string())
+                format!(
+                    "an error occured while converting time: {}",
+                    error.to_string()
+                )
             }
         }
     }

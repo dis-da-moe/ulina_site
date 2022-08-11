@@ -7,6 +7,7 @@ use oauth2::{
 
 pub const ZERO_WIDTH: &str = "\u{200B}";
 
+#[allow(unused)]
 pub fn capitalise(string: &str) -> String {
     string
         .trim()
@@ -25,7 +26,7 @@ pub fn capitalise(string: &str) -> String {
         .join(" ")
 }
 
-pub fn go_to_site(action: &str, subsection: &str) -> String{
+pub fn go_to_site(action: &str, subsection: &str) -> String {
     format!("to {} go to {}/{}", action, current_url(), subsection)
 }
 

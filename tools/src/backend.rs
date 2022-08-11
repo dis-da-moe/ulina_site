@@ -1,4 +1,4 @@
-use common::{LoadMap, current_url};
+use common::{current_url, LoadMap};
 use reqwasm::http::Request;
 
 use crate::debug;

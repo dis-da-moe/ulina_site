@@ -1,6 +1,6 @@
 use common::Social;
-use sqlx::{SqlitePool, query_as};
 use once_cell::sync::OnceCell;
+use sqlx::{query_as, SqlitePool};
 
 use crate::error::Error;
 

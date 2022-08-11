@@ -1,5 +1,5 @@
 use rocket::response::content::RawHtml;
-use sycamore::{prelude::Html, SsrNode};
+use sycamore::SsrNode;
 
 static TEMPLATE: &str = include_str!("../../../tools/index.html");
 

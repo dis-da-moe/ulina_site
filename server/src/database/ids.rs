@@ -13,17 +13,19 @@ macro_rules! id_type {
                 $name(self.$field_name)
             }
         }
-    )*  
+    )*
     )+
     };
 }
 
-pub trait Id<T>{
+pub trait Id<T> {
     fn id(&self) -> T;
 }
 
 id_type!(
-    (SocialsId, socialsId), 
-    (NationId, nationId), NationDiscord, Nation,
+    (SocialsId, socialsId),
+    (NationId, nationId),
+    NationDiscord,
+    Nation,
     (FlagId, flagId)
 );

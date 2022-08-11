@@ -1,21 +1,19 @@
 pub use crate::database::models::*;
 use crate::error::Error;
-use common::{Map, Social};
 
-use sqlx::types::chrono::{self, TimeZone, Utc};
-use sqlx::{query, query_as, SqlitePool};
+use sqlx::types::chrono::{self, Utc};
+use sqlx::query;
 use std::fs;
 
 use super::{db, NationId};
 const FLAG_DIR: &str = "./public/flags";
-
 
 pub async fn add_flag(
     nation_id: NationId,
     name: &str,
     extension: &str,
     buffer: Vec<u8>,
-    is_admin: bool
+    is_admin: bool,
 ) -> Result<(), Error> {
     let date = chrono::Utc::now().naive_utc();
 
@@ -37,9 +35,18 @@ pub async fn add_flag(
         nation_id.0
     )
     .fetch_one(db())
-    .await?.flagId;
+    .await?
+    .flagId;
 
-    let old_flag = query!("SELECT currentFlagId FROM Nation WHERE nationId = ?", nation_id.0).fetch_one(db()).await.unwrap().currentFlagId.map(|x| x.to_string());
+    let old_flag = query!(
+        "SELECT currentFlagId FROM Nation WHERE nationId = ?",
+        nation_id.0
+    )
+    .fetch_one(db())
+    .await
+    .unwrap()
+    .currentFlagId
+    .map(|x| x.to_string());
 
     query!(
         "UPDATE Nation SET currentFlagId = ? WHERE nationId = ?",
@@ -49,24 +56,31 @@ pub async fn add_flag(
     .execute(db())
     .await?;
 
-    nation_change(nation_id, ChangeType::Flag, old_flag, Some(new_flag.to_string()), is_admin).await?;
+    nation_change(
+        nation_id,
+        ChangeType::Flag,
+        old_flag,
+        Some(new_flag.to_string()),
+        is_admin,
+    )
+    .await?;
 
     Ok(())
 }
 
-pub enum ChangeType{
+pub enum ChangeType {
     Creation,
     Removed,
     Continent,
     Flag,
     OwnerDiscord,
     Description,
-    Name
+    Name,
 }
 
-impl ToString for ChangeType{
+impl ToString for ChangeType {
     fn to_string(&self) -> String {
-        match self{
+        match self {
             ChangeType::Creation => "Creation",
             ChangeType::Removed => "Removed",
             ChangeType::Continent => "Continent",
@@ -74,14 +88,21 @@ impl ToString for ChangeType{
             ChangeType::OwnerDiscord => "OwnerDiscord",
             ChangeType::Description => "Description",
             ChangeType::Name => "Name",
-        }.to_string()
+        }
+        .to_string()
     }
 }
 
-pub async fn nation_change(nation_id: NationId, change_type: ChangeType, old_value: Option<String>, new_value: Option<String>, admin: bool) -> Result<(), Error> {
+pub async fn nation_change(
+    nation_id: NationId,
+    change_type: ChangeType,
+    old_value: Option<String>,
+    new_value: Option<String>,
+    admin: bool,
+) -> Result<(), Error> {
     let now = Utc::now();
     let change_type = change_type.to_string();
-    
+
     query!("INSERT INTO NationChange (nationId, type, oldValue, newValue, admin, timeStamp) VALUES (?, ?, ?, ?, ?, ?)",
         nation_id.0,
         change_type,

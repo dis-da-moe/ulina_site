@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use crate::config::CONFIG;
 use crate::database::db;
 use crate::site::user_data::UserId;
@@ -24,9 +22,7 @@ use super::rendering::Render;
 use super::user_data::{AdminUser, Login};
 
 lazy_static! {
-    static ref REDIRECT_URL: String = {
-        format!("{}/oauth-redirect", current_url())
-    };
+    static ref REDIRECT_URL: String = format!("{}/oauth-redirect", current_url());
     pub static ref OAUTH_CLIENT: StandardClient = BasicClient::new(
         ClientId::new(CONFIG.client_id.to_string()),
         Some(ClientSecret::new(CONFIG.client_secret.clone())),
@@ -130,7 +126,7 @@ pub async fn oauth_redirect(code: String, state: String, user: UserId) -> RawHtm
 }
 
 #[get("/admin", rank = 1)]
-pub async fn admin(user: AdminUser) -> RawHtml<String> {
+pub async fn admin(_user: AdminUser) -> RawHtml<String> {
     view! {div{"This is the admin page"}}.render()
 }
 

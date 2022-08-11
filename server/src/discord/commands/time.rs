@@ -21,13 +21,17 @@ pub async fn time(ctx: &Context, interaction: &Interaction) -> Result<(), Error>
     let now = chrono::Utc::now();
     let ulina_time = to_ulina::<NaiveDate>(now.timestamp()).map_err(|e| Error::TimeError(e))?;
     let mut embed = CreateEmbed::default();
-    
+
     embed
         .title("Ulina Time")
         .field("Real Time", now.format(DATE_FORMAT), false)
         .field("Ulina Time", ulina_time.format(DATE_FORMAT), false)
-        .field(ZERO_WIDTH, go_to_site("convert a custom time", "tools/time"), false);
-    
+        .field(
+            ZERO_WIDTH,
+            go_to_site("convert a custom time", "tools/time"),
+            false,
+        );
+
     interaction
         .message(&ctx.http, |data| data.add_embed(embed))
         .await;

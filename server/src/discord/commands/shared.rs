@@ -1,10 +1,10 @@
+use crate::database::NationDiscord;
 use crate::database::CONTINENTS;
 use crate::discord::commands::commands::build_commands_embed;
 use crate::discord::commands::COMMANDS;
 use crate::discord::helper::is_admin;
 use crate::discord::ids::NAME;
 use crate::error::Error;
-use crate::database::NationDiscord;
 use serenity::builder::{CreateApplicationCommand, CreateApplicationCommandOption};
 use serenity::client::Context;
 use serenity::http::Http;
@@ -66,14 +66,26 @@ macro_rules! get_nation {
 
         match name_option {
             Ok(name) => {
-                sqlx::query_as!($model, "SELECT " + $select + " FROM Nation WHERE name LIKE ? AND removed = false", name)
-                    .fetch_one(crate::database::db())
-                    .await
+                sqlx::query_as!(
+                    $model,
+                    "SELECT " + $select + " FROM Nation WHERE name LIKE ? AND removed = false",
+                    name
+                )
+                .fetch_one(crate::database::db())
+                .await
             }
             _ => {
-                { sqlx::query_as!($model, "SELECT " + $select + " FROM Nation WHERE ownerDiscord = ? AND removed = false", id) }
-                    .fetch_one(crate::database::db())
-                    .await
+                {
+                    sqlx::query_as!(
+                        $model,
+                        "SELECT "
+                            + $select
+                            + " FROM Nation WHERE ownerDiscord = ? AND removed = false",
+                        id
+                    )
+                }
+                .fetch_one(crate::database::db())
+                .await
             }
         }
     }};
@@ -113,7 +125,10 @@ pub fn name_option(option: &mut CreateOption) -> &mut CreateOption {
     option.name(NAME).kind(OptionType::String)
 }
 
-pub async fn edit_action(interaction: &Interaction, data: &CommandData) -> Result<NationDiscord, Error> {
+pub async fn edit_action(
+    interaction: &Interaction,
+    data: &CommandData,
+) -> Result<NationDiscord, Error> {
     if data.admin_only && !is_admin(&interaction.user) {
         return Err(Error::InvalidPermissions(
             "only an admin can do this - contact one if this is desired".to_string(),
@@ -157,7 +172,7 @@ pub async fn create_commands(guild_id: &GuildId, http: &Http) {
     })
     .await
     .expect("error creating slash commands");
-    
+
     build_commands_embed(categorised_commands);
 
     println!(

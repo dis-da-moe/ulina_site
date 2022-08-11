@@ -1,5 +1,3 @@
-use std::env;
-
 use crate::config::CONFIG;
 use crate::discord::helper::Helper;
 use serenity::async_trait;
@@ -19,9 +17,6 @@ use crate::discord::commands::create_commands;
 use crate::discord::commands::COMMANDS;
 
 use super::modal::handle_modal;
-
-const DISCORD_TOKEN: &str = "DISCORD_TOKEN";
-const GUILD_ID: &str = "GUILD_ID";
 
 struct Handler;
 

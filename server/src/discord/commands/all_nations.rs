@@ -24,8 +24,6 @@ use super::shared::{
     Interaction,
 };
 
-
-
 pub const DATA: CommandData = CommandData {
     admin_only: false,
     name: "all-nations",

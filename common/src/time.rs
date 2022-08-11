@@ -48,12 +48,13 @@ pub enum TimeError {
     InvalidDate,
 }
 
-impl ToString for TimeError{
+impl ToString for TimeError {
     fn to_string(&self) -> String {
-        match self{
+        match self {
             TimeError::OutOfRange => "Given time was out of range",
             TimeError::InvalidDate => "Give date was invalid",
-        }.to_string()
+        }
+        .to_string()
     }
 }
 

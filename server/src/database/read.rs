@@ -1,9 +1,9 @@
 pub use crate::database::models::*;
 use crate::error::Error;
-use common::{Map, Social};
+use common::Map;
 
-use sqlx::types::chrono::{self, TimeZone, Utc};
-use sqlx::{query, query_as, SqlitePool};
+use sqlx::types::chrono::{TimeZone, Utc};
+use sqlx::query;
 use std::fs;
 
 use super::{db, FlagId};

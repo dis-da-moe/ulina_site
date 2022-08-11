@@ -7,11 +7,10 @@ lazy_static! {
     pub static ref LOCAL_URL: String = format!("http://{}:{}", LOCAL_IP, PORT);
 }
 
-pub fn current_url() -> &'static str{
+pub fn current_url() -> &'static str {
     if cfg!(debug_assertions) {
         LOCAL_URL.as_str()
-    }
-    else{
+    } else {
         URL
     }
 }

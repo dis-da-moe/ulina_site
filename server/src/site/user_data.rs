@@ -1,5 +1,5 @@
 use rocket::{
-    http::{Cookie, CookieJar, SameSite, Status},
+    http::{Cookie, CookieJar, SameSite},
     request::FromRequest,
     request::Outcome,
     Request,
@@ -13,10 +13,7 @@ use crate::database::db;
 pub struct UserId(pub i64);
 
 #[derive(Debug)]
-pub enum UserError {
-    InvalidUser,
-    NotAdmin,
-}
+pub struct UserError;
 
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for UserId {

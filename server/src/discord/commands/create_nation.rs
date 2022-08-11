@@ -1,4 +1,4 @@
-use crate::database::db;
+use crate::database::{db, nation_change, NationId, ChangeType};
 use crate::discord::commands::shared::{
     continent_option, get_continent, Category, CommandData, CreateCommand, Interaction, OptionType,
 };
@@ -54,14 +54,16 @@ pub async fn create_nation(ctx: &Context, interaction: &Interaction) -> Result<(
     let (name, continent, user) = (name?, get_continent(*continent?)?, user?);
     let user = user.id.0.to_string();
 
-    query!(
-        "INSERT INTO Nation (continentName, name, removed, ownerDiscord) VALUES (?, ?, false, ?)",
+    let id = query!(
+        "INSERT INTO Nation (continentName, name, removed, ownerDiscord) VALUES (?, ?, false, ?) RETURNING nationId",
         continent,
         name,
         user
     )
-    .execute(db())
-    .await?;
+    .fetch_one(db())
+    .await?.nationId;
+
+    nation_change(NationId(id), ChangeType::Creation, None, None, true).await?;
 
     interaction
         .message(&ctx.http, |message| {

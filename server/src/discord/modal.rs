@@ -4,10 +4,13 @@ use serenity::{
 };
 use sqlx::query;
 
-use crate::{database::{db, NationId, nation_change, ChangeType}, error::Error};
+use crate::{
+    database::{db, nation_change, ChangeType, NationId},
+    error::Error,
+};
 
 use super::{
-    helper::{Helper, is_admin},
+    helper::{is_admin, Helper},
     ids::{DESCRIPTION_INPUT, NAME_INPUT},
 };
 
@@ -72,19 +75,24 @@ async fn action(interaction: &ModalSubmitInteraction) -> Result<String, Error> {
     )
     .fetch_one(db())
     .await?;
-    
+
     let id = NationId(nation.nationId);
     let admin = is_admin(&interaction.user);
 
     let change = |change_type, old, new| nation_change(id, change_type, old, new, admin);
-    
-    if &nation.name != name{
-       change(ChangeType::Name, Some(nation.name), Some(name.clone())).await?;
+
+    if &nation.name != name {
+        change(ChangeType::Name, Some(nation.name), Some(name.clone())).await?;
     }
 
-    if nation.description.as_ref() != description{
-        change(ChangeType::Description, nation.description, description.cloned()).await?;
-    } 
+    if nation.description.as_ref() != description {
+        change(
+            ChangeType::Description,
+            nation.description,
+            description.cloned(),
+        )
+        .await?;
+    }
 
     Ok(name.clone())
 }
