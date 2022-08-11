@@ -2,8 +2,8 @@ pub use crate::database::models::*;
 use crate::error::Error;
 use common::Map;
 
-use sqlx::types::chrono::{TimeZone, Utc};
 use sqlx::query;
+use sqlx::types::chrono::{TimeZone, Utc};
 use std::fs;
 
 use super::{db, FlagId};

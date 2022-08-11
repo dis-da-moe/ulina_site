@@ -1,10 +1,10 @@
 mod all_nations;
 mod commands;
 mod create_nation;
+mod edit_discord_user;
 mod edit_flag;
 mod edit_name_description;
 mod edit_socials;
-mod edit_discord_user;
 mod nation;
 mod ping;
 mod remove_nation;

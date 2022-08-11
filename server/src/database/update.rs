@@ -1,8 +1,8 @@
 pub use crate::database::models::*;
 use crate::error::Error;
 
-use sqlx::types::chrono::{self, Utc};
 use sqlx::query;
+use sqlx::types::chrono::{self, Utc};
 use std::fs;
 
 use super::{db, NationId};
