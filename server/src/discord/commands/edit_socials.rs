@@ -8,7 +8,7 @@ use crate::{
         ids::{LINK, PLATFORM},
     },
     error::Error,
-    get_options,
+    get_options, util::go_to_site,
 };
 
 use super::shared::{
@@ -39,7 +39,7 @@ pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
         });
 
     default_data(command, &DATA)
-        .description("update the links of your socials - use the site to remove/create socials")
+        .description(format!("update the links of your socials - {}", go_to_site("create/remove socials", "???")))
 }
 
 pub async fn edit_socials(ctx: &Context, interaction: &Interaction) -> Result<(), Error> {

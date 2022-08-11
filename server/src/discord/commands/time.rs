@@ -4,7 +4,6 @@ use crate::error::Error;
 use crate::util::{go_to_site, ZERO_WIDTH};
 use chrono::NaiveDate;
 use common::{to_ulina, DATE_FORMAT};
-use serenity::builder::CreateEmbed;
 use serenity::client::Context;
 
 pub const DATA: CommandData = CommandData {

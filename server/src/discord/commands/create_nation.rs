@@ -1,4 +1,4 @@
-use crate::database::{db, nation_change, ChangeType, NationId, CONTINENTS};
+use crate::database::{db, nation_change, ChangeType, NationId};
 use crate::discord::commands::shared::{
     create_continent_option, get_continent, Category, CommandData, CreateCommand, Interaction, OptionType,
 };

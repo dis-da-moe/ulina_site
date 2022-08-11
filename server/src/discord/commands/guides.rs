@@ -1,4 +1,3 @@
-use std::fs;
 
 use rocket::serde::json;
 use serde::Deserialize;
@@ -9,10 +8,10 @@ use crate::discord::helper::{embed, Helper};
 use crate::discord::ids::GUIDE;
 use crate::error::Error;
 use crate::util::{capitalise, ZERO_WIDTH};
-use crate::{get_options, index_option, internal};
+use crate::{get_options, index_option};
 use serenity::client::Context;
 
-use super::shared::{create_index_option, OptionType};
+use super::shared::create_index_option;
 
 #[derive(Deserialize)]
 struct Guide {

@@ -3,3 +3,5 @@
 **/Cargo.lock
 **/.env
 server/data
+/test.html
+/tabs.svg
