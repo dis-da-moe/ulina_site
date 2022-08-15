@@ -60,7 +60,7 @@ pub async fn nations(user: UserId) -> Json<LoadNations> {
             user,
             query_as!(
                 NationContinentId,
-                "SELECT nationId, name, continentName, ownerDiscord FROM Nation"
+                "SELECT nationId, name, continentName, ownerDiscord FROM Nation WHERE removed = false"
             )
             .fetch_all(db())
             .await

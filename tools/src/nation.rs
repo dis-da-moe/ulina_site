@@ -45,6 +45,7 @@ impl Component for Nation {
                 {show_trivia(nation)}
             </div>
         }
+        //TODO: edit nation
     }
 }
 
