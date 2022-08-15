@@ -26,7 +26,7 @@ impl Component for Nation {
         Nation { is_mine: loaded.user.owner_discord.as_ref() == Some(&loaded.data.core.ownerDiscord), flag_loaded: false }
     }
 
-    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::FlagLoaded => self.flag_loaded = true
         };

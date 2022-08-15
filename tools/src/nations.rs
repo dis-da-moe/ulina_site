@@ -2,12 +2,12 @@ use async_trait::async_trait;
 use common::{LoadNations, NationContinentId};
 
 use crate::loader::{LoadHandler, Loader};
-use crate::util::log;
+
 use crate::{backend, Route};
 use std::collections::HashMap;
 
 use crate::loader::LoadProps;
-use common::{NationContinent, CONTINENTS};
+use common::{CONTINENTS};
 use web_sys::{HtmlInputElement, InputEvent};
 use yew::{html, Component, Context, TargetCast};
 use yew_router::prelude::Link;

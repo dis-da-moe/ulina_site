@@ -1,13 +1,13 @@
-use crate::database::{self, latest_map, nation_all, nations_all, FlagId};
-use crate::database::{db, socials};
+use crate::database::{latest_map, nation_all, nations_all};
+use crate::database::{db};
 use common::{
-    LoadMap, LoadNation, LoadNations, Nation, NationAll, NationContinentId, UserAndData, UserData,
+    LoadMap, LoadNation, LoadNations, NationContinentId, UserAndData, UserData,
 };
 use rocket::fs::NamedFile;
-use rocket::response::content::RawHtml;
+
 use rocket::serde::json::Json;
-use rocket::serde::DeserializeOwned;
-use serde::{Deserialize, Serialize};
+
+
 use sqlx::{query, query_as};
 use std::ffi::OsStr;
 use std::fmt::Debug;
