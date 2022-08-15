@@ -1,14 +1,13 @@
 use std::{collections::HashMap, rc::Rc};
 
 use super::{
-    error::Error,
     infobox::Infobox,
-    loading::Loading,
     map::{Map, NationNameId},
 };
-use crate::backend::start_load;
+use crate::backend::load_map;
+use crate::error::Error;
+use crate::loading::Loading;
 use common::LoadMap;
-
 use yew::prelude::*;
 
 pub struct App {
@@ -25,7 +24,7 @@ impl Component for App {
 
     fn create(ctx: &Context<Self>) -> Self {
         ctx.link()
-            .send_future(async move { Msg::Loaded(start_load().await) });
+            .send_future(async move { Msg::Loaded(load_map().await) });
 
         Self { children: None }
     }

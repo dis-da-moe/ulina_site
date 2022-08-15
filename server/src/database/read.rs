@@ -1,9 +1,9 @@
 pub use crate::database::models::*;
 use crate::error::Error;
-use common::Map;
+use common::{Map, Nation, NationAll, Social};
 
-use sqlx::query;
 use sqlx::types::chrono::{TimeZone, Utc};
+use sqlx::{query, query_as};
 use std::fs;
 
 use super::{db, FlagId};
@@ -29,4 +29,50 @@ pub async fn flag_link(id: FlagId) -> Result<String, Error> {
         .map_err(|e| e.into())
 }
 
-pub const CONTINENTS: [&str; 5] = ["Ripiero", "Kanita", "Zapita", "Ailou", "Sivalat"];
+pub async fn socials(id: i64) -> Result<Vec<Social>, Error> {
+    query_as!(Social, "SELECT * FROM Social WHERE nationId = ?", id)
+        .fetch_all(db())
+        .await
+        .map_err(|err| err.into())
+}
+
+async fn more_nation_info(nation: Nation) -> Result<NationAll, Error> {
+    let socials = socials(nation.nationId).await?;
+
+    let flag_link = match nation.currentFlagId {
+        Some(id) => Some(flag_link(FlagId(id)).await?),
+        None => None,
+    };
+
+    Ok(NationAll {
+        core: nation,
+        socials,
+        flag_link,
+    })
+}
+
+pub async fn nations_all() -> Result<Vec<NationAll>, Error> {
+    let result: Vec<Nation> = query_as!(Nation, "SELECT * FROM Nation WHERE removed = false")
+        .fetch_all(db())
+        .await?;
+
+    let mut nations = vec![];
+
+    for nation in result {
+        nations.push(more_nation_info(nation).await?);
+    }
+
+    Ok(nations)
+}
+
+pub async fn nation_all(id: i64) -> Result<NationAll, Error> {
+    let result: Nation = query_as!(
+        Nation,
+        "SELECT * FROM Nation WHERE removed = false AND nationId = ?",
+        id
+    )
+    .fetch_one(db())
+    .await?;
+
+    more_nation_info(result).await
+}

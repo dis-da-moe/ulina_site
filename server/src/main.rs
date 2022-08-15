@@ -23,13 +23,15 @@ async fn main() -> Result<(), String> {
 
     database::init().await;
 
-    let rocket = tokio::spawn(site::run());
-    let discord = tokio::spawn(discord::run());
+    if false {
+        let rocket = tokio::spawn(site::run());
+        let discord = tokio::spawn(discord::run());
 
-    let (discord, rocket) = try_join!(discord, rocket).unwrap();
+        let (discord, rocket) = try_join!(discord, rocket).unwrap();
 
-    discord?;
-    rocket
-
-    //site::run().await
+        discord?;
+        rocket
+    } else {
+        site::run().await
+    }
 }

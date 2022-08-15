@@ -1,4 +1,3 @@
-
 use rocket::serde::json;
 use serde::Deserialize;
 use serenity::builder::CreateEmbed;
@@ -68,9 +67,8 @@ pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
     command
         .description("view guides for getting acquainted with Ulina")
         .add_option({
-            let mut option = create_index_option(GUIDES.iter(), GUIDE, |embed| {
-                capitalise(&embed.name)
-            });
+            let mut option =
+                create_index_option(GUIDES.iter(), GUIDE, |embed| capitalise(&embed.name));
             option.required(true);
             option
         })

@@ -68,7 +68,6 @@ struct DiscordResponse {
 #[get("/oauth-redirect?<code>&<state>")]
 pub async fn oauth_redirect(code: String, state: String, user: UserId) -> RawHtml<String> {
     let message = |message: String| view! {p{(message)}}.render();
-    println!("{:?}", user);
     let stored_state = query!("SELECT pendingAuth FROM User WHERE userId = ?", user.0)
         .fetch_one(db())
         .await
@@ -119,7 +118,10 @@ pub async fn oauth_redirect(code: String, state: String, user: UserId) -> RawHtm
             .execute(db())
             .await
             .unwrap();
-            message(format!("successfully signed in as {}", response.username))
+            view!{
+                p{(format!("successfully signed in as {}", response.username))}
+                a(href="/tools/nations"){"View Nations"}
+            }.render()
         }
         Err(e) => message(e.to_string()),
     }

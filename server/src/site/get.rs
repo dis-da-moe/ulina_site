@@ -1,13 +1,20 @@
-use crate::database::{self, FlagId};
+use crate::database::{self, latest_map, nation_all, nations_all, FlagId};
 use crate::database::{db, socials};
-use common::{LoadMap, Nation, NationAll};
+use common::{
+    LoadMap, LoadNation, LoadNations, Nation, NationAll, NationContinentId, UserAndData, UserData,
+};
 use rocket::fs::NamedFile;
+use rocket::response::content::RawHtml;
 use rocket::serde::json::Json;
-use sqlx::query_as;
+use rocket::serde::DeserializeOwned;
+use serde::{Deserialize, Serialize};
+use sqlx::{query, query_as};
 use std::ffi::OsStr;
+use std::fmt::Debug;
 use std::path::{Path, PathBuf};
 
 use super::directories::STATIC_DIR;
+use super::user_data::UserId;
 
 #[get("/<path..>", rank = 12)]
 pub async fn page(path: PathBuf) -> Option<NamedFile> {
@@ -32,28 +39,45 @@ pub async fn tools(_path: PathBuf) -> Option<NamedFile> {
 
 #[get("/load-map")]
 pub async fn load_map() -> Json<LoadMap> {
-    let result: Vec<Nation> = query_as!(Nation, "SELECT * FROM Nation WHERE removed = false")
-        .fetch_all(db())
+    Json(LoadMap {
+        nations: nations_all().await.unwrap(),
+        map: latest_map().await.unwrap(),
+    })
+}
+
+#[get("/nation/<id>")]
+pub async fn nation(user: UserId, id: i64) -> Json<Option<LoadNation>> {
+    Json(match nation_all(id).await.ok() {
+        Some(nation) => Some(user_and_data(user, nation).await),
+        _ => None,
+    })
+}
+
+#[get("/nations")]
+pub async fn nations(user: UserId) -> Json<LoadNations> {
+    Json(
+        user_and_data(
+            user,
+            query_as!(
+                NationContinentId,
+                "SELECT nationId, name, continentName, ownerDiscord FROM Nation"
+            )
+            .fetch_all(db())
+            .await
+            .unwrap(),
+        )
+        .await,
+    )
+}
+
+async fn user_and_data<T>(user: UserId, data: T) -> UserAndData<T> {
+    let user = query!("SELECT discord, isAdmin FROM User WHERE userId = ?", user.0)
+        .fetch_one(db())
         .await
         .unwrap();
-
-    let mut nations = vec![];
-
-    for nation in result {
-        let socials = socials(nation.nationId).await.unwrap();
-
-        let flag_link = match nation.currentFlagId {
-            Some(id) => Some(database::flag_link(FlagId(id)).await.unwrap()),
-            None => None,
-        };
-        nations.push(NationAll {
-            core: nation,
-            socials,
-            flag_link,
-        });
-    }
-
-    let map = database::latest_map().await.unwrap();
-
-    Json(LoadMap { nations, map })
+    let user = UserData {
+        is_admin: user.isAdmin,
+        owner_discord: user.discord,
+    };
+    UserAndData { data, user }
 }

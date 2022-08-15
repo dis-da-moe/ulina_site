@@ -72,3 +72,6 @@ body{
 .cls2-10 {
   font-size: 31.93px;
 }
+.dropdown:hover .dropdown-menu {
+  display: grid;
+}

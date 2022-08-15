@@ -1,7 +1,13 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
+pub struct UserData {
+    pub is_admin: bool,
+    pub owner_discord: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[allow(unused, non_snake_case)]
 pub struct Nation {
     pub nationId: i64,
@@ -17,7 +23,7 @@ pub struct Nation {
     pub alliances: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[allow(non_snake_case)]
 pub struct Social {
     pub socialsId: i64,
@@ -26,7 +32,7 @@ pub struct Social {
     pub platform: String,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 pub struct NationAll {
     pub core: Nation,
     pub socials: Vec<Social>,
@@ -53,3 +59,29 @@ pub struct User {
     pub discord: Option<String>,
     pub pendingAuth: Option<String>,
 }
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+pub struct UserAndData<T> {
+    pub data: T,
+    pub user: UserData,
+}
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[allow(unused, non_snake_case)]
+pub struct NationContinent {
+    pub name: String,
+    pub ownerDiscord: String,
+    pub continentName: String,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[allow(unused, non_snake_case)]
+pub struct NationContinentId {
+    pub nationId: i64,
+    pub name: String,
+    pub ownerDiscord: String,
+    pub continentName: String,
+}
+
+pub type LoadNations = UserAndData<Vec<NationContinentId>>;
+pub type LoadNation = UserAndData<NationAll>;
+pub const CONTINENTS: [&str; 5] = ["Ripiero", "Kanita", "Zapita", "Ailou", "Sivalat"];

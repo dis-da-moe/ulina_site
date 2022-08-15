@@ -1,14 +1,13 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use super::flag::Flag;
 use common::NationAll;
 use yew::prelude::*;
 use yew_agent::{Bridge, Bridged};
 
 use crate::{
     event_bus::{Content, EventBus},
-    util::EMPTY_DIV,
+    show_nation::{show_info, show_trivia, title},
 };
 
 pub enum Msg {
@@ -35,71 +34,7 @@ pub struct Infobox {
     _producer: Box<dyn Bridge<EventBus>>,
 }
 
-fn title(title: &str) -> Html {
-    html! {
-        <span class="infobox-title">
-            {title}
-        </span>
-    }
-}
-
 impl Infobox {
-    fn show_info(&self, ctx: &Context<Self>, nation: &NationAll) -> Html {
-        let socials = nation.socials.iter().map(|social| {
-            html! {
-                <>
-                {title(&social.platform)}
-                <span class="infobox-field">
-                    <a class="text-blue-600 visited:text-purple-600" href={social.link.clone()}>
-                        {&social.link}
-                    </a>
-                </span>
-                </>
-            }
-        });
-
-        let id = nation.core.nationId;
-        let flag_load = ctx.link().callback(move |_| Msg::FlagLoad(id));
-
-        html! {
-            <>
-                <Flag flag={nation.flag_link.clone()} on_load={flag_load} loaded={self.flag_loaded(nation.core.nationId)}/>
-
-                {field_title("Continent", &nation.core.continentName)}
-
-                {for socials}
-
-                if let Some(description) = nation.core.description.as_ref(){
-                    {field_title("Description", &description)}
-                }
-            </>
-        }
-    }
-
-    fn show_trivia(&self, nation: &NationAll) -> Html {
-        let trivia: Vec<Html> = [
-            ("Leader", nation.core.leader.as_ref()),
-            ("Capital", nation.core.capital.as_ref()),
-            ("Ideology", nation.core.ideology.as_ref()),
-            ("Alliances", nation.core.alliances.as_ref()),
-        ]
-        .iter()
-        .filter_map(|(name, content)| content.map(|content| field_title(name, content)))
-        .collect();
-
-        if trivia.is_empty() {
-            html! {
-                <div class={EMPTY_DIV}>
-                    {"no trivia"}
-                </div>
-            }
-        } else {
-            html! {
-                {for trivia}
-            }
-        }
-    }
-
     fn tabs(&self, ctx: &Context<Self>) -> Html {
         const SELECTED_TAB: &str = "fill-[#f7f7e9]";
         const UNSELECTED_TAB: &str = "fill-[#abafb4]";
@@ -137,19 +72,6 @@ impl Infobox {
     }
 }
 
-fn field_title(title: &str, content: &str) -> Html {
-    html! {
-        <>
-        <span class="infobox-title">
-            {title}
-        </span>
-        <span class="infobox-field">
-            {content}
-        </span>
-        </>
-    }
-}
-
 impl Component for Infobox {
     type Message = Msg;
     type Properties = InfoBoxProps;
@@ -175,8 +97,14 @@ impl Component for Infobox {
             }
             Some(nation) => {
                 let main = match self.current_tab {
-                    Tab::Info => self.show_info(ctx, &nation),
-                    Tab::Trivia => self.show_trivia(&nation),
+                    Tab::Info => {
+                        let id = nation.core.nationId;
+                        let flag_load = ctx.link().callback(move |_| Msg::FlagLoad(id));
+                        let loaded = self.flag_loaded(id);                
+
+                        show_info(&nation, flag_load, loaded)
+                    },
+                    Tab::Trivia => show_trivia(&nation),
                 };
                 html! {
                     <>

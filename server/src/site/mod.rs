@@ -13,7 +13,7 @@ mod rendering;
 mod user_data;
 
 use auth::{admin, admin_login, discord_login, login_result, oauth_redirect};
-use get::{load_map, page, tools};
+use get::{load_map, nation, nations, page, tools};
 
 use crate::config::CONFIG;
 use crate::site::directories::{CURRENT_DIR, PUBLIC_FOLDER, STATIC_DIR};
@@ -47,7 +47,9 @@ pub async fn run() -> Result<(), String> {
                 oauth_redirect,
                 admin_login,
                 login_result,
-                discord_login
+                discord_login,
+                nations,
+                nation
             ],
         )
         .ignite()

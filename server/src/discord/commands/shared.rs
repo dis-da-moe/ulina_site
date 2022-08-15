@@ -1,11 +1,11 @@
 use crate::database::NationDiscord;
-use crate::database::CONTINENTS;
 use crate::discord::commands::commands::build_commands_embed;
 use crate::discord::commands::COMMANDS;
 use crate::discord::helper::is_admin;
 use crate::discord::ids::CONTINENT;
 use crate::discord::ids::NAME;
 use crate::error::Error;
+use common::CONTINENTS;
 use serenity::builder::{CreateApplicationCommand, CreateApplicationCommandOption};
 use serenity::client::Context;
 use serenity::http::Http;
@@ -230,5 +230,7 @@ pub fn create_index_option<T>(
 }
 
 pub fn create_continent_option() -> CreateOption {
-   create_index_option(CONTINENTS.iter(), CONTINENT, |continent| continent.to_string())
+    create_index_option(CONTINENTS.iter(), CONTINENT, |continent| {
+        continent.to_string()
+    })
 }

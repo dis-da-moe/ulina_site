@@ -19,6 +19,7 @@ glam = "0.21.2"
 yew-router = "0.16"
 chrono = { version = "0.4", features = ["serde", "wasmbind"] }
 js-sys = "0.3"
+async-trait = "0.1.57"
 
 [dependencies.web-sys]
 version = "0.3"

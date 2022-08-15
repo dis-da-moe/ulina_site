@@ -1,5 +1,6 @@
 use std::{collections::HashMap, time::Duration};
 
+use common::NationContinent;
 use rocket::futures::StreamExt;
 use serenity::{
     builder::{CreateActionRow, CreateEmbed},
@@ -10,7 +11,7 @@ use serenity::{
 use sqlx::query_as;
 
 use crate::{
-    database::{db, NationContinent},
+    database::db,
     discord::{
         helper::{display_user, embed, Helper},
         ids::{CONTINENT, NEXT, PREVIOUS},

@@ -1,4 +1,4 @@
-use common::Nation;
+use common::{Nation, Social};
 
 use super::NationDiscord;
 
@@ -24,6 +24,7 @@ pub trait Id<T> {
 
 id_type!(
     (SocialsId, socialsId),
+    Social,
     (NationId, nationId),
     NationDiscord,
     Nation,

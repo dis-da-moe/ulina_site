@@ -82,7 +82,7 @@ async fn add_user<'r>(cookies: &CookieJar<'r>) -> UserId {
         .userId;
 
     let mut cookie = Cookie::new("userId", id.to_string());
-    cookie.set_same_site(SameSite::Lax);
+    cookie.set_same_site(SameSite::None);
     cookie.set_secure(Some(true));
     cookies.add_private(cookie);
 

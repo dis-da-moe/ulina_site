@@ -1,4 +1,4 @@
-use common::{current_url, LoadMap};
+use common::{current_url, LoadMap, LoadNation, LoadNations};
 use reqwasm::http::Request;
 
 use crate::debug;
@@ -22,6 +22,14 @@ where
     Ok(payload)
 }
 
-pub async fn start_load() -> Result<LoadMap, String> {
+pub async fn load_map() -> Result<LoadMap, String> {
     request("load-map").await
+}
+
+pub async fn load_nations() -> Result<LoadNations, String> {
+    request("nations").await
+}
+
+pub async fn load_nation(id: i64) -> Result<LoadNation, String> {
+    request(&format!("nation/{}", id)).await
 }
