@@ -1,7 +1,7 @@
-use std::collections::HashMap;
+
 
 use common::{AddSocial, CONTINENTS};
-use rocket::{form::{Form, Strict, Lenient}, response::{Redirect, content::RawHtml}, http::Status, fs::TempFile, serde::json::{Json, self}};
+use rocket::{form::{Form, Strict, Lenient}, response::{content::RawHtml}, fs::TempFile, serde::json::{self}};
 use sqlx::query;
 use sycamore::view;
 

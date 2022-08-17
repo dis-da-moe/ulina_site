@@ -6,7 +6,7 @@ use common::{AddSocial, LoadNation, CONTINENTS};
 use web_sys::{HtmlFormElement, HtmlInputElement};
 use yew::prelude::*;
 
-use crate::util::{input_text, input_checkbox, BUTTON_CLASS, log};
+use crate::util::{input_text, input_checkbox, BUTTON_CLASS};
 use crate::{
     backend::load_nation,
     loader::{LoadHandler, LoadProps, Loader},
