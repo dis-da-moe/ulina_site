@@ -1,5 +1,6 @@
 use crate::config::CONFIG;
 use crate::database::db;
+use crate::error::Error;
 use crate::site::user_data::UserId;
 use crate::util::StandardClient;
 use common::current_url;
@@ -40,7 +41,7 @@ fn oauth_url() -> (Url, CsrfToken) {
 }
 
 #[get("/discord-login")]
-pub async fn discord_login(user_id: UserId) -> RawHtml<String> {
+pub async fn discord_login(user_id: UserId) -> Result<RawHtml<String>, Error> {
     let (url, token) = oauth_url();
     let token = token.secret();
 
@@ -50,13 +51,12 @@ pub async fn discord_login(user_id: UserId) -> RawHtml<String> {
         user_id.0
     )
     .execute(db())
-    .await
-    .unwrap();
+    .await?;
 
-    view! {
+    Ok(view! {
         a(href={url.as_str()}) {"Click here to log in"}
     }
-    .render()
+    .render())
 }
 
 #[derive(Deserialize)]
@@ -66,25 +66,23 @@ struct DiscordResponse {
 }
 
 #[get("/oauth-redirect?<code>&<state>")]
-pub async fn oauth_redirect(code: String, state: String, user: UserId) -> RawHtml<String> {
+pub async fn oauth_redirect(code: String, state: String, user: UserId) -> Result<RawHtml<String>, Error> {
     let message = |message: String| view! {p{(message)}}.render();
     let stored_state = query!("SELECT pendingAuth FROM User WHERE userId = ?", user.0)
         .fetch_one(db())
-        .await
-        .unwrap()
+        .await?
         .pendingAuth;
 
     if let Some(stored_state) = stored_state {
         query! {"UPDATE User SET pendingAuth = NULL WHERE userId = ?", user.0}
             .execute(db())
-            .await
-            .unwrap();
+            .await?;
 
         if stored_state != state {
-            return message("Invalid state".to_string());
+            return Ok(message("Invalid state".to_string()));
         }
     } else {
-        return message("No request made yet".to_string());
+        return Ok(message("No request made yet".to_string()));
     }
 
     let token_result = OAUTH_CLIENT
@@ -95,7 +93,7 @@ pub async fn oauth_redirect(code: String, state: String, user: UserId) -> RawHtm
     let auth_code = match token_result {
         Ok(token) => token.access_token().secret().clone(),
         Err(e) => {
-            return message(format!("An error occured while exchanging codes: {:?}", e));
+            return Ok(message(format!("An error occured while exchanging codes: {:?}", e)));
         }
     };
     let client = reqwest::Client::new();
@@ -103,8 +101,7 @@ pub async fn oauth_redirect(code: String, state: String, user: UserId) -> RawHtm
         .get("https://discord.com/api/users/@me")
         .bearer_auth(auth_code)
         .send()
-        .await
-        .unwrap()
+        .await?
         .json::<DiscordResponse>()
         .await;
 
@@ -116,14 +113,15 @@ pub async fn oauth_redirect(code: String, state: String, user: UserId) -> RawHtm
                 user.0
             )
             .execute(db())
-            .await
-            .unwrap();
-            view!{
+            .await?;
+            
+            Ok(view! {
                 p{(format!("successfully signed in as {}", response.username))}
                 a(href="/tools/nations"){"View Nations"}
-            }.render()
+            }
+            .render())
         }
-        Err(e) => message(e.to_string()),
+        Err(e) => Ok(message(e.to_string())),
     }
 }
 
@@ -154,27 +152,26 @@ pub async fn login_result(
     user: UserId,
     admin: Option<AdminUser>,
     limitguard: Option<RocketGovernor<'_, LimitLogin>>,
-) -> Redirect {
+) -> Result<Redirect, Error> {
     let success = Redirect::to(uri!(admin));
 
     if admin.is_some() {
-        return success;
+        return Ok(success);
     }
 
     let error = |message: &str| Redirect::to(uri!(admin_login(Some(message.to_string()))));
 
     if limitguard.is_none() {
-        return error("too many tries");
+        return Ok(error("too many tries"));
     }
 
     if login.password == CONFIG.admin.as_str() {
         query!("UPDATE User SET isAdmin = true WHERE userId = ?", user.0)
             .execute(db())
-            .await
-            .unwrap();
-        success
+            .await?;
+        Ok(success)
     } else {
-        error("incorrect password")
+        Ok(error("incorrect password"))
     }
 }
 pub struct LimitLogin;

@@ -4,16 +4,19 @@ use rocket::figment::Figment;
 use rocket::fs::FileServer;
 use rocket::futures::TryFutureExt;
 use rocket::Config;
+use std::net::IpAddr;
 use std::path::Path;
 
 mod auth;
 mod directories;
 mod get;
-mod rendering;
+pub mod rendering;
 mod user_data;
+mod post;
 
 use auth::{admin, admin_login, discord_login, login_result, oauth_redirect};
 use get::{load_map, nation, nations, page, tools};
+use post::edit_nation;
 
 use crate::config::CONFIG;
 use crate::site::directories::{CURRENT_DIR, PUBLIC_FOLDER, STATIC_DIR};
@@ -25,7 +28,7 @@ pub async fn run() -> Result<(), String> {
     let config = Config {
         log_level: LogLevel::Critical,
         cli_colors: true,
-        address: common::LOCAL_IP.parse().unwrap(),
+        address: common::LOCAL_IP.parse::<IpAddr>().map_err(|e| format!("error parsing IP address: {}", e))?,
         port: common::PORT,
         ..Default::default()
     };
@@ -49,7 +52,8 @@ pub async fn run() -> Result<(), String> {
                 login_result,
                 discord_login,
                 nations,
-                nation
+                nation,
+                edit_nation
             ],
         )
         .ignite()

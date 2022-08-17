@@ -1,4 +1,4 @@
-use common::{Nation, Social};
+use common::{Nation, Social, NationAll};
 
 use super::NationDiscord;
 
@@ -30,3 +30,9 @@ id_type!(
     Nation,
     (FlagId, flagId)
 );
+
+impl Id<NationId> for NationAll{
+    fn id(&self) -> NationId {
+        self.core.id()
+    }
+}

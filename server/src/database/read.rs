@@ -52,9 +52,8 @@ async fn more_nation_info(nation: Nation) -> Result<NationAll, Error> {
 }
 
 pub async fn nations_all() -> Result<Vec<NationAll>, Error> {
-    let result: Vec<Nation> = query_as!(Nation, "SELECT * FROM Nation WHERE removed = false")
-        .fetch_all(db())
-        .await?;
+    let result: Vec<Nation> = 
+        query_as!(Nation, "SELECT * FROM Nation WHERE removed = false").fetch_all(db()).await?;
 
     let mut nations = vec![];
 
@@ -65,14 +64,25 @@ pub async fn nations_all() -> Result<Vec<NationAll>, Error> {
     Ok(nations)
 }
 
-pub async fn nation_all(id: i64) -> Result<NationAll, Error> {
-    let result: Nation = query_as!(
-        Nation,
-        "SELECT * FROM Nation WHERE removed = false AND nationId = ?",
-        id
-    )
-    .fetch_one(db())
-    .await?;
+pub async fn nation_all(id: i64, include_removed: bool) -> Result<NationAll, Error> {
+    let result: Nation = if include_removed{
+        query_as!(
+            Nation,
+            "SELECT * FROM Nation WHERE nationId = ?",
+            id
+        )
+        .fetch_one(db())
+        .await
+    }
+    else{
+        query_as!(
+            Nation,
+            "SELECT * FROM Nation WHERE removed = false AND nationId = ?",
+            id
+        )
+        .fetch_one(db())
+        .await
+    }?;
 
     more_nation_info(result).await
 }

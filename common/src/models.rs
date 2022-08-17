@@ -33,6 +33,13 @@ pub struct Social {
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+pub struct AddSocial {
+    pub socials_id: Option<i64>,
+    pub link: String,
+    pub platform: String,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 pub struct NationAll {
     pub core: Nation,
     pub socials: Vec<Social>,
@@ -80,6 +87,7 @@ pub struct NationContinentId {
     pub name: String,
     pub ownerDiscord: String,
     pub continentName: String,
+    pub removed: bool
 }
 
 pub type LoadNations = UserAndData<Vec<NationContinentId>>;

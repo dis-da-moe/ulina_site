@@ -3,28 +3,61 @@ use crate::error::Error;
 
 use sqlx::query;
 use sqlx::types::chrono::{self, Utc};
+use std::fmt::Debug;
 use std::fs;
+use std::future::Future;
+use std::path::Path;
+use std::pin::Pin;
 
 use super::{db, NationId};
 const FLAG_DIR: &str = "./public/flags";
 
-pub async fn add_flag(
+pub const ACCEPTED_EXTENSIONS: [&str; 3] = ["jpg", "jpeg", "png"];
+
+pub const MAX_SIZE: u64 = 8_000_000; //max size of an image in bytes
+
+
+pub fn validate_flag(file_name: &str, size: u64) -> Result<&str, Error>{
+    //accepts the full file-name of an image and its size in bytes
+    //validates the size and extension and returns the extension of the file
+    let extension = Path::new(file_name)
+        .extension()
+        .and_then(|e| e.to_str())
+        .ok_or(Error::ExpectedImage("unknown".to_string()))?;
+
+    if !ACCEPTED_EXTENSIONS.contains(&extension.to_lowercase().as_str()) {
+        return Err(Error::ExpectedImage(extension.to_string()));
+    }
+
+    if size > MAX_SIZE {
+        return Err(Error::TooLarge("8MB".to_string()));
+    }
+
+    Ok(extension)
+}
+
+pub async fn add_flag<F, E>(
     nation_id: NationId,
-    name: &str,
+    nation_name: &str,
     extension: &str,
-    buffer: Vec<u8>,
+    //async closure that accepts a file path and writes the flag to it
+    writer: impl FnOnce(String) -> F,    
     is_admin: bool,
-) -> Result<(), Error> {
+) -> Result<(), Error> 
+where F: Future<Output = Result<(), E>>, E: Debug
+{
+    //adds a flag and assigns it to the nation as its current flag
+
     let date = chrono::Utc::now().naive_utc();
 
     let file_name = format!(
         "{}-{}.{}",
-        name.replace(" ", ""),
+        nation_name.replace(" ", ""),
         date.format("%Y_%m_%d_%H_%M_%S"),
         extension
     );
 
-    fs::write(format!("{}/{}", FLAG_DIR, file_name), buffer)
+    writer(format!("{}/{}", FLAG_DIR, file_name)).await
         .map_err(|e| Error::InternalError(format!("{:?}", e)))?;
 
     let path = format!("/flags/{}", file_name);
@@ -43,8 +76,7 @@ pub async fn add_flag(
         nation_id.0
     )
     .fetch_one(db())
-    .await
-    .unwrap()
+    .await?
     .currentFlagId
     .map(|x| x.to_string());
 
@@ -76,6 +108,10 @@ pub enum ChangeType {
     OwnerDiscord,
     Description,
     Name,
+    Leader,
+    Capital,
+    Ideology,
+    Alliances
 }
 
 impl ToString for ChangeType {
@@ -88,6 +124,10 @@ impl ToString for ChangeType {
             ChangeType::OwnerDiscord => "OwnerDiscord",
             ChangeType::Description => "Description",
             ChangeType::Name => "Name",
+            ChangeType::Leader => "Leader",
+            ChangeType::Capital => "Capital",
+            ChangeType::Ideology => "Ideology",
+            ChangeType::Alliances => "Alliances",
         }
         .to_string()
     }

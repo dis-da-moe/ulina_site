@@ -33,8 +33,7 @@ pub async fn edit_name_description(ctx: &Context, interaction: &Interaction) -> 
         nation.nationId
     )
     .fetch_one(db())
-    .await
-    .unwrap()
+    .await?
     .description;
 
     let mut name_input = CreateInputText::default();

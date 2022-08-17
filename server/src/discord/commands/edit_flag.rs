@@ -1,9 +1,10 @@
 use std::path::Path;
 
+use rocket::tokio::fs;
 use serenity::client::Context;
 
 use crate::{
-    database::{add_flag, Id},
+    database::{add_flag, Id, validate_flag},
     discord::{
         helper::{is_admin, Helper},
         ids::FLAG,
@@ -22,9 +23,7 @@ pub const DATA: CommandData = CommandData {
     category: Category::EditNation,
 };
 
-pub const ACCEPTED_EXTENSIONS: [&str; 3] = ["jpg", "jpeg", "png"];
 
-pub const MAX_SIZE: u64 = 8_000_000;
 
 pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
     command.create_option(|option| {
@@ -41,18 +40,7 @@ pub async fn edit_flag(ctx: &Context, interaction: &Interaction) -> Result<(), E
     let nation = edit_action(interaction, &DATA).await?;
     let flag = get_options!(interaction.data.options, FLAG, Attachment)?;
 
-    let extension = Path::new(&flag.filename)
-        .extension()
-        .and_then(|e| e.to_str())
-        .ok_or(Error::ExpectedImage("unknown".to_string()))?;
-
-    if !ACCEPTED_EXTENSIONS.contains(&extension.to_lowercase().as_str()) {
-        return Err(Error::ExpectedImage(extension.to_string()));
-    }
-
-    if flag.size > MAX_SIZE {
-        return Err(Error::TooLarge("8MB".to_string()));
-    }
+    let extension = validate_flag(&flag.filename, flag.size)?;
 
     interaction
         .message(&ctx.http, |message| {
@@ -65,14 +53,19 @@ pub async fn edit_flag(ctx: &Context, interaction: &Interaction) -> Result<(), E
         .await
         .map_err(|err| Error::InternalError(format!("{:?}", err)))?;
 
+    let writer =  |path| async move {
+        fs::write(path, buffer).await
+    };
+
     add_flag(
         nation.id(),
         &nation.name,
         extension,
-        buffer,
+        writer,
         is_admin(&interaction.user),
     )
     .await?;
+
 
     interaction
         .follow_up(&ctx.http, |message| {

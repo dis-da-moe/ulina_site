@@ -30,7 +30,7 @@ pub async fn nation(ctx: &Context, interaction: &Interaction) -> Result<(), Erro
     let socials = database::socials(nation.nationId).await?;
 
     let flag_link = match nation.currentFlagId {
-        Some(flag) => Some(database::flag_link(FlagId(flag)).await.unwrap()),
+        Some(flag) => Some(database::flag_link(FlagId(flag)).await?),
         _ => None,
     };
 

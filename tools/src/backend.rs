@@ -32,7 +32,7 @@ pub async fn load_nations() -> Result<LoadNations, String> {
 
 pub async fn load_nation(id: i64) -> Result<LoadNation, String> {
     let result: Result<Option<LoadNation>, String> = request(&format!("nation/{}", id)).await;
-    match result{
+    match result {
         Ok(Some(x)) => Ok(x),
         Ok(None) => Err("Nation not found".to_string()),
         Err(e) => Err(e),

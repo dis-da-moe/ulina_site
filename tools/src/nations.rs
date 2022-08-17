@@ -3,11 +3,12 @@ use common::{LoadNations, NationContinentId};
 
 use crate::loader::{LoadHandler, Loader};
 
+use crate::util::{BUTTON_CLASS, input_checkbox};
 use crate::{backend, Route};
 use std::collections::HashMap;
 
 use crate::loader::LoadProps;
-use common::{CONTINENTS};
+use common::CONTINENTS;
 use web_sys::{HtmlInputElement, InputEvent};
 use yew::{html, Component, Context, TargetCast};
 use yew_router::prelude::Link;
@@ -20,6 +21,12 @@ impl LoadHandler<(), LoadNations, LoadNations> for Loader<(), LoadNations, LoadN
 
     fn on_load(mut loaded: LoadNations) -> LoadNations {
         loaded.data.sort_by(|a, b| a.name.cmp(&b.name));
+        if !loaded.user.is_admin{
+            loaded.data = loaded.data.into_iter().filter(|nation| !nation.removed).collect();
+        }
+        else {
+            loaded.data.sort_by(|a, b| a.removed.cmp(&b.removed));
+        }
         loaded
     }
 }
@@ -32,12 +39,14 @@ struct NationIndex(usize);
 pub struct Nations {
     my_nation: Option<NationIndex>,
     searched_nations: Option<Vec<NationIndex>>,
+    include_removed: bool,
     selected_continents: HashMap<&'static str, bool>,
 }
 
 pub enum Msg {
     NameSearch(String),
     Checkbox(&'static str, bool),
+    Removed(bool)
 }
 
 impl Component for Nations {
@@ -62,6 +71,7 @@ impl Component for Nations {
             my_nation,
             searched_nations: None,
             selected_continents,
+            include_removed: false
         }
     }
 
@@ -94,6 +104,9 @@ impl Component for Nations {
             Msg::Checkbox(continent, checked) => {
                 *self.selected_continents.get_mut(continent).unwrap() = checked;
             }
+            Msg::Removed(removed) => {
+                self.include_removed = removed;
+            }
         }
 
         true
@@ -107,7 +120,7 @@ impl Component for Nations {
             ctx.link().callback(move |e: InputEvent| {
                 Msg::Checkbox(
                     continent,
-                    e.target_dyn_into::<HtmlInputElement>().unwrap().checked(),
+                    input_checkbox(e),
                 )
             })
         };
@@ -134,15 +147,22 @@ impl Component for Nations {
 
         let nations = nations.into_iter()
         .filter(|nation| *self.selected_continents.get(nation.continentName.as_str()).unwrap())
+        .filter(|nation| !nation.removed || self.include_removed)
         .map(|nation|{
+            let name = if nation.removed{
+                format!("{} [removed]", nation.name, )
+            }else{
+                nation.name.clone()
+            };
+
             html!{
                 <div class="table-row">
-                    <Link<Route> classes={"table-cell"} to={Route::Nation{id: nation.nationId}}>{&nation.name}</Link<Route>>
+                    <Link<Route> classes={"table-cell"} to={Route::Nation{id: nation.nationId}}>{name}</Link<Route>>
                     <div class="table-cell">{&nation.continentName}</div>
                 </div>
             }
         });
-        const BUTTON_CLASS: &str = "bg-blue-400 rounded-lg p-1";
+
         html! {
             <>
             <div class="flex flex-wrap">
@@ -158,6 +178,14 @@ impl Component for Nations {
                         {for continents}
                     </div>
                 </div>
+
+                if ctx.props().loaded.user.is_admin{
+                    <div>
+                    <label>{"Removed: "}</label>
+                    <input type="checkbox" checked={self.include_removed} oninput={ctx.link().callback(|e| Msg::Removed(input_checkbox(e)))}/>   
+                    </div>
+                }
+
                 if let Some(index) = self.my_nation{
                     <Link<Route> classes={BUTTON_CLASS} to={Route::Nation{id: get_nation(ctx, index).nationId}}>{"My Nation"}</Link<Route>>
                 }

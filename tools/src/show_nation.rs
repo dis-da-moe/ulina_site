@@ -1,6 +1,6 @@
+use crate::{flag::Flag, util::EMPTY_DIV};
 use common::NationAll;
 use yew::prelude::*;
-use crate::{flag::Flag, util::EMPTY_DIV};
 
 pub fn show_info(nation: &NationAll, flag_load: Callback<()>, flag_loaded: bool) -> Html {
     let socials = nation.socials.iter().map(|social| {

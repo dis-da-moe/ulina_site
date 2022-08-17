@@ -4,16 +4,16 @@ use yew_router::prelude::*;
 mod backend;
 mod error;
 mod event_bus;
+mod flag;
 mod loader;
 mod loading;
 mod map;
 mod nation;
 mod nations;
+mod show_nation;
 mod time;
 mod util;
 mod viewbox;
-mod show_nation;
-mod flag;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {

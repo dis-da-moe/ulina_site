@@ -100,10 +100,10 @@ impl Component for Infobox {
                     Tab::Info => {
                         let id = nation.core.nationId;
                         let flag_load = ctx.link().callback(move |_| Msg::FlagLoad(id));
-                        let loaded = self.flag_loaded(id);                
+                        let loaded = self.flag_loaded(id);
 
                         show_info(&nation, flag_load, loaded)
-                    },
+                    }
                     Tab::Trivia => show_trivia(&nation),
                 };
                 html! {

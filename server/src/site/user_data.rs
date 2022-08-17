@@ -1,29 +1,26 @@
 use rocket::{
-    http::{Cookie, CookieJar, SameSite},
+    http::{Cookie, CookieJar, SameSite, Status},
     request::FromRequest,
     request::Outcome,
-    Request,
+    Request, outcome::IntoOutcome,
 };
 use serde::Deserialize;
 use sqlx::query;
 
-use crate::database::db;
+use crate::{database::db, error::Error};
 
 #[derive(Debug)]
 pub struct UserId(pub i64);
 
-#[derive(Debug)]
-pub struct UserError;
-
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for UserId {
-    type Error = UserError;
+    type Error = Error;
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
-        Outcome::Success(if let Some(cookie) = get_user(req.cookies()) {
+        let result = if let Some(cookie) = get_user(req.cookies()) {
             if let Some(id) = cookie.value().parse::<i64>().ok() {
                 if valid_id(id).await {
-                    UserId(id)
+                    Ok(UserId(id))
                 } else {
                     reset_user(req.cookies()).await
                 }
@@ -32,7 +29,9 @@ impl<'r> FromRequest<'r> for UserId {
             }
         } else {
             add_user(req.cookies()).await
-        })
+        };
+
+        result.into_outcome(Status::InternalServerError)
     }
 }
 
@@ -40,7 +39,7 @@ pub struct AdminUser(pub i64);
 
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for AdminUser {
-    type Error = UserError;
+    type Error = Error;
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         let user_outcome = req.guard::<UserId>().await;
@@ -51,15 +50,18 @@ impl<'r> FromRequest<'r> for AdminUser {
             Outcome::Forward(_) => return Outcome::Forward(()),
         };
 
-        if query!("SELECT isAdmin FROM User WHERE userId = ?", id.0)
-            .fetch_one(db())
-            .await
-            .unwrap()
-            .isAdmin
-        {
-            Outcome::Success(AdminUser(id.0))
-        } else {
-            Outcome::Forward(())
+        match query!("SELECT isAdmin FROM User WHERE userId = ?", id.0)
+        .fetch_one(db())
+        .await{
+            Err(e) => {
+                Outcome::Failure((Status::InternalServerError, e.into()))
+            }
+            Ok(result) if result.isAdmin => {
+                Outcome::Success(AdminUser(id.0))
+            }
+            _ => {
+                Outcome::Forward(())
+            }
         }
     }
 }
@@ -74,11 +76,10 @@ async fn valid_id(id: i64) -> bool {
         .is_ok()
 }
 
-async fn add_user<'r>(cookies: &CookieJar<'r>) -> UserId {
+async fn add_user<'r>(cookies: &CookieJar<'r>) -> Result<UserId, Error> {
     let id = query!("INSERT INTO User (isAdmin) VALUES (false) RETURNING userId")
         .fetch_one(db())
-        .await
-        .unwrap()
+        .await?
         .userId;
 
     let mut cookie = Cookie::new("userId", id.to_string());
@@ -86,10 +87,10 @@ async fn add_user<'r>(cookies: &CookieJar<'r>) -> UserId {
     cookie.set_secure(Some(true));
     cookies.add_private(cookie);
 
-    UserId(id)
+    Ok(UserId(id))
 }
 
-async fn reset_user<'r>(cookies: &CookieJar<'r>) -> UserId {
+async fn reset_user<'r>(cookies: &CookieJar<'r>) -> Result<UserId, Error> {
     cookies.remove_private(Cookie::named("userId"));
     add_user(cookies).await
 }

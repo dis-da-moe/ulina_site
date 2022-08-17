@@ -1,4 +1,8 @@
 use common::TimeError;
+use rocket::{serde::json, response::Responder};
+use serenity::json::JsonError;
+use sycamore::view;
+use crate::site::rendering::Render;
 
 #[derive(Debug, Clone)]
 pub enum Error {
@@ -9,6 +13,16 @@ pub enum Error {
     ExpectedImage(String),
     TooLarge(String),
     TimeError(TimeError),
+    JsonError(String),
+    NetworkError(String)
+}
+
+impl<'r> Responder<'r, 'static> for Error{
+    fn respond_to(self, request: &'r rocket::Request<'_>) -> rocket::response::Result<'static> {
+        let content = view!{(format!("error: {}", self.to_string()))}.render();
+
+        content.respond_to(request)
+    }
 }
 
 impl From<rocket::Error> for Error {
@@ -23,6 +37,18 @@ impl From<sqlx::Error> for Error {
             sqlx::Error::RowNotFound => Error::NotFound,
             _ => Error::InternalError(format!("{:?}", error)),
         }
+    }
+}
+
+impl From<reqwest::Error> for Error{
+    fn from(error: reqwest::Error) -> Self {
+        Error::NetworkError(error.to_string())
+    }
+}
+
+impl From<JsonError> for Error{
+    fn from(e: JsonError) -> Self {
+        Error::JsonError(e.to_string())
     }
 }
 
@@ -59,6 +85,14 @@ impl ToString for Error {
                     error.to_string()
                 )
             }
+            JsonError(e) => format!(
+                "an error occured while deserialising JSON: {}",
+                e
+            ),
+            NetworkError(e) => format!(
+                "error occured while networking: {}",
+                e
+            )
         }
     }
 }
