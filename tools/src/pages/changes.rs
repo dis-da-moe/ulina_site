@@ -1,8 +1,8 @@
 use async_trait::async_trait;
-use common::{UserData, UserAndData, LoadChanges, ChangeType};
+use common::{LoadChanges, ChangeType};
 use yew::prelude::*;
 use common::DATE_FORMAT;
-use crate::{loader::{LoaderProcessor, LoadProps, LoadProcessHandler, Loader, LoadHandler}, backend, back};
+use crate::{loader::{LoadProps, Loader, LoadHandler}, backend, back};
 pub type App = Loader<LoadChanges, Changes>;
 
 type ChangesProps = LoadProps<LoadChanges>;

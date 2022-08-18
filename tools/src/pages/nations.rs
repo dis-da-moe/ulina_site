@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use common::{LoadNations, NationContinentId};
 
-use crate::loader::{LoadProcessHandler, LoaderProcessor, Loader, LoadHandler};
+use crate::loader::{Loader, LoadHandler};
 
 use crate::util::{BUTTON_CLASS, input_checkbox};
 use crate::{backend, Route, back};
