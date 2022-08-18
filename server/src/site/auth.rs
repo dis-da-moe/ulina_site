@@ -117,7 +117,6 @@ pub async fn oauth_redirect(code: String, state: String, user: UserId) -> Result
             
             Ok(view! {
                 p{(format!("successfully signed in as {}", response.username))}
-                a(href="/tools/nations"){"View Nations"}
             }
             .render())
         }
@@ -174,6 +173,16 @@ pub async fn login_result(
         Ok(error("incorrect password"))
     }
 }
+
+#[get("/logout")]
+pub async fn logout(user: UserId) -> Result<RawHtml<String>, Error>{
+    query!("UPDATE User SET isAdmin = false, discord = NULL WHERE userId = ?", user.0).execute(db()).await?;
+    
+    Ok(view!(
+        p{"logged out successfully"}
+    ).render())
+}
+
 pub struct LimitLogin;
 
 impl<'r> RocketGovernable<'r> for LimitLogin {

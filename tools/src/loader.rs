@@ -1,11 +1,11 @@
 use std::marker::PhantomData;
 
-use crate::error::Error;
-use crate::loading::Loading;
+use crate::components::Error;
+use crate::components::Loading;
 use async_trait::async_trait;
 use yew::prelude::*;
 
-pub struct Loader<Props, Data, ProcessedData, Comp> {
+pub struct LoaderProcessor<Props, Data, ProcessedData, Comp> {
     props_data: Option<Result<ProcessedData, String>>,
     data: PhantomData<Data>,
     child: PhantomData<Comp>,
@@ -22,19 +22,41 @@ pub struct LoadProps<ProcessedData: PartialEq> {
 }
 
 #[async_trait(?Send)]
-pub trait LoadHandler<Props, Data, ProcessedData> {
+pub trait LoadProcessHandler<Props, Data, ProcessedData> {
     async fn load(props: Props) -> Result<Data, String>;
 
     fn on_load(loaded: Data) -> ProcessedData;
 }
 
-impl<Props, Data, ProcessedData, Comp> Component for Loader<Props, Data, ProcessedData, Comp>
+#[async_trait(?Send)]
+pub trait LoadHandler<Data>{
+    async fn load() -> Result<Data, String>;
+
+    fn on_load(loaded: Data) -> Data{
+        loaded
+    }
+}
+
+#[async_trait(?Send)]
+impl<Data, Handler: LoadHandler<Data>> LoadProcessHandler<(), Data, Data> for Handler{
+    async fn load(_: ()) -> Result<Data, String>{
+        Handler::load().await
+    }
+
+    fn on_load(loaded: Data) -> Data{
+        Handler::on_load(loaded)
+    }
+}
+
+pub type Loader<Data, Comp> = LoaderProcessor<(), Data, Data, Comp>;
+
+impl<Props, Data, ProcessedData, Comp> Component for LoaderProcessor<Props, Data, ProcessedData, Comp>
 where
     Props: 'static + Properties + Clone,
     Data: 'static,
     ProcessedData: 'static + PartialEq + Clone,
     Comp: 'static + Component<Properties = LoadProps<ProcessedData>>,
-    Loader<Props, Data, ProcessedData, Comp>: LoadHandler<Props, Data, ProcessedData>,
+    LoaderProcessor<Props, Data, ProcessedData, Comp>: LoadProcessHandler<Props, Data, ProcessedData>,
 {
     type Message = Msg<Data>;
 
@@ -43,9 +65,9 @@ where
     fn create(ctx: &Context<Self>) -> Self {
         let props = ctx.props().clone();
         ctx.link().send_future(async move {
-            Msg::<Data>::Loaded(Loader::<Props, Data, ProcessedData, Comp>::load(props).await)
+            Msg::<Data>::Loaded(LoaderProcessor::<Props, Data, ProcessedData, Comp>::load(props).await)
         });
-        Loader {
+        LoaderProcessor {
             props_data: None,
             props: PhantomData,
             data: PhantomData,
@@ -58,7 +80,7 @@ where
             Msg::Loaded(data) => data,
         };
         self.props_data =
-            Some(data.map(|data| Loader::<Props, Data, ProcessedData, Comp>::on_load(data)));
+            Some(data.map(|data| LoaderProcessor::<Props, Data, ProcessedData, Comp>::on_load(data)));
         true
     }
 

@@ -1,3 +1,4 @@
+use common::ChangeType;
 use serenity::{
     http::Http,
     model::interactions::{message_component::ActionRowComponent, modal::ModalSubmitInteraction},
@@ -5,7 +6,7 @@ use serenity::{
 use sqlx::query;
 
 use crate::{
-    database::{db, nation_change, ChangeType, NationId},
+    database::{db, nation_change, NationId},
     error::Error,
 };
 

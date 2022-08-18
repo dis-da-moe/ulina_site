@@ -1,0 +1,152 @@
+use chrono::{Local, NaiveDate};
+use common::{to_real, DATE_FORMAT};
+use common::{to_ulina, TimeError};
+use gloo::timers::callback::Interval;
+use web_sys::HtmlInputElement;
+use yew::prelude::*;
+use yew::TargetCast;
+
+use crate::back;
+
+pub struct App {
+    current_real: chrono::DateTime<Local>,
+    current_ulina: chrono::NaiveDateTime,
+    convert_real: Option<Result<NaiveDate, TimeError>>,
+    convert_ulina: Option<Result<NaiveDate, TimeError>>,
+}
+
+const TIME_SECTION: &str = "grid space-y-2 place-items-center mt-7 border-solid border-slate-600 border-b-4 pb-6 w-[70%] mx-auto";
+
+const TIME_FORMAT: &str = "%H:%M:%S";
+const DATE_INPUT_FORMAT: &str = "%Y-%m-%d";
+
+pub enum Msg {
+    Time,
+    Input(Convert, String),
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum Convert {
+    Real,
+    Ulina,
+}
+type DateResult = Result<NaiveDate, TimeError>;
+
+type Converter = fn(i64) -> DateResult;
+
+fn conversion(string: &str, conversion: Converter, result: &mut Option<DateResult>) {
+    *result = Some(
+        NaiveDate::parse_from_str(string, DATE_INPUT_FORMAT)
+            .map_err(|_| TimeError::InvalidDate)
+            .and_then(|date| conversion(date.and_hms(0, 0, 0).timestamp())),
+    );
+}
+
+impl Component for App {
+    type Message = Msg;
+
+    type Properties = ();
+
+    fn create(ctx: &Context<Self>) -> Self {
+        let now = Local::now();
+        //log(format!("{}", now.offset().local_minus_utc() / 3600));
+        let timer = {
+            let link = ctx.link().clone();
+            Interval::new(250, move || link.send_message(Msg::Time))
+        };
+        timer.forget();
+
+        App {
+            current_real: now.clone(),
+            current_ulina: to_ulina(now.timestamp()).unwrap(),
+            convert_real: None,
+            convert_ulina: None,
+        }
+    }
+
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            Msg::Input(convert, input) => {
+                self.convert_real = None;
+                self.convert_ulina = None;
+
+                if input.is_empty() {
+                    return true;
+                }
+
+                let (converter, target): (Converter, &mut Option<DateResult>) = match convert {
+                    Convert::Real => (to_ulina, &mut self.convert_ulina),
+                    Convert::Ulina => (to_real, &mut self.convert_real),
+                };
+
+                conversion(&input, converter, target);
+
+                true
+            }
+            Msg::Time => {
+                let now = Local::now();
+                self.current_real = now.clone();
+                self.current_ulina = to_ulina(now.timestamp()).unwrap();
+
+                true
+            }
+        }
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let oninput = |convert: Convert| {
+            ctx.link().callback(move |e: InputEvent| {
+                Msg::Input(
+                    convert,
+                    e.target_dyn_into::<HtmlInputElement>().unwrap().value(),
+                )
+            })
+        };
+
+        html! {
+            <>
+            {back!()}
+            <div class={TIME_SECTION}>
+                <div class="font-bold text-base underline">{"Real Time:"}</div>
+                <div>{self.current_real.date().format(DATE_FORMAT)}</div>
+                <div>{self.current_real.time().format(TIME_FORMAT)}</div>
+            </div>
+
+            <div class={TIME_SECTION}>
+                <div class="font-bold text-lg underline">{"Ulina Time:"}</div>
+                <div class="text-lg">{self.current_ulina.date().format(DATE_FORMAT)}</div>
+                <div>{self.current_ulina.time().format(TIME_FORMAT)}</div>
+            </div>
+
+            <div class="text-center mt-6 underline font-bold text-lg"> {"Convert"} </div>
+
+            <div class="grid grid-cols-2 place-items-stretch mt-5">
+                {time_input("Real time", self.convert_real.clone(), oninput(Convert::Real))}
+                {time_input("Ulina time", self.convert_ulina.clone(), oninput(Convert::Ulina))}
+            </div>
+            </>
+        }
+    }
+}
+
+fn time_input(
+    name: &str,
+    date: Option<Result<NaiveDate, TimeError>>,
+    oninput: Callback<InputEvent>,
+) -> Html {
+    let value = date
+        .clone()
+        .map_or(None, |time| time.ok())
+        .map(|date| date.format(DATE_INPUT_FORMAT).to_string());
+
+    html! {
+        <div class="grid justify-center">
+            <span class="italic text-sm">{name}</span>
+            <input {oninput} class="bg-[#c5e1ef]" type="date" value={value}/>
+
+            if let Some(Err(err)) = date{
+                <p>{format!("{:?}", err)}</p>
+            }
+        </div>
+    }
+}

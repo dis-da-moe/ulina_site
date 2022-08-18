@@ -1,10 +1,13 @@
+use std::str::FromStr;
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
+#[allow(non_snake_case)]
 pub struct UserData {
-    pub is_admin: bool,
-    pub owner_discord: Option<String>,
+    pub isAdmin: bool,
+    pub discord: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
@@ -90,6 +93,66 @@ pub struct NationContinentId {
     pub removed: bool
 }
 
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+pub struct NationChange{
+    pub nation_name: String,
+    pub change_type: ChangeType,
+    pub old_value: Option<String>,
+    pub new_value: Option<String>,
+    pub date: DateTime<Utc>,
+    pub admin: bool
+}
+
+macro_rules! change_type {
+    ($($variant: tt),+) => {
+        #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+        pub enum ChangeType {
+            $($variant),+
+        }
+
+        impl FromStr for ChangeType{
+            type Err = ChangeTypeParseError;
+        
+            fn from_str(s: &str) -> Result<Self, Self::Err> {
+                match s {
+                    $(
+                        stringify!($variant) => Ok(ChangeType::$variant),
+                    )+
+                    _ => Err(ChangeTypeParseError(format!("{} is not a Change Type", s)))
+                }
+            }
+        }
+
+        impl ToString for ChangeType {
+            fn to_string(&self) -> String {
+                match self {
+                    $(
+                        ChangeType::$variant => stringify!($variant),
+                    )+
+                }
+                .to_string()
+            }
+        }
+    };
+}
+
+pub struct ChangeTypeParseError(pub String);
+
+change_type! {
+    Creation,
+    Removed,
+    Continent,
+    Flag,
+    OwnerDiscord,
+    Description,
+    Name,
+    Leader,
+    Capital,
+    Ideology,
+    Alliances
+}
+
 pub type LoadNations = UserAndData<Vec<NationContinentId>>;
 pub type LoadNation = UserAndData<NationAll>;
+pub type LoadChanges = UserAndData<Vec<NationChange>>;
 pub const CONTINENTS: [&str; 5] = ["Ripiero", "Kanita", "Zapita", "Ailou", "Sivalat"];

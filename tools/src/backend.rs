@@ -1,4 +1,4 @@
-use common::{current_url, LoadMap, LoadNation, LoadNations};
+use common::{current_url, LoadMap, LoadNation, LoadNations, UserData, LoadChanges};
 use reqwasm::http::Request;
 
 use crate::debug;
@@ -22,13 +22,20 @@ where
     Ok(payload)
 }
 
-pub async fn load_map() -> Result<LoadMap, String> {
-    request("load-map").await
+macro_rules! backend {
+    ($(($func_name: tt, $endpoint: expr, $type: ty)),+) => {
+        $(pub async fn $func_name() -> Result<$type, String>{
+            request($endpoint).await
+        })+
+    };
 }
 
-pub async fn load_nations() -> Result<LoadNations, String> {
-    request("nations").await
-}
+backend!(
+    (load_map, "load-map", LoadMap),
+    (load_nations, "nations", LoadNations),
+    (user_data, "user-data", UserData),
+    (nation_changes, "nation-changes", LoadChanges)
+);
 
 pub async fn load_nation(id: i64) -> Result<LoadNation, String> {
     let result: Result<Option<LoadNation>, String> = request(&format!("nation/{}", id)).await;

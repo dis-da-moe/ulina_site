@@ -1,19 +1,16 @@
+use async_trait::async_trait;
+use common::UserData;
+use loader::{LoadProps, LoadHandler, Loader};
+use util::BUTTON_CLASS;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
 mod backend;
-mod error;
-mod event_bus;
-mod flag;
 mod loader;
-mod loading;
-mod map;
-mod nation;
-mod nations;
-mod show_nation;
-mod time;
+mod display;
 mod util;
-mod viewbox;
+mod pages;
+mod components;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -27,6 +24,8 @@ pub enum Route {
     Nations,
     #[at("/tools/nation/:id")]
     Nation { id: i64 },
+    #[at("/tools/changes")]
+    Changes
 }
 
 fn switch(routes: &Route) -> Html {
@@ -35,34 +34,56 @@ fn switch(routes: &Route) -> Html {
             <App/>
         },
         Route::Map => html! {
-            <map::App/>
+            <pages::map::App/>
         },
         Route::Time => html! {
-            <time::App/>
+            <pages::time::App/>
         },
         Route::Nations => html! {
-            <nations::App/>
+            <pages::nations::App/>
         },
         Route::Nation { id } => html! {
-            <nation::App id={*id}/>
+            <pages::nation::App id={*id}/>
         },
+        Route::Changes => html!{
+            <pages::changes::App/>
+        }
     }
 }
 
-pub struct App;
+pub struct Home;
+type HomeProps = LoadProps<UserData>;
+type App = Loader<UserData, Home>;
 
-impl Component for App {
+#[async_trait(?Send)]
+impl LoadHandler<UserData> for Loader<UserData, Home>{
+    async fn load() -> Result<UserData, String>{
+        backend::user_data().await
+    }
+}
+
+impl Component for Home {
     type Message = ();
 
-    type Properties = ();
+    type Properties = HomeProps;
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self
     }
 
-    fn view(&self, _ctx: &Context<Self>) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let user = &ctx.props().loaded;
         html! {
             <>
+            {back!()}
+            
+            if user.discord.is_some() || user.isAdmin{
+                <a href="/logout" class={BUTTON_CLASS}>{"Logout"}</a>
+            }
+            else if user.discord.is_none(){
+                <a href="/discord-login" class={BUTTON_CLASS}>{"Login"}</a>
+            }
+
             <div>
                 <Link<Route> to={Route::Map}>{"map"}</Link<Route>>
             </div>
@@ -72,6 +93,11 @@ impl Component for App {
             <div>
                 <Link<Route> to={Route::Nations}>{"nations"}</Link<Route>>
             </div>
+            if user.isAdmin{
+                <div>
+                    <Link<Route> to={Route::Changes}>{"changes"}</Link<Route>>
+                </div>
+            }
             </>
         }
     }

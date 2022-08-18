@@ -1,6 +1,7 @@
 pub use crate::database::models::*;
 use crate::error::Error;
 
+use common::ChangeType;
 use sqlx::query;
 use sqlx::types::chrono::{self, Utc};
 use std::fmt::Debug;
@@ -100,39 +101,6 @@ where F: Future<Output = Result<(), E>>, E: Debug
     Ok(())
 }
 
-pub enum ChangeType {
-    Creation,
-    Removed,
-    Continent,
-    Flag,
-    OwnerDiscord,
-    Description,
-    Name,
-    Leader,
-    Capital,
-    Ideology,
-    Alliances
-}
-
-impl ToString for ChangeType {
-    fn to_string(&self) -> String {
-        match self {
-            ChangeType::Creation => "Creation",
-            ChangeType::Removed => "Removed",
-            ChangeType::Continent => "Continent",
-            ChangeType::Flag => "Flag",
-            ChangeType::OwnerDiscord => "OwnerDiscord",
-            ChangeType::Description => "Description",
-            ChangeType::Name => "Name",
-            ChangeType::Leader => "Leader",
-            ChangeType::Capital => "Capital",
-            ChangeType::Ideology => "Ideology",
-            ChangeType::Alliances => "Alliances",
-        }
-        .to_string()
-    }
-}
-
 pub async fn nation_change(
     nation_id: NationId,
     change_type: ChangeType,
@@ -142,8 +110,6 @@ pub async fn nation_change(
 ) -> Result<(), Error> {
     let now = Utc::now();
     let change_type = change_type.to_string();
-    let old_value = old_value.unwrap_or("".to_string());
-    let new_value = new_value.unwrap_or("".to_string());
     query!("INSERT INTO NationChange (nationId, type, oldValue, newValue, admin, timeStamp) VALUES (?, ?, ?, ?, ?, ?)",
         nation_id.0,
         change_type,

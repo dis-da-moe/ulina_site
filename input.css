@@ -10,7 +10,9 @@
 .unselectable {
   user-select: none;
 }
-
+a {
+  color: rgba(5, 159, 255, 0.94);
+}
 .infobox-title {
   display: block;
   font-weight: bold;

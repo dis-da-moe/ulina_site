@@ -37,6 +37,12 @@ impl<'r> FromRequest<'r> for UserId {
 
 pub struct AdminUser(pub i64);
 
+impl From<AdminUser> for UserId{
+    fn from(user: AdminUser) -> Self {
+        UserId(user.0)
+    }
+}
+
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for AdminUser {
     type Error = Error;
@@ -77,6 +83,7 @@ async fn valid_id(id: i64) -> bool {
 }
 
 async fn add_user<'r>(cookies: &CookieJar<'r>) -> Result<UserId, Error> {
+    //TODO: add `lastVisited` field to `User` table and schedule task to remove users who have not signed in for more than a week  
     let id = query!("INSERT INTO User (isAdmin) VALUES (false) RETURNING userId")
         .fetch_one(db())
         .await?

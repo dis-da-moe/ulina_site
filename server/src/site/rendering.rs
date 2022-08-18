@@ -1,5 +1,5 @@
 use rocket::response::content::RawHtml;
-use sycamore::SsrNode;
+use sycamore::{SsrNode, view};
 
 static TEMPLATE: &str = include_str!("../../../tools/index.html");
 
@@ -9,7 +9,9 @@ pub trait Render {
 
 impl Render for sycamore::view::View<SsrNode> {
     fn render(self) -> RawHtml<String> {
-        let content = format!("<body>{}", sycamore::render_to_string(|| self));
-        RawHtml(TEMPLATE.replace("<body>", &content))
+        let button = sycamore::render_to_string(|| view!(a(href="/tools"){"back"}));
+        let content = format!("<body>{}{}", button, sycamore::render_to_string(|| self));
+        RawHtml(TEMPLATE.replace("<body>", &content))  
     }
+
 }

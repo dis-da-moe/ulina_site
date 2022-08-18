@@ -9,7 +9,7 @@ use crate::{error::Error, database::{nation_all, db, validate_flag, add_flag, Id
 
 use super::{rendering::Render, user_data::UserId};
 use crate::database::nation_change;
-use crate::database::ChangeType;
+use common::ChangeType;
 
 macro_rules! none_if_empty {
     ($nation: ident, $($field: tt)+) => {

@@ -14,8 +14,8 @@ pub mod rendering;
 mod user_data;
 mod post;
 
-use auth::{admin, admin_login, discord_login, login_result, oauth_redirect};
-use get::{load_map, nation, nations, page, tools};
+use auth::{admin, admin_login, discord_login, login_result, oauth_redirect, logout};
+use get::{load_map, nation, nations, page, tools, get_user_data, nation_changes};
 use post::edit_nation;
 
 use crate::config::CONFIG;
@@ -53,7 +53,10 @@ pub async fn run() -> Result<(), String> {
                 discord_login,
                 nations,
                 nation,
-                edit_nation
+                edit_nation,
+                get_user_data,
+                nation_changes,
+                logout
             ],
         )
         .ignite()

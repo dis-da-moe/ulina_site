@@ -1,4 +1,4 @@
-use common::TimeError;
+use common::{TimeError, ChangeTypeParseError};
 use rocket::{response::Responder};
 use serenity::json::JsonError;
 use sycamore::view;
@@ -49,6 +49,12 @@ impl From<reqwest::Error> for Error{
 impl From<JsonError> for Error{
     fn from(e: JsonError) -> Self {
         Error::JsonError(e.to_string())
+    }
+}
+
+impl From<ChangeTypeParseError> for Error{
+    fn from(e: ChangeTypeParseError) -> Self {
+        Error::InternalError(format!("invalid database entry: {}", e.0))
     }
 }
 
