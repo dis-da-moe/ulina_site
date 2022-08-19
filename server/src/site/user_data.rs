@@ -1,3 +1,6 @@
+use std::time::Duration;
+
+use chrono::Utc;
 use rocket::{
     http::{Cookie, CookieJar, SameSite, Status},
     request::FromRequest,
@@ -76,18 +79,28 @@ fn get_user<'r>(cookies: &CookieJar<'r>) -> Option<Cookie<'static>> {
     cookies.get_private("userId")
 }
 async fn valid_id(id: i64) -> bool {
-    query!("SELECT userId FROM User WHERE userId = ?", id)
+    let now = Utc::now();
+    query!("UPDATE User SET lastVisit = ? WHERE userId = ? RETURNING userId", now, id)
         .fetch_one(db())
         .await
         .is_ok()
 }
 
 async fn add_user<'r>(cookies: &CookieJar<'r>) -> Result<UserId, Error> {
-    //TODO: add `lastVisited` field to `User` table and schedule task to remove users who have not signed in for more than a week  
-    let id = query!("INSERT INTO User (isAdmin) VALUES (false) RETURNING userId")
+    let now = Utc::now();
+    let id = query!("INSERT INTO User (isAdmin, lastVisit) VALUES (false, ?) RETURNING userId", now)
         .fetch_one(db())
         .await?
         .userId;
+
+    /* 
+    this timeout is to prevent a weird bug where inserting a row and then 
+    retrieving that row in the same request 
+    (which is necessary for cases where a cookie is created in a UserId guard)
+    results in that row not being found, even though it exits. for some reason adding another await in between
+    the two queries fixes this issue.
+    */
+    rocket::tokio::time::sleep(Duration::from_millis(1)).await;
 
     let mut cookie = Cookie::new("userId", id.to_string());
     cookie.set_same_site(SameSite::None);

@@ -4,6 +4,7 @@ use serenity::json::JsonError;
 use sycamore::view;
 use crate::site::rendering::Render;
 
+//TODO: rework this, look into the anyhow crate maybe? specialise across modules and share with frontend
 #[derive(Debug, Clone)]
 pub enum Error {
     NotFound,
@@ -19,7 +20,15 @@ pub enum Error {
 
 impl<'r> Responder<'r, 'static> for Error{
     fn respond_to(self, request: &'r rocket::Request<'_>) -> rocket::response::Result<'static> {
-        let content = view!{(format!("error: {}", self.to_string()))}.render();
+        let message = match self{
+            Error::InternalError(e) => {
+                println!("internal error while responding to request: {}", e.to_string());
+                "Internal error occurred".to_string()
+            }
+            _ => self.to_string()
+        };
+
+        let content = view!{(format!("error: {}", message))}.render();
 
         content.respond_to(request)
     }

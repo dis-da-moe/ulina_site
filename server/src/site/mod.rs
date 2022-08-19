@@ -17,10 +17,8 @@ mod post;
 use auth::{admin, admin_login, discord_login, login_result, oauth_redirect, logout};
 use get::{load_map, nation, nations, page, tools, get_user_data, nation_changes};
 use post::edit_nation;
-
 use crate::config::CONFIG;
 use crate::site::directories::{CURRENT_DIR, PUBLIC_FOLDER, STATIC_DIR};
-
 pub async fn run() -> Result<(), String> {
     initialize(&CURRENT_DIR);
     initialize(&STATIC_DIR);
