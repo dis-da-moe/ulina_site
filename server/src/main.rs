@@ -13,7 +13,7 @@ extern crate rocket;
 extern crate lazy_static;
 
 use lazy_static::initialize;
-use rocket::tokio::{self, try_join};
+use rocket::tokio::{self};
 
 #[tokio::main]
 async fn main() -> Result<(), String> {
