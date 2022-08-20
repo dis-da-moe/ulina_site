@@ -157,7 +157,12 @@ pub async fn create_commands(guild_id: &GuildId, http: &Http) {
             commands.create_application_command(|builder| {
                 let data = (command.create)(builder.name(name));
 
-                let description = data.0.get("description").expect(&format!("no description set for command {}", name)).as_str().expect(&format!("description for command {} is not a string", name));
+                let description = data
+                    .0
+                    .get("description")
+                    .expect(&format!("no description set for command {}", name))
+                    .as_str()
+                    .expect(&format!("description for command {} is not a string", name));
 
                 let entry = match categorised_commands.entry(command.data.category) {
                     Entry::Occupied(entry) => entry.into_mut(),

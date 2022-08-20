@@ -1,4 +1,4 @@
-use web_sys::{Element, HtmlCollection, HtmlInputElement, InputEvent, HtmlTextAreaElement};
+use web_sys::{Element, HtmlCollection, HtmlInputElement, HtmlTextAreaElement, InputEvent};
 use yew::TargetCast;
 
 pub fn get_vec(collection: &HtmlCollection) -> Vec<Element> {
@@ -14,10 +14,12 @@ pub fn by_id(element: &Element, id: String) -> Option<Element> {
 }
 
 pub fn input_text(e: InputEvent) -> String {
-    e.target_dyn_into::<HtmlInputElement>().map(|element| element.value()).unwrap_or_else(|| e.target_dyn_into::<HtmlTextAreaElement>().unwrap().value())
+    e.target_dyn_into::<HtmlInputElement>()
+        .map(|element| element.value())
+        .unwrap_or_else(|| e.target_dyn_into::<HtmlTextAreaElement>().unwrap().value())
 }
 
-pub fn input_checkbox(e: InputEvent) -> bool{
+pub fn input_checkbox(e: InputEvent) -> bool {
     e.target_dyn_into::<HtmlInputElement>().unwrap().checked()
 }
 

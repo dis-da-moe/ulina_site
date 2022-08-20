@@ -66,7 +66,11 @@ struct DiscordResponse {
 }
 
 #[get("/oauth-redirect?<code>&<state>")]
-pub async fn oauth_redirect(code: String, state: String, user: UserId) -> Result<RawHtml<String>, Error> {
+pub async fn oauth_redirect(
+    code: String,
+    state: String,
+    user: UserId,
+) -> Result<RawHtml<String>, Error> {
     let message = |message: String| view! {p{(message)}}.render();
     let stored_state = query!("SELECT pendingAuth FROM User WHERE userId = ?", user.0)
         .fetch_one(db())
@@ -93,7 +97,10 @@ pub async fn oauth_redirect(code: String, state: String, user: UserId) -> Result
     let auth_code = match token_result {
         Ok(token) => token.access_token().secret().clone(),
         Err(e) => {
-            return Ok(message(format!("An error occured while exchanging codes: {:?}", e)));
+            return Ok(message(format!(
+                "An error occured while exchanging codes: {:?}",
+                e
+            )));
         }
     };
     let client = reqwest::Client::new();
@@ -114,7 +121,7 @@ pub async fn oauth_redirect(code: String, state: String, user: UserId) -> Result
             )
             .execute(db())
             .await?;
-            
+
             Ok(view! {
                 p{(format!("successfully signed in as {}", response.username))}
             }
@@ -175,12 +182,18 @@ pub async fn login_result(
 }
 
 #[get("/logout")]
-pub async fn logout(user: UserId) -> Result<RawHtml<String>, Error>{
-    query!("UPDATE User SET isAdmin = false, discord = NULL WHERE userId = ?", user.0).execute(db()).await?;
-    
+pub async fn logout(user: UserId) -> Result<RawHtml<String>, Error> {
+    query!(
+        "UPDATE User SET isAdmin = false, discord = NULL WHERE userId = ?",
+        user.0
+    )
+    .execute(db())
+    .await?;
+
     Ok(view!(
         p{"logged out successfully"}
-    ).render())
+    )
+    .render())
 }
 
 pub struct LimitLogin;

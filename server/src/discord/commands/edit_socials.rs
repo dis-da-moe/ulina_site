@@ -9,7 +9,7 @@ use crate::{
     },
     error::Error,
     get_options,
-    util::go_to_site,
+    util::{go_to_site, ZERO_WIDTH},
 };
 
 use super::shared::{
@@ -39,10 +39,7 @@ pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
                 .required(true)
         });
 
-    default_data(command, &DATA).description(format!(
-        "update the links of your socials - {}",
-        go_to_site("create/remove socials", "???")
-    ))
+    default_data(command, &DATA)
 }
 
 pub async fn edit_socials(ctx: &Context, interaction: &Interaction) -> Result<(), Error> {
@@ -64,7 +61,7 @@ pub async fn edit_socials(ctx: &Context, interaction: &Interaction) -> Result<()
 
     interaction
         .message(&ctx.http, |message| {
-            message.content("successfully updated socials")
+            message.embed(|embed| embed.title("Socials").description(go_to_site("create/remove socials", &format!("tools/nation/{}", nation.nationId))).field("successfully updated socials", ZERO_WIDTH, false))
         })
         .await;
 

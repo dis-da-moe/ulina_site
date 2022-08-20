@@ -1,8 +1,8 @@
-use common::{TimeError, ChangeTypeParseError};
-use rocket::{response::Responder};
+use crate::site::rendering::Render;
+use common::{ChangeTypeParseError, TimeError};
+use rocket::response::Responder;
 use serenity::json::JsonError;
 use sycamore::view;
-use crate::site::rendering::Render;
 
 //TODO: rework this, look into the anyhow crate maybe? specialise across modules and share with frontend
 #[derive(Debug, Clone)]
@@ -15,20 +15,23 @@ pub enum Error {
     TooLarge(String),
     TimeError(TimeError),
     JsonError(String),
-    NetworkError(String)
+    NetworkError(String),
 }
 
-impl<'r> Responder<'r, 'static> for Error{
+impl<'r> Responder<'r, 'static> for Error {
     fn respond_to(self, request: &'r rocket::Request<'_>) -> rocket::response::Result<'static> {
-        let message = match self{
+        let message = match self {
             Error::InternalError(e) => {
-                println!("internal error while responding to request: {}", e.to_string());
+                println!(
+                    "internal error while responding to request: {}",
+                    e.to_string()
+                );
                 "Internal error occurred".to_string()
             }
-            _ => self.to_string()
+            _ => self.to_string(),
         };
 
-        let content = view!{(format!("error: {}", message))}.render();
+        let content = view! {(format!("error: {}", message))}.render();
 
         content.respond_to(request)
     }
@@ -49,19 +52,19 @@ impl From<sqlx::Error> for Error {
     }
 }
 
-impl From<reqwest::Error> for Error{
+impl From<reqwest::Error> for Error {
     fn from(error: reqwest::Error) -> Self {
         Error::NetworkError(error.to_string())
     }
 }
 
-impl From<JsonError> for Error{
+impl From<JsonError> for Error {
     fn from(e: JsonError) -> Self {
         Error::JsonError(e.to_string())
     }
 }
 
-impl From<ChangeTypeParseError> for Error{
+impl From<ChangeTypeParseError> for Error {
     fn from(e: ChangeTypeParseError) -> Self {
         Error::InternalError(format!("invalid database entry: {}", e.0))
     }
@@ -100,14 +103,8 @@ impl ToString for Error {
                     error.to_string()
                 )
             }
-            JsonError(e) => format!(
-                "an error occured while deserialising JSON: {}",
-                e
-            ),
-            NetworkError(e) => format!(
-                "error occured while networking: {}",
-                e
-            )
+            JsonError(e) => format!("an error occured while deserialising JSON: {}", e),
+            NetworkError(e) => format!("error occured while networking: {}", e),
         }
     }
 }

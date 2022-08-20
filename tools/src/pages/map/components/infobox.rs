@@ -6,8 +6,8 @@ use yew::prelude::*;
 use yew_agent::{Bridge, Bridged};
 
 use crate::{
-    pages::map::event_bus::{Content, EventBus},
     display::{show_info, show_trivia, title},
+    pages::map::event_bus::{Content, EventBus},
 };
 
 pub enum Msg {

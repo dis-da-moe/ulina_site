@@ -13,15 +13,15 @@ extern crate rocket;
 extern crate lazy_static;
 
 use lazy_static::initialize;
-use rocket::tokio::{self};
+use rocket::tokio;
 
 #[tokio::main]
-async fn main() -> Result<(), String> {
+async fn main() {
     std::env::set_current_dir("./server").unwrap();
 
     initialize(&config::CONFIG);
 
     database::init().await;
     tokio::spawn(site::run());
-    discord::run().await
+    discord::run().await;
 }

@@ -1,10 +1,10 @@
 use async_trait::async_trait;
 use common::{LoadNations, NationContinentId};
 
-use crate::loader::{Loader, LoadHandler};
+use crate::loader::{LoadHandler, Loader};
 
-use crate::util::{BUTTON_CLASS, input_checkbox};
-use crate::{backend, Route, back};
+use crate::util::{input_checkbox, BUTTON_CLASS};
+use crate::{back, backend, Route};
 use std::collections::HashMap;
 
 use crate::loader::LoadProps;
@@ -21,10 +21,13 @@ impl LoadHandler<LoadNations> for Loader<LoadNations, Nations> {
 
     fn on_load(mut loaded: LoadNations) -> LoadNations {
         loaded.data.sort_by(|a, b| a.name.cmp(&b.name));
-        if !loaded.user.isAdmin{
-            loaded.data = loaded.data.into_iter().filter(|nation| !nation.removed).collect();
-        }
-        else {
+        if !loaded.user.isAdmin {
+            loaded.data = loaded
+                .data
+                .into_iter()
+                .filter(|nation| !nation.removed)
+                .collect();
+        } else {
             loaded.data.sort_by(|a, b| a.removed.cmp(&b.removed));
         }
         loaded
@@ -46,7 +49,7 @@ pub struct Nations {
 pub enum Msg {
     NameSearch(String),
     Checkbox(&'static str, bool),
-    Removed(bool)
+    Removed(bool),
 }
 
 impl Component for Nations {
@@ -71,7 +74,7 @@ impl Component for Nations {
             my_nation,
             searched_nations: None,
             selected_continents,
-            include_removed: false
+            include_removed: false,
         }
     }
 
@@ -117,12 +120,8 @@ impl Component for Nations {
             Msg::NameSearch(e.target_dyn_into::<HtmlInputElement>().unwrap().value())
         });
         let checkbox_input = |continent| {
-            ctx.link().callback(move |e: InputEvent| {
-                Msg::Checkbox(
-                    continent,
-                    input_checkbox(e),
-                )
-            })
+            ctx.link()
+                .callback(move |e: InputEvent| Msg::Checkbox(continent, input_checkbox(e)))
         };
 
         let continents = self.selected_continents.iter().map(|(name, checked)| {
@@ -183,7 +182,7 @@ impl Component for Nations {
                 if ctx.props().loaded.user.isAdmin{
                     <div>
                     <label>{"Removed: "}</label>
-                    <input type="checkbox" checked={self.include_removed} oninput={ctx.link().callback(|e| Msg::Removed(input_checkbox(e)))}/>   
+                    <input type="checkbox" checked={self.include_removed} oninput={ctx.link().callback(|e| Msg::Removed(input_checkbox(e)))}/>
                     </div>
                 }
 

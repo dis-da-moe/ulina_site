@@ -29,34 +29,36 @@ pub trait LoadProcessHandler<Props, Data, ProcessedData> {
 }
 
 #[async_trait(?Send)]
-pub trait LoadHandler<Data>{
+pub trait LoadHandler<Data> {
     async fn load() -> Result<Data, String>;
 
-    fn on_load(loaded: Data) -> Data{
+    fn on_load(loaded: Data) -> Data {
         loaded
     }
 }
 
 #[async_trait(?Send)]
-impl<Data, Handler: LoadHandler<Data>> LoadProcessHandler<(), Data, Data> for Handler{
-    async fn load(_: ()) -> Result<Data, String>{
+impl<Data, Handler: LoadHandler<Data>> LoadProcessHandler<(), Data, Data> for Handler {
+    async fn load(_: ()) -> Result<Data, String> {
         Handler::load().await
     }
 
-    fn on_load(loaded: Data) -> Data{
+    fn on_load(loaded: Data) -> Data {
         Handler::on_load(loaded)
     }
 }
 
 pub type Loader<Data, Comp> = LoaderProcessor<(), Data, Data, Comp>;
 
-impl<Props, Data, ProcessedData, Comp> Component for LoaderProcessor<Props, Data, ProcessedData, Comp>
+impl<Props, Data, ProcessedData, Comp> Component
+    for LoaderProcessor<Props, Data, ProcessedData, Comp>
 where
     Props: 'static + Properties + Clone,
     Data: 'static,
     ProcessedData: 'static + PartialEq + Clone,
     Comp: 'static + Component<Properties = LoadProps<ProcessedData>>,
-    LoaderProcessor<Props, Data, ProcessedData, Comp>: LoadProcessHandler<Props, Data, ProcessedData>,
+    LoaderProcessor<Props, Data, ProcessedData, Comp>:
+        LoadProcessHandler<Props, Data, ProcessedData>,
 {
     type Message = Msg<Data>;
 
@@ -65,7 +67,9 @@ where
     fn create(ctx: &Context<Self>) -> Self {
         let props = ctx.props().clone();
         ctx.link().send_future(async move {
-            Msg::<Data>::Loaded(LoaderProcessor::<Props, Data, ProcessedData, Comp>::load(props).await)
+            Msg::<Data>::Loaded(
+                LoaderProcessor::<Props, Data, ProcessedData, Comp>::load(props).await,
+            )
         });
         LoaderProcessor {
             props_data: None,
@@ -79,8 +83,9 @@ where
         let data = match msg {
             Msg::Loaded(data) => data,
         };
-        self.props_data =
-            Some(data.map(|data| LoaderProcessor::<Props, Data, ProcessedData, Comp>::on_load(data)));
+        self.props_data = Some(
+            data.map(|data| LoaderProcessor::<Props, Data, ProcessedData, Comp>::on_load(data)),
+        );
         true
     }
 

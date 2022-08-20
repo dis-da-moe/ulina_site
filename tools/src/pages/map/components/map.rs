@@ -1,6 +1,6 @@
-use super::nation::{Nation, Rect};
-use crate::{util::by_id};
 use super::super::viewbox::Viewbox;
+use super::nation::{Nation, Rect};
+use crate::util::by_id;
 
 use glam::Vec2;
 use gloo_events::EventListener;

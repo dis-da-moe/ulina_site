@@ -3,7 +3,7 @@ use yew_router::prelude::{use_history, History};
 
 #[function_component(Back)]
 pub fn back() -> Html {
-    match use_history(){
+    match use_history() {
         Some(history) => {
             let onclick = Callback::from(move |e: MouseEvent| {
                 e.prevent_default();
@@ -16,8 +16,8 @@ pub fn back() -> Html {
                 </>
             }
         }
-        _ => html!{}
-    }    
+        _ => html! {},
+    }
 }
 
 #[macro_export]

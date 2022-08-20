@@ -1,19 +1,22 @@
+use crate::{
+    back, backend,
+    loader::{LoadHandler, LoadProps, Loader},
+};
 use async_trait::async_trait;
-use common::{LoadChanges, ChangeType};
-use yew::prelude::*;
 use common::DATE_FORMAT;
-use crate::{loader::{LoadProps, Loader, LoadHandler}, backend, back};
+use common::{ChangeType, LoadChanges};
+use yew::prelude::*;
 pub type App = Loader<LoadChanges, Changes>;
 
 type ChangesProps = LoadProps<LoadChanges>;
 
 #[async_trait(?Send)]
-impl LoadHandler<LoadChanges> for App{
-    async fn load() ->  Result<LoadChanges, String> {
+impl LoadHandler<LoadChanges> for App {
+    async fn load() -> Result<LoadChanges, String> {
         backend::nation_changes().await
     }
 
-    fn on_load(mut loaded: LoadChanges) -> LoadChanges{
+    fn on_load(mut loaded: LoadChanges) -> LoadChanges {
         loaded.data.sort_by(|a, b| a.date.cmp(&b.date));
         loaded
     }
@@ -37,49 +40,46 @@ macro_rules! row_values {
     };
 }
 
-
-fn default_convert(val: &Option<String>) -> Html{
+fn default_convert(val: &Option<String>) -> Html {
     row_values!(val.clone().unwrap_or_else(|| "NULL".to_string()))
 }
 
-fn flag_convert(val: &Option<String>) -> Html{
-    match val{
+fn flag_convert(val: &Option<String>) -> Html {
+    match val {
         None => default_convert(val),
-        Some(value) => row_values!(html!{
+        Some(value) => row_values!(html! {
             <img src={value.clone()} class="w-[20%] m-auto"/>
-        })
+        }),
     }
 }
 
-impl Component for Changes{
+impl Component for Changes {
     type Message = ();
 
     type Properties = ChangesProps;
 
     fn create(_ctx: &Context<Self>) -> Self {
-        Changes{}
+        Changes {}
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-
-        let changes = ctx.props().loaded.data.iter().map(|change|{
-
-            let convert = match change.change_type{
+        let changes = ctx.props().loaded.data.iter().map(|change| {
+            let convert = match change.change_type {
                 ChangeType::Flag => flag_convert,
-                _ => default_convert
+                _ => default_convert,
             };
 
-            html!{
+            html! {
                 <tr class="border-y border-gray-600">
                 {row_values!(change.nation_name.clone(), change.change_type.to_string())}
                 {convert(&change.old_value)}
-                {convert(&change.new_value)}    
+                {convert(&change.new_value)}
                 {row_values!(change.date.format(DATE_FORMAT).to_string(), change.admin.to_string())}
                 </tr>
             }
         });
-        
-        html!{
+
+        html! {
             <>
                 {back!()}
                 <h1>{"Nation Changes"}</h1>

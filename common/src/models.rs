@@ -90,17 +90,17 @@ pub struct NationContinentId {
     pub name: String,
     pub ownerDiscord: String,
     pub continentName: String,
-    pub removed: bool
+    pub removed: bool,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
-pub struct NationChange{
+pub struct NationChange {
     pub nation_name: String,
     pub change_type: ChangeType,
     pub old_value: Option<String>,
     pub new_value: Option<String>,
     pub date: DateTime<Utc>,
-    pub admin: bool
+    pub admin: bool,
 }
 
 macro_rules! change_type {
@@ -112,7 +112,7 @@ macro_rules! change_type {
 
         impl FromStr for ChangeType{
             type Err = ChangeTypeParseError;
-        
+
             fn from_str(s: &str) -> Result<Self, Self::Err> {
                 match s {
                     $(

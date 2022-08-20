@@ -1,10 +1,8 @@
-
-
 use rocket::tokio::fs;
 use serenity::client::Context;
 
 use crate::{
-    database::{add_flag, Id, validate_flag},
+    database::{add_flag, validate_flag, Id},
     discord::{
         helper::{is_admin, Helper},
         ids::FLAG,
@@ -22,8 +20,6 @@ pub const DATA: CommandData = CommandData {
     name: "edit-flag",
     category: Category::EditNation,
 };
-
-
 
 pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
     command.create_option(|option| {
@@ -53,9 +49,7 @@ pub async fn edit_flag(ctx: &Context, interaction: &Interaction) -> Result<(), E
         .await
         .map_err(|err| Error::InternalError(format!("{:?}", err)))?;
 
-    let writer =  |path| async move {
-        fs::write(path, buffer).await
-    };
+    let writer = |path| async move { fs::write(path, buffer).await };
 
     add_flag(
         nation.id(),
@@ -65,7 +59,6 @@ pub async fn edit_flag(ctx: &Context, interaction: &Interaction) -> Result<(), E
         is_admin(&interaction.user),
     )
     .await?;
-
 
     interaction
         .follow_up(&ctx.http, |message| {

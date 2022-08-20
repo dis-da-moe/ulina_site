@@ -1,4 +1,4 @@
-use common::{current_url, LoadMap, LoadNation, LoadNations, UserData, LoadChanges};
+use common::{current_url, LoadChanges, LoadMap, LoadNation, LoadNations, UserData};
 use reqwasm::http::Request;
 
 use crate::debug;

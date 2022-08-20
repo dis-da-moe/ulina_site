@@ -2,7 +2,6 @@ use lazy_static::initialize;
 use rocket::config::LogLevel;
 use rocket::figment::Figment;
 use rocket::fs::FileServer;
-use rocket::futures::TryFutureExt;
 use rocket::Config;
 use std::net::IpAddr;
 use std::path::Path;
@@ -10,23 +9,25 @@ use std::path::Path;
 mod auth;
 mod directories;
 mod get;
+mod post;
 pub mod rendering;
 mod user_data;
-mod post;
 
-use auth::{admin, admin_login, discord_login, login_result, oauth_redirect, logout};
-use get::{load_map, nation, nations, page, tools, get_user_data, nation_changes};
-use post::edit_nation;
 use crate::config::CONFIG;
 use crate::site::directories::{CURRENT_DIR, PUBLIC_FOLDER, STATIC_DIR};
-pub async fn run() -> Result<(), String> {
+use auth::{admin, admin_login, discord_login, login_result, logout, oauth_redirect};
+use get::{get_user_data, load_map, nation, nation_changes, nations, page, tools};
+use post::edit_nation;
+pub async fn run() {
     initialize(&CURRENT_DIR);
     initialize(&STATIC_DIR);
 
     let config = Config {
         log_level: LogLevel::Critical,
         cli_colors: true,
-        address: common::LOCAL_IP.parse::<IpAddr>().map_err(|e| format!("error parsing IP address: {}", e))?,
+        address: common::LOCAL_IP
+            .parse::<IpAddr>()
+            .expect("error parsing IP address"),
         port: common::PORT,
         ..Default::default()
     };
@@ -58,10 +59,10 @@ pub async fn run() -> Result<(), String> {
             ],
         )
         .ignite()
-        .map_err(|err| err.to_string())
-        .await?;
+        .await
+        .expect("Error igniting server");
 
     println!("available on {}", common::LOCAL_URL.as_str());
 
-    rocket.launch().map_err(|x| x.to_string()).await.map(|_| ())
+    let _rocket = rocket.launch().await.expect("Error launching server");
 }

@@ -55,7 +55,7 @@ pub async fn commands(ctx: &Context, interaction: &Interaction) -> Result<(), Er
         &NORMAL_COMMANDS
     }
     .get()
-    .ok_or_else(||Error::InternalError("can not get embeds from `OnceCell`".to_string()))?
+    .ok_or_else(|| Error::InternalError("can not get embeds from `OnceCell`".to_string()))?
     .clone();
 
     interaction

@@ -10,6 +10,7 @@ pub struct Config {
     pub secret_key: String,
     pub redirect: String,
     pub database_url: String,
+    pub google_key: String,
 }
 
 lazy_static! {

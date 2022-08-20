@@ -9,7 +9,6 @@ use serenity::model::id::GuildId;
 use serenity::model::interactions::application_command::ApplicationCommandInteraction;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
-use std::result::Result;
 
 use crate::error::Error;
 
@@ -95,7 +94,7 @@ impl EventHandler for Handler {
     }
 }
 
-pub async fn run() -> Result<(), String> {
+pub async fn run() {
     lazy_static::initialize(&COMMANDS);
 
     // Login with a bot token from the environment
@@ -107,8 +106,5 @@ pub async fn run() -> Result<(), String> {
         .expect("Error creating client");
 
     // start listening for events by starting a single shard
-    client
-        .start()
-        .await
-        .map_err(|err| format!("Error creating client: {}", err))
+    client.start().await.expect("Error starting client");
 }

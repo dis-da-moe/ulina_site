@@ -38,12 +38,14 @@ fn get_guides() -> Vec<GuideEmbed> {
                 .title(guide.title)
                 .url(guide.link.clone())
                 .description(format!("{}\n{}", guide.link, guide.description))
-                .image(guide.image)
-                .field("This includes: ", ZERO_WIDTH, false);
+                .image(guide.image);
 
-            guide.includes.into_iter().for_each(|include| {
-                embed.field(format!("• **{}**", capitalise(&include)), ZERO_WIDTH, true);
-            });
+            if !guide.includes.is_empty() {
+                embed.field("This includes: ", ZERO_WIDTH, false);
+                guide.includes.into_iter().for_each(|include| {
+                    embed.field(format!("• **{}**", capitalise(&include)), ZERO_WIDTH, true);
+                });
+            }
 
             GuideEmbed {
                 name: guide.name,

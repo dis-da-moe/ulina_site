@@ -7,11 +7,11 @@ use common::{AddSocial, LoadNation, CONTINENTS};
 use web_sys::{HtmlFormElement, HtmlInputElement};
 use yew::prelude::*;
 
-use crate::util::{input_text, input_checkbox, BUTTON_CLASS};
+use crate::util::{input_checkbox, input_text, BUTTON_CLASS};
 use crate::{
     backend::load_nation,
-    loader::{LoadProcessHandler, LoadProps, LoaderProcessor},
     display::{field_title, show_info, show_trivia},
+    loader::{LoadProcessHandler, LoadProps, LoaderProcessor},
 };
 
 pub struct Nation {
@@ -25,7 +25,7 @@ pub struct Nation {
     continent_field: NodeRef,
     removed: bool,
     message: Option<String>,
-    edit: bool
+    edit: bool,
 }
 
 pub enum Msg {
@@ -36,7 +36,7 @@ pub enum Msg {
     RemoveSocial(usize),
     EditSocial(usize, String, fn(&mut AddSocial) -> &mut String),
     Removed(bool),
-    Edit
+    Edit,
 }
 
 impl Component for Nation {
@@ -77,7 +77,7 @@ impl Component for Nation {
             continent_field: NodeRef::default(),
             removed: nation.removed,
             message: None,
-            edit: false
+            edit: false,
         }
     }
 
@@ -105,28 +105,29 @@ impl Component for Nation {
                 *editor(self.socials.get_mut(index).unwrap()) = value
             }
             Msg::Submit => {
-                if let Some(continent_field) = &self.continent_field.cast::<HtmlInputElement>(){
-                    if !CONTINENTS.contains(&continent_field.value().as_str()){
+                if let Some(continent_field) = &self.continent_field.cast::<HtmlInputElement>() {
+                    if !CONTINENTS.contains(&continent_field.value().as_str()) {
                         self.message = Some("Invalid continent name".to_string());
                         return true;
                     }
                 }
 
-                
                 let form = self.form.cast::<HtmlFormElement>().unwrap();
 
-                if !form.check_validity(){
+                if !form.check_validity() {
                     self.message = Some("Invalid form".to_string());
                     return true;
                 }
-                
-                self.socials.retain(|social| !social.link.trim().is_empty() && !social.platform.trim().is_empty());
-                
+
+                self.socials.retain(|social| {
+                    !social.link.trim().is_empty() && !social.platform.trim().is_empty()
+                });
+
                 self.socials_field
                     .cast::<HtmlInputElement>()
                     .unwrap()
                     .set_value(&serde_json::to_string(&self.socials).unwrap());
-                
+
                 form.submit().unwrap();
             }
             Msg::Removed(removed) => {
@@ -240,8 +241,8 @@ impl Component for Nation {
                 else if !self.is_mine{
                     <p>{"This is not your nation - if this is a mistake contact the admins on discord"}</p>
                 }
-                
-                
+
+
                 <div class="flex flex-col place-items-center">
                     {field_title("Name", &nation.core.name)}
                     {show_info(nation, flag_load, self.flag_loaded)}

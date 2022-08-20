@@ -9,7 +9,6 @@ use std::fmt::Debug;
 use std::future::Future;
 use std::path::Path;
 
-
 use super::{db, NationId};
 const FLAG_DIR: &str = "./public/flags";
 
@@ -17,8 +16,7 @@ pub const ACCEPTED_EXTENSIONS: [&str; 3] = ["jpg", "jpeg", "png"];
 
 pub const MAX_SIZE: u64 = 8_000_000; //max size of an image in bytes
 
-
-pub fn validate_flag(file_name: &str, size: u64) -> Result<&str, Error>{
+pub fn validate_flag(file_name: &str, size: u64) -> Result<&str, Error> {
     //accepts the full file-name of an image and its size in bytes
     //validates the size and extension and returns the extension of the file
     let extension = Path::new(file_name)
@@ -42,10 +40,12 @@ pub async fn add_flag<F, E>(
     nation_name: &str,
     extension: &str,
     //async closure that accepts a file path and writes the flag to it
-    writer: impl FnOnce(String) -> F,    
+    writer: impl FnOnce(String) -> F,
     is_admin: bool,
-) -> Result<(), Error> 
-where F: Future<Output = Result<(), E>>, E: Debug
+) -> Result<(), Error>
+where
+    F: Future<Output = Result<(), E>>,
+    E: Debug,
 {
     //adds a flag and assigns it to the nation as its current flag
 
@@ -58,7 +58,8 @@ where F: Future<Output = Result<(), E>>, E: Debug
         extension
     );
 
-    writer(format!("{}/{}", FLAG_DIR, file_name)).await
+    writer(format!("{}/{}", FLAG_DIR, file_name))
+        .await
         .map_err(|e| Error::InternalError(format!("{:?}", e)))?;
 
     let path = format!("/flags/{}", file_name);

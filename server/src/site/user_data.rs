@@ -3,9 +3,10 @@ use std::time::Duration;
 use chrono::Utc;
 use rocket::{
     http::{Cookie, CookieJar, SameSite, Status},
+    outcome::IntoOutcome,
     request::FromRequest,
     request::Outcome,
-    Request, outcome::IntoOutcome,
+    Request,
 };
 use serde::Deserialize;
 use sqlx::query;
@@ -40,7 +41,7 @@ impl<'r> FromRequest<'r> for UserId {
 
 pub struct AdminUser(pub i64);
 
-impl From<AdminUser> for UserId{
+impl From<AdminUser> for UserId {
     fn from(user: AdminUser) -> Self {
         UserId(user.0)
     }
@@ -60,17 +61,12 @@ impl<'r> FromRequest<'r> for AdminUser {
         };
 
         match query!("SELECT isAdmin FROM User WHERE userId = ?", id.0)
-        .fetch_one(db())
-        .await{
-            Err(e) => {
-                Outcome::Failure((Status::InternalServerError, e.into()))
-            }
-            Ok(result) if result.isAdmin => {
-                Outcome::Success(AdminUser(id.0))
-            }
-            _ => {
-                Outcome::Forward(())
-            }
+            .fetch_one(db())
+            .await
+        {
+            Err(e) => Outcome::Failure((Status::InternalServerError, e.into())),
+            Ok(result) if result.isAdmin => Outcome::Success(AdminUser(id.0)),
+            _ => Outcome::Forward(()),
         }
     }
 }
@@ -80,22 +76,29 @@ fn get_user<'r>(cookies: &CookieJar<'r>) -> Option<Cookie<'static>> {
 }
 async fn valid_id(id: i64) -> bool {
     let now = Utc::now();
-    query!("UPDATE User SET lastVisit = ? WHERE userId = ? RETURNING userId", now, id)
-        .fetch_one(db())
-        .await
-        .is_ok()
+    query!(
+        "UPDATE User SET lastVisit = ? WHERE userId = ? RETURNING userId",
+        now,
+        id
+    )
+    .fetch_one(db())
+    .await
+    .is_ok()
 }
 
 async fn add_user<'r>(cookies: &CookieJar<'r>) -> Result<UserId, Error> {
     let now = Utc::now();
-    let id = query!("INSERT INTO User (isAdmin, lastVisit) VALUES (false, ?) RETURNING userId", now)
-        .fetch_one(db())
-        .await?
-        .userId;
+    let id = query!(
+        "INSERT INTO User (isAdmin, lastVisit) VALUES (false, ?) RETURNING userId",
+        now
+    )
+    .fetch_one(db())
+    .await?
+    .userId;
 
-    /* 
-    this timeout is to prevent a weird bug where inserting a row and then 
-    retrieving that row in the same request 
+    /*
+    this timeout is to prevent a weird bug where inserting a row and then
+    retrieving that row in the same request
     (which is necessary for cases where a cookie is created in a UserId guard)
     results in that row not being found, even though it exits. for some reason adding another await in between
     the two queries fixes this issue.

@@ -1,16 +1,16 @@
 use async_trait::async_trait;
 use common::UserData;
-use loader::{LoadProps, LoadHandler, Loader};
+use loader::{LoadHandler, LoadProps, Loader};
 use util::BUTTON_CLASS;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
 mod backend;
-mod loader;
-mod display;
-mod util;
-mod pages;
 mod components;
+mod display;
+mod loader;
+mod pages;
+mod util;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -25,7 +25,7 @@ pub enum Route {
     #[at("/tools/nation/:id")]
     Nation { id: i64 },
     #[at("/tools/changes")]
-    Changes
+    Changes,
 }
 
 fn switch(routes: &Route) -> Html {
@@ -45,9 +45,9 @@ fn switch(routes: &Route) -> Html {
         Route::Nation { id } => html! {
             <pages::nation::App id={*id}/>
         },
-        Route::Changes => html!{
+        Route::Changes => html! {
             <pages::changes::App/>
-        }
+        },
     }
 }
 
@@ -56,8 +56,8 @@ type HomeProps = LoadProps<UserData>;
 type App = Loader<UserData, Home>;
 
 #[async_trait(?Send)]
-impl LoadHandler<UserData> for Loader<UserData, Home>{
-    async fn load() -> Result<UserData, String>{
+impl LoadHandler<UserData> for Loader<UserData, Home> {
+    async fn load() -> Result<UserData, String> {
         backend::user_data().await
     }
 }
@@ -76,7 +76,7 @@ impl Component for Home {
         html! {
             <>
             {back!()}
-            
+
             if user.discord.is_some() || user.isAdmin{
                 <a href="/logout" class={BUTTON_CLASS}>{"Logout"}</a>
             }

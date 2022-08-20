@@ -6,3 +6,4 @@ server/data
 /test.html
 /tabs.svg
 server/public/flags
+server/google_secret.json

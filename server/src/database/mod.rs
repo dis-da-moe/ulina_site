@@ -1,10 +1,10 @@
 pub mod models;
 
+mod clear;
 mod connection;
 mod ids;
 mod read;
 mod update;
-mod clear;
 pub use connection::*;
 pub use ids::*;
 pub use read::*;

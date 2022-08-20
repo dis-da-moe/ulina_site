@@ -75,5 +75,3 @@ pub fn title(title: &str) -> Html {
         </span>
     }
 }
-
-
