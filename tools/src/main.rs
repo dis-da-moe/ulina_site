@@ -76,7 +76,6 @@ impl Component for Home {
         html! {
             <>
             {back!()}
-
             if user.discord.is_some() || user.isAdmin{
                 <a href="/logout" class={BUTTON_CLASS}>{"Logout"}</a>
             }

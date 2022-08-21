@@ -1,6 +1,7 @@
 use crate::database::{db, flag_link, FlagId};
 use crate::database::{latest_map, nation_all, nations_all};
 use crate::error::Error;
+use crate::site::directories::PUBLIC_DIR;
 use crate::site::user_data::AdminUser;
 use chrono::{TimeZone, Utc};
 use common::{
@@ -34,11 +35,17 @@ pub async fn page(path: PathBuf) -> Option<NamedFile> {
         .ok()
 }
 
-#[get("/tools/<_path..>")]
-pub async fn tools(_path: PathBuf) -> Option<NamedFile> {
-    NamedFile::open(STATIC_DIR.join(Path::new("tools.html")))
+#[get("/<path..>", rank=11)]
+pub async fn tools(path: PathBuf) -> Option<NamedFile> {
+    let path = path.file_name().and_then(|file| file.to_str())?;
+    if matches!(path, "tools_bg.wasm" | "tools.js"){
+        NamedFile::open(PUBLIC_DIR.join(Path::new(&format!("tools/{}", path))))
         .await
         .ok()
+    }
+    else{
+        None
+    }
 }
 
 #[get("/load-map")]
