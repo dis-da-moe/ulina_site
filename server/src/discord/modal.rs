@@ -6,10 +6,10 @@ use serenity::{
 use sqlx::query;
 
 use crate::{
-    database::{db, nation_change, NationId},
+    database::{db, nation_change},
     error::Error,
 };
-
+use common::NationId;
 use super::{
     helper::{is_admin, Helper},
     ids::{DESCRIPTION_INPUT, NAME_INPUT},

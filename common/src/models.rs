@@ -156,3 +156,39 @@ pub type LoadNations = UserAndData<Vec<NationContinentId>>;
 pub type LoadNation = UserAndData<NationAll>;
 pub type LoadChanges = UserAndData<Vec<NationChange>>;
 pub const CONTINENTS: [&str; 5] = ["Ripiero", "Kanita", "Zapita", "Ailou", "Sivalat"];
+
+#[macro_export]
+macro_rules! id_type {
+    ($(($name: tt, $field_name: tt) $(, $model: ident)*),+) => {
+    $(  #[derive(Debug, Clone, Copy, PartialEq)]
+        pub struct $name(pub i64);
+
+    $(
+        impl Id<$name> for $model{
+            fn id(&self) -> $name{
+                $name(self.$field_name)
+            }
+        }
+    )*
+    )+
+    };
+}
+
+pub trait Id<T> {
+    fn id(&self) -> T;
+}
+
+id_type!(
+    (SocialsId, socialsId),
+    Social,
+    (NationId, nationId),
+    Nation,
+    NationContinentId,
+    (FlagId, flagId)
+);
+
+impl Id<NationId> for NationAll {
+    fn id(&self) -> NationId {
+        self.core.id()
+    }
+}

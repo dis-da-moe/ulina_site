@@ -9,10 +9,10 @@ use sqlx::query;
 use sycamore::view;
 
 use crate::{
-    database::{add_flag, db, nation_all, validate_flag, Id},
+    database::{add_flag, db, nation_all, validate_flag},
     error::Error,
 };
-
+use common::Id;
 use super::{rendering::Render, user_data::UserId};
 use crate::database::nation_change;
 use common::ChangeType;

@@ -6,7 +6,8 @@ use sqlx::types::chrono::{TimeZone, Utc};
 use sqlx::{query, query_as};
 use std::fs;
 
-use super::{db, FlagId};
+use super::db;
+use common::FlagId;
 const MAP_DIR: &str = "data/maps";
 
 pub async fn latest_map() -> Result<Map, Error> {

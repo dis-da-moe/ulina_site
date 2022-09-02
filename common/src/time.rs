@@ -108,3 +108,4 @@ converter!(to_real, time_period_ulina, calculate_to_real);
 converter!(to_ulina, time_period_real, calculate_to_ulina);
 
 pub const DATE_FORMAT: &str = "%A %e %B %Y";
+pub const DATE_TIME_FORMAT: &str = "%Y_%m_%d_%H_%M_%S";

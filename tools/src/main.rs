@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use common::UserData;
 use loader::{LoadHandler, LoadProps, Loader};
-use util::BUTTON_CLASS;
+use crate::components::Login;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
@@ -75,13 +75,8 @@ impl Component for Home {
         let user = &ctx.props().loaded;
         html! {
             <>
-            {back!()}
-            if user.discord.is_some() || user.isAdmin{
-                <a href="/logout" class={BUTTON_CLASS}>{"Logout"}</a>
-            }
-            else if user.discord.is_none(){
-                <a href="/discord-login" class={BUTTON_CLASS}>{"Login"}</a>
-            }
+            {navbar!()}
+            <Login user={user.clone()}/>
 
             <div>
                 <Link<Route> to={Route::Map}>{"map"}</Link<Route>>

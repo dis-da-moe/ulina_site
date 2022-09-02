@@ -1,7 +1,7 @@
 pub use crate::database::models::*;
 use crate::error::Error;
 
-use common::ChangeType;
+use common::{ChangeType, DATE_TIME_FORMAT};
 use sqlx::query;
 use sqlx::types::chrono::{self, Utc};
 use std::fmt::Debug;
@@ -9,7 +9,8 @@ use std::fmt::Debug;
 use std::future::Future;
 use std::path::Path;
 
-use super::{db, NationId};
+use super::db;
+use common::NationId;
 const FLAG_DIR: &str = "./public/flags";
 
 pub const ACCEPTED_EXTENSIONS: [&str; 3] = ["jpg", "jpeg", "png"];
@@ -54,7 +55,7 @@ where
     let file_name = format!(
         "{}-{}.{}",
         nation_name.replace(" ", ""),
-        date.format("%Y_%m_%d_%H_%M_%S"),
+        date.format(DATE_TIME_FORMAT),
         extension
     );
 

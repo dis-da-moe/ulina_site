@@ -1,8 +1,9 @@
 use rocket::tokio::fs;
 use serenity::client::Context;
 
+use common::Id;
 use crate::{
-    database::{add_flag, validate_flag, Id},
+    database::{add_flag, validate_flag},
     discord::{
         helper::{is_admin, Helper},
         ids::FLAG,

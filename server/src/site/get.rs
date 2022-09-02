@@ -1,4 +1,5 @@
-use crate::database::{db, flag_link, FlagId};
+use crate::database::{db, flag_link};
+use common::FlagId;
 use crate::database::{latest_map, nation_all, nations_all};
 use crate::error::Error;
 use crate::site::directories::PUBLIC_DIR;
@@ -13,27 +14,11 @@ use rocket::serde::json::Json;
 
 use sqlx::{query, query_as};
 use std::collections::HashMap;
-use std::ffi::OsStr;
 use std::fmt::Debug;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
-use super::directories::STATIC_DIR;
 use super::user_data::UserId;
-
-#[get("/<path..>", rank = 12)]
-pub async fn page(path: PathBuf) -> Option<NamedFile> {
-    let mut page = path
-        .file_name()
-        .unwrap_or_else(|| OsStr::new("index"))
-        .to_owned();
-
-    page.push(".html");
-
-    NamedFile::open(STATIC_DIR.join(Path::new(&page)))
-        .await
-        .ok()
-}
 
 #[get("/<path..>", rank=11)]
 pub async fn tools(path: PathBuf) -> Option<NamedFile> {
@@ -46,6 +31,13 @@ pub async fn tools(path: PathBuf) -> Option<NamedFile> {
     else{
         None
     }
+}
+
+#[get("/tools/<_path..>", rank=10)]
+pub async fn tools_dir(_path: PathBuf) -> Option<NamedFile> {
+    NamedFile::open(PUBLIC_DIR.join(Path::new("tools/index.html")))
+        .await
+        .ok()
 }
 
 #[get("/load-map")]

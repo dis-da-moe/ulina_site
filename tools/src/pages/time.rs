@@ -1,4 +1,4 @@
-use chrono::{Local, NaiveDate};
+use chrono::{Local, NaiveDate, NaiveDateTime};
 use common::{to_real, DATE_FORMAT};
 use common::{to_ulina, TimeError};
 use gloo::timers::callback::Interval;
@@ -6,7 +6,7 @@ use web_sys::HtmlInputElement;
 use yew::prelude::*;
 use yew::TargetCast;
 
-use crate::back;
+use crate::navbar;
 
 pub struct App {
     current_real: chrono::DateTime<Local>,
@@ -15,7 +15,6 @@ pub struct App {
     convert_ulina: Option<Result<NaiveDate, TimeError>>,
 }
 
-const TIME_SECTION: &str = "grid space-y-2 place-items-center mt-7 border-solid border-slate-600 border-b-4 pb-6 w-[70%] mx-auto";
 
 const TIME_FORMAT: &str = "%H:%M:%S";
 const DATE_INPUT_FORMAT: &str = "%Y-%m-%d";
@@ -49,7 +48,6 @@ impl Component for App {
 
     fn create(ctx: &Context<Self>) -> Self {
         let now = Local::now();
-        //log(format!("{}", now.offset().local_minus_utc() / 3600));
         let timer = {
             let link = ctx.link().clone();
             Interval::new(250, move || link.send_message(Msg::Time))
@@ -105,18 +103,10 @@ impl Component for App {
 
         html! {
             <>
-            {back!()}
-            <div class={TIME_SECTION}>
-                <div class="font-bold text-base underline">{"Real Time:"}</div>
-                <div>{self.current_real.date().format(DATE_FORMAT)}</div>
-                <div>{self.current_real.time().format(TIME_FORMAT)}</div>
-            </div>
-
-            <div class={TIME_SECTION}>
-                <div class="font-bold text-lg underline">{"Ulina Time:"}</div>
-                <div class="text-lg">{self.current_ulina.date().format(DATE_FORMAT)}</div>
-                <div>{self.current_ulina.time().format(TIME_FORMAT)}</div>
-            </div>
+            {navbar!()}
+            
+            {time_section(&self.current_real.naive_utc(), "Real")}
+            {time_section(&self.current_ulina, "Ulina")}
 
             <div class="text-center mt-6 underline font-bold text-lg"> {"Convert"} </div>
 
@@ -126,6 +116,18 @@ impl Component for App {
             </div>
             </>
         }
+    }
+}
+
+fn time_section(date_time: &NaiveDateTime, name: &str) -> Html{
+    const TIME_SECTION: &str = "grid space-y-2 place-items-center mt-7 border-solid border-slate-600 border-b-4 pb-6 w-[70%] mx-auto";
+
+    html!{
+        <div class={TIME_SECTION}>
+        <div class="font-bold text-base underline">{format!("{} Time:", name)}</div>
+            <div>{date_time.date().format(DATE_FORMAT)}</div>
+            <div>{date_time.time().format(TIME_FORMAT)}</div>
+        </div>
     }
 }
 
@@ -142,7 +144,7 @@ fn time_input(
     html! {
         <div class="grid justify-center">
             <span class="italic text-sm">{name}</span>
-            <input {oninput} class="bg-[#c5e1ef]" type="date" value={value}/>
+            <input {oninput} style="background:none" type="date" value={value}/>
 
             if let Some(Err(err)) = date{
                 <p>{format!("{:?}", err)}</p>

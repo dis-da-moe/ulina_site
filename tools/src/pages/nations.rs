@@ -3,16 +3,16 @@ use common::{LoadNations, NationContinentId};
 
 use crate::loader::{LoadHandler, Loader};
 
-use crate::util::{input_checkbox, BUTTON_CLASS};
-use crate::{back, backend, Route};
+use crate::util::{input_checkbox, BUTTON_CLASS, input_text};
+use crate::{navbar, backend, Route};
 use std::collections::HashMap;
-
+use common::Id;
 use crate::loader::LoadProps;
 use common::CONTINENTS;
 use web_sys::{HtmlInputElement, InputEvent};
-use yew::{html, Component, Context, TargetCast};
+use yew::{html, Component, Context, TargetCast, Callback, Html};
 use yew_router::prelude::Link;
-
+use crate::components::MyNation;
 #[async_trait(?Send)]
 impl LoadHandler<LoadNations> for Loader<LoadNations, Nations> {
     async fn load() -> Result<LoadNations, String> {
@@ -51,6 +51,7 @@ pub enum Msg {
     Checkbox(&'static str, bool),
     Removed(bool),
 }
+const COLUMN_CLASS: &str = "col d-flex justify-content-center align-items-center mb-1";
 
 impl Component for Nations {
     type Message = Msg;
@@ -116,22 +117,40 @@ impl Component for Nations {
     }
 
     fn view(&self, ctx: &yew::Context<Self>) -> yew::Html {
-        let text_on_input = ctx.link().callback(|e: InputEvent| {
-            Msg::NameSearch(e.target_dyn_into::<HtmlInputElement>().unwrap().value())
-        });
-        let checkbox_input = |continent| {
-            ctx.link()
-                .callback(move |e: InputEvent| Msg::Checkbox(continent, input_checkbox(e)))
-        };
 
-        let continents = self.selected_continents.iter().map(|(name, checked)| {
-            html! {
-                <div>
-                    <input type="checkbox" oninput={checkbox_input(name)} checked={*checked}/>
-                    <span>{name.clone()}</span>
+        html! {
+        <>
+        {navbar!()}
+        <div class="vstack">
+
+            <div class="row d-flex justify-content-center align-items-center align-content-center me-auto" style="margin-left: 0;">
+                <span>{"Search: "}</span>
+                
+                <div class="col d-flex d-lg-flex d-xl-flex justify-content-center align-items-center align-items-lg-center justify-content-xl-center" style="max-width: 100%;margin-bottom: 5px;">
+                    <input class="d-grid justify-content-center align-items-md-center" style="margin-bottom: 0px;max-height: 34px; color:black;"  id="name"
+                        type="text" placeholder="Enter nation name here" oninput={ctx.link().callback(|e: InputEvent| Msg::NameSearch(input_text(e)))}
+                    />
                 </div>
-            }
-        });
+
+                {self.dropdown(ctx)}
+                
+                {self.removed(ctx)}
+
+                <div class={COLUMN_CLASS}>
+                    <MyNation nation={self.my_nation.map(|index| get_nation(ctx, index).id())}/>
+                </div>
+            </div>
+
+            {self.table(ctx)}
+
+        </div>
+        </>
+        }
+    }
+}
+
+impl Nations{
+    fn table(&self, ctx: &Context<Self>) -> Html{
 
         let nations: Vec<_> = self
             .searched_nations
@@ -146,7 +165,7 @@ impl Component for Nations {
 
         let nations = nations.into_iter()
         .filter(|nation| *self.selected_continents.get(nation.continentName.as_str()).unwrap())
-        .filter(|nation| !nation.removed || self.include_removed)
+        .filter(|nation| nation.removed == self.include_removed)
         .map(|nation|{
             let name = if nation.removed{
                 format!("{} [removed]", nation.name, )
@@ -155,58 +174,78 @@ impl Component for Nations {
             };
 
             html!{
-                <div class="table-row">
-                    <Link<Route> classes={"table-cell"} to={Route::Nation{id: nation.nationId}}>{name}</Link<Route>>
-                    <div class="table-cell">{&nation.continentName}</div>
+                <tr>
+                    <td>
+                        <Link<Route> to={Route::Nation{id: nation.nationId}}>{name}</Link<Route>>
+                    </td>
+                    <td>{&nation.continentName}</td>
+                </tr>
+            }
+        });
+
+        html!{
+            <div class="table-responsive" style="margin-top: 13px;">
+                <table class="table table-striped table-hover table-dark table-sm">
+                    <thead>
+                        <tr>
+                            <th>{"Name"}</th>
+                            <th>{"Continent"}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {for nations}
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+
+    fn removed(&self, ctx: &Context<Self>) -> Html{
+        let removed_callback = ctx.link().callback(|e| Msg::Removed(input_checkbox(e)));
+
+        html!{
+            if ctx.props().loaded.user.isAdmin{
+                <div class="col">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="removed" checked={self.include_removed} oninput={removed_callback}/>
+                        <label class="form-check-label" for="removed">{"Removed"}</label>
+                    </div>
+                </div>
+            }
+        }
+    }
+
+    fn dropdown(&self, ctx: &Context<Self>) -> Html{
+        let checkbox_input = |continent| {
+            ctx.link()
+                .callback(move |e: InputEvent| Msg::Checkbox(continent, input_checkbox(e)))
+        };
+
+        let continents = self.selected_continents.iter().map(|(&name, &checked)| {
+            html! {
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id={name} oninput={checkbox_input(name)} checked={checked}/>
+                    <label class="form-check-label" for={name}>{name}</label>
                 </div>
             }
         });
 
-        html! {
-            <>
-            {back!()}
-            <div class="flex flex-wrap">
-                <span>{"Search: "}</span>
-                <input placeholder="Enter nation name" oninput={text_on_input}/>
-                <div class="dropdown relative">
-                    <button class="inline-flex items-center">
-                        <span class="mr-1">{"Continents"}</span>
-                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                        </svg>
+        html!{
+            <div class="col d-flex d-md-flex justify-content-center align-items-md-center" style="margin-bottom: 5px;">
+                <div class="dropdown justify-content-center align-self-center">
+                    <button class="btn btn-primary dropdown-toggle align-self-center" aria-expanded="false" data-bs-toggle="dropdown" type="button">
+                        {"Continents"}
                     </button>
-                    <div class="dropdown-menu absolute hidden text-gray-700 pt-1">
+                    <div class="dropdown-menu" style="margin-right: 0;margin-left: 0;min-width: 0;padding-right: 19px;padding-left: 19px;">
                         {for continents}
                     </div>
                 </div>
-
-                if ctx.props().loaded.user.isAdmin{
-                    <div>
-                    <label>{"Removed: "}</label>
-                    <input type="checkbox" checked={self.include_removed} oninput={ctx.link().callback(|e| Msg::Removed(input_checkbox(e)))}/>
-                    </div>
-                }
-
-                if let Some(index) = self.my_nation{
-                    <Link<Route> classes={BUTTON_CLASS} to={Route::Nation{id: get_nation(ctx, index).nationId}}>{"My Nation"}</Link<Route>>
-                }
-                else{
-                    <a class={BUTTON_CLASS} href="/discord-login">{"My Nation"}</a>
-                }
             </div>
-
-            <div class="table max-w-full w-full md:w-[50%]">
-                <div class="table-header-group">
-                    <div class="table-cell">{"Name"}</div>
-                    <div class="table-cell">{"Continent"}</div>
-                </div>
-                <div class="table-row-group bg-gray-600 text-zinc-300">
-                    {for nations}
-                </div>
-            </div>
-            </>
         }
     }
 }
+
+
 
 fn get_nation(ctx: &Context<Nations>, index: NationIndex) -> &NationContinentId {
     ctx.props().loaded.data.get(index.0).unwrap()

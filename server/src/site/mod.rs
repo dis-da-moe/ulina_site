@@ -14,13 +14,12 @@ pub mod rendering;
 mod user_data;
 
 use crate::config::CONFIG;
-use crate::site::directories::{CURRENT_DIR, STATIC_DIR, PUBLIC_DIR};
+use crate::site::directories::{CURRENT_DIR, PUBLIC_DIR};
 use auth::{admin, admin_login, discord_login, login_result, logout, oauth_redirect};
-use get::{get_user_data, load_map, nation, nation_changes, nations, page, tools};
+use get::{get_user_data, load_map, nation, nation_changes, nations, tools, tools_dir};
 use post::edit_nation;
 pub async fn run() {
     initialize(&CURRENT_DIR);
-    initialize(&STATIC_DIR);
 
     let config = Config {
         log_level: LogLevel::Critical,
@@ -42,9 +41,9 @@ pub async fn run() {
         .mount(
             "/",
             routes![
-                page,
                 load_map,
                 tools,
+                tools_dir,
                 admin,
                 oauth_redirect,
                 admin_login,

@@ -3,7 +3,7 @@
 **/Cargo.lock
 **/.env
 server/data
-/test.html
+/test-animations.html
 /tabs.svg
 server/public/flags
 server/google_secret.json

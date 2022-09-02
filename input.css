@@ -19,8 +19,21 @@ a {
   word-break: break-word;
 }
 
+.text-input{
+  color: black;
+}
+
 body{
-  background-color: #c5e1ef;
+  background-color: #274372;
+}
+
+@layer components{
+  .home{
+    @apply flex justify-center items-center bg-navy-50 
+      rounded-md w-36 h-20 shadow-lg shadow-navy-700 cursor-pointer hover:scale-105 
+      transition-transform text-center align-middle text-navy-800 text-xl 
+      decoration-navy-200 underline;
+  }
 }
 
 .cls-1 {

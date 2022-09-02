@@ -1,5 +1,5 @@
 use crate::{
-    back, backend,
+    navbar, backend,
     loader::{LoadHandler, LoadProps, Loader},
 };
 use async_trait::async_trait;
@@ -81,7 +81,7 @@ impl Component for Changes {
 
         html! {
             <>
-                {back!()}
+                {navbar!()}
                 <h1>{"Nation Changes"}</h1>
                 <table>
                     <tr>

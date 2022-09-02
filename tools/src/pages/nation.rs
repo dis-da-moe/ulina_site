@@ -1,11 +1,13 @@
 use std::collections::HashMap;
 
-use crate::back;
+use crate::navbar;
 use crate::components::Flag;
 use async_trait::async_trait;
 use common::{AddSocial, LoadNation, CONTINENTS};
 use web_sys::{HtmlFormElement, HtmlInputElement};
 use yew::prelude::*;
+
+use crate::components::{LinkButton, CallbackButton};
 
 use crate::util::{input_checkbox, input_text, BUTTON_CLASS};
 use crate::{
@@ -158,7 +160,7 @@ impl Component for Nation {
                     html!{
                         <div>
                         <label>{name.to_string()}</label>
-                        <textarea type="text" name={name.to_string()} value={value.clone().unwrap_or("".to_string())} {oninput}/>
+                        <textarea class="text-input" type="text" name={name.to_string()} value={value.clone().unwrap_or("".to_string())} {oninput}/>
                         </div>
                     }
                 });
@@ -173,16 +175,16 @@ impl Component for Nation {
 
                 html!{
                     <tr>
-                        <td><input value={social.platform.clone()} oninput={edit(|social| &mut social.platform)}/></td>
-                        <td><input value={social.link.clone()} oninput={edit(|social| &mut social.link)}/></td>
-                        <td><a class={BUTTON_CLASS} onclick={ctx.link().callback(move |_| Msg::RemoveSocial(index))}>{"Delete"}</a></td>
+                        <td><input class="text-input" value={social.platform.clone()} oninput={edit(|social| &mut social.platform)}/></td>
+                        <td><input class="text-input" value={social.link.clone()} oninput={edit(|social| &mut social.link)}/></td>
+                        <td><CallbackButton text="Delete" callback={ctx.link().callback(move |_| Msg::RemoveSocial(index))}/></td>
                     </tr>
                 }
             });
 
             html! {
                 <>
-                {back!()}
+                {navbar!()}
 
                 if let Some(message) = self.message.clone(){
                     <p>{message}</p>
@@ -190,7 +192,7 @@ impl Component for Nation {
 
                 <form ref={self.form.clone()} action="/edit-nation" method="POST" enctype="multipart/form-data">
                     {input_field("id", nation.core.nationId, true, true)}
-                    <input type="text" name="socials" value="" hidden=true ref={self.socials_field.clone()}/>
+                    <input type="text" name="socials" class="text-input" value="" hidden=true ref={self.socials_field.clone()}/>
 
                     {input_field("name", &nation.core.name, false, true)}
                     {for optional_fields}
@@ -204,18 +206,18 @@ impl Component for Nation {
                     if is_admin{
                         <div>
                         <label>{"Removed"}</label>
-                        <input type="checkbox" required=false name="removed" checked={self.removed} oninput={ctx.link().callback(|e| Msg::Removed(input_checkbox(e)))}/>
+                        <input type="checkbox" required=false class="text-input" name="removed" checked={self.removed} oninput={ctx.link().callback(|e| Msg::Removed(input_checkbox(e)))}/>
                         </div>
 
                         {input_field("discord", &nation.core.ownerDiscord, false, true)}
                         <div>
                         <label>{"Continent"}</label>
-                        <input ref={self.continent_field.clone()} type="text" name="continent" value={nation.core.continentName.clone()} required=true/>
+                        <input ref={self.continent_field.clone()} class="text-input" type="text" name="continent" value={nation.core.continentName.clone()} required=true/>
                         </div>
                     }
                 </form>
 
-                <a class={BUTTON_CLASS} onclick={ctx.link().callback(|_| Msg::AddSocial)}>{"Add Social"}</a>
+                <CallbackButton text="Add Social" callback={ctx.link().callback(|_| Msg::AddSocial)}/>
 
                 <table>
                     <tr>
@@ -225,23 +227,26 @@ impl Component for Nation {
                     {for socials}
                 </table>
 
-                <a onclick={ctx.link().callback(|_| Msg::Submit)} class={BUTTON_CLASS}>{"Submit"}</a>
+                <CallbackButton text="Submit" callback={ctx.link().callback(|_| Msg::Submit)}/>
+                
                 </>
             }
         } else {
             html! {
                 <>
-                {back!()}
-                if is_admin || self.is_mine{
-                    <a class={BUTTON_CLASS} onclick={ctx.link().callback(|_| Msg::Edit)}>{"Edit"}</a>
-                }
-                else if !self.logged_in{
-                    <a class={BUTTON_CLASS} href="/discord-login">{"Click to login with discord to edit"}</a>
-                }
-                else if !self.is_mine{
-                    <p>{"This is not your nation - if this is a mistake contact the admins on discord"}</p>
-                }
-
+                {navbar!()}
+                <div class="flex">
+                    if is_admin || self.is_mine{
+                        <CallbackButton text="Edit" callback={ctx.link().callback(|_| Msg::Edit)}/>
+                        <LinkButton text="Logout" link="/logout"/>
+                    }
+                    else if !self.logged_in{
+                        <LinkButton text="Login to edit" link="/discord-login"/>
+                    }
+                    else if !self.is_mine{
+                        <p>{"This is not your nation - if this is a mistake contact the admins on discord"}</p>
+                    }
+                </div>
 
                 <div class="flex flex-col place-items-center">
                     {field_title("Name", &nation.core.name)}
@@ -260,7 +265,7 @@ fn input_field<T: ToString, Y: ToString>(name: Y, value: T, hidden: bool, requir
         if !hidden{
             <label>{name.to_string()}</label>
         }
-        <input type="text" name={name.to_string()} value={value.to_string()} hidden={hidden} required={required}/>
+        <input class="text-input" type="text" name={name.to_string()} value={value.to_string()} hidden={hidden} required={required}/>
         </div>
     }
 }

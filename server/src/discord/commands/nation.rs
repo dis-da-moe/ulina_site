@@ -1,4 +1,4 @@
-use crate::database::FlagId;
+use common::FlagId;
 use crate::discord::commands::shared::{
     name_option, Category, CommandData, CreateCommand, Interaction,
 };

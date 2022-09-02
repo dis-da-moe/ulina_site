@@ -74,9 +74,7 @@ impl EventHandler for Handler {
                             handle_err_reply(&command_err, reply_err, &ctx.http, &command).await;
                         }
 
-                        if matches!(command_err, Error::InternalError(_)) {
-                            println!("{:?}", command_err);
-                        }
+
                     };
                 } else {
                     command

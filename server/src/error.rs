@@ -1,10 +1,13 @@
+use std::fmt::Debug;
+
 use crate::site::rendering::Render;
-use common::{ChangeTypeParseError, TimeError};
+use chrono::Utc;
+use common::{ChangeTypeParseError, TimeError, DATE_TIME_FORMAT};
 use rocket::response::Responder;
 use serenity::json::JsonError;
 use sycamore::view;
 
-//TODO: rework this, look into the anyhow crate maybe? specialise across modules and share with frontend
+//TODO: rework this
 #[derive(Debug, Clone)]
 pub enum Error {
     NotFound,
@@ -85,7 +88,8 @@ impl ToString for Error {
                 format!("nation not found")
             }
             InternalError(error) => {
-                format!("an internal error occurred: ```{}```", error)
+                println!("{}: {}", Utc::now().format(DATE_TIME_FORMAT), error);
+                "An internal error occurred".to_string()
             }
             InvalidPermissions(message) => message.clone(),
             ExpectedImage(received) => {

@@ -1,4 +1,5 @@
-use crate::database::{db, nation_change, Id};
+use crate::database::{db, nation_change};
+use common::Id;
 use crate::discord::commands::shared::{Category, CommandData, CreateCommand, Interaction};
 use crate::discord::helper::Helper;
 use crate::discord::ids::USER;

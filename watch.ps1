@@ -1,10 +1,11 @@
 $trunk = Start-Job -ScriptBlock{ Set-Location $using:PWD; trunk watch ./tools/index.html --dist ./server/public/tools --filehash false} -name "trunk"
-$tailwind = Start-Job -ScriptBlock{ Set-Location $using:PWD; npx tailwindcss -i "./input.css" -o "./server/public/styles.css" -w} -name "tailwind"
+$tailwind = Start-Job -ScriptBlock{ Set-Location $using:PWD; ./tailwind.ps1} -name "tailwind"
+$server = Start-Job -ScriptBlock{Set-Location $using:PWD; cargo run --bin server} -name "server"
 
-$jobs = @($trunk, $tailwind)
+$jobs = @($trunk, $tailwind, $server)
 
 try{
-    While(2){
+    While(1){
         foreach($job in $jobs){
             Write-Host $(Receive-Job -Job $job) -NoNewline
         }

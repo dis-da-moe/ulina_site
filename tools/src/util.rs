@@ -24,7 +24,7 @@ pub fn input_checkbox(e: InputEvent) -> bool {
 }
 
 pub const EMPTY_DIV: &str = "grid place-items-center h-20 text-md italic";
-pub const BUTTON_CLASS: &str = "bg-blue-400 rounded-lg p-1 border-gray-400 border-2 unselectable";
+pub const BUTTON_CLASS: &str = "btn btn-primary text-center d-md-flex justify-content-md-center align-items-md-center btn-ulina min-w-[113px] min-h-[42px] text-[18px] h-[35px]";
 #[allow(unused)]
 pub fn log(message: String) {
     web_sys::console::log_1(&message.into());
