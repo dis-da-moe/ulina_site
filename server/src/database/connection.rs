@@ -2,7 +2,7 @@ use once_cell::sync::OnceCell;
 use rocket::tokio::spawn;
 use sqlx::SqlitePool;
 
-use super::{clear::clear, backup::backup};
+use super::{backup::backup, clear::clear};
 
 const DATABASE_URL: &str = "sqlite:data/Ulina.db";
 
