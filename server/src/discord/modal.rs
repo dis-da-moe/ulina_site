@@ -5,15 +5,15 @@ use serenity::{
 };
 use sqlx::query;
 
+use super::{
+    helper::{is_admin, Helper},
+    ids::{DESCRIPTION_INPUT, NAME_INPUT},
+};
 use crate::{
     database::{db, nation_change},
     error::Error,
 };
 use common::NationId;
-use super::{
-    helper::{is_admin, Helper},
-    ids::{DESCRIPTION_INPUT, NAME_INPUT},
-};
 
 pub async fn handle_modal(http: &Http, interaction: ModalSubmitInteraction) {
     match action(&interaction).await {

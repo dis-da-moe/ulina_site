@@ -1,7 +1,6 @@
 use rocket::tokio::fs;
 use serenity::client::Context;
 
-use common::Id;
 use crate::{
     database::{add_flag, validate_flag},
     discord::{
@@ -11,6 +10,7 @@ use crate::{
     error::Error,
     get_options,
 };
+use common::Id;
 
 use super::shared::{
     default_data, edit_action, Category, CommandData, CreateCommand, Interaction, OptionType,

@@ -8,14 +8,14 @@ use rocket::{
 use sqlx::query;
 use sycamore::view;
 
+use super::{rendering::Render, user_data::UserId};
+use crate::database::nation_change;
 use crate::{
     database::{add_flag, db, nation_all, validate_flag},
     error::Error,
 };
-use common::Id;
-use super::{rendering::Render, user_data::UserId};
-use crate::database::nation_change;
 use common::ChangeType;
+use common::Id;
 
 macro_rules! none_if_empty {
     ($nation: ident, $($field: tt)+) => {

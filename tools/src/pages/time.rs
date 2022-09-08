@@ -15,7 +15,6 @@ pub struct App {
     convert_ulina: Option<Result<NaiveDate, TimeError>>,
 }
 
-
 const TIME_FORMAT: &str = "%H:%M:%S";
 const DATE_INPUT_FORMAT: &str = "%Y-%m-%d";
 
@@ -104,7 +103,7 @@ impl Component for App {
         html! {
             <>
             {navbar!()}
-            
+
             {time_section(&self.current_real.naive_utc(), "Real")}
             {time_section(&self.current_ulina, "Ulina")}
 
@@ -119,10 +118,10 @@ impl Component for App {
     }
 }
 
-fn time_section(date_time: &NaiveDateTime, name: &str) -> Html{
+fn time_section(date_time: &NaiveDateTime, name: &str) -> Html {
     const TIME_SECTION: &str = "grid space-y-2 place-items-center mt-7 border-solid border-slate-600 border-b-4 pb-6 w-[70%] mx-auto";
 
-    html!{
+    html! {
         <div class={TIME_SECTION}>
         <div class="font-bold text-base underline">{format!("{} Time:", name)}</div>
             <div>{date_time.date().format(DATE_FORMAT)}</div>

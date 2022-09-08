@@ -61,7 +61,15 @@ pub async fn edit_socials(ctx: &Context, interaction: &Interaction) -> Result<()
 
     interaction
         .message(&ctx.http, |message| {
-            message.embed(|embed| embed.title("Socials").description(go_to_site("create/remove socials", &format!("tools/nation/{}", nation.nationId))).field("successfully updated socials", ZERO_WIDTH, false))
+            message.embed(|embed| {
+                embed
+                    .title("Socials")
+                    .description(go_to_site(
+                        "create/remove socials",
+                        &format!("tools/nation/{}", nation.nationId),
+                    ))
+                    .field("successfully updated socials", ZERO_WIDTH, false)
+            })
         })
         .await;
 

@@ -1,10 +1,10 @@
 use crate::database::{db, flag_link};
-use common::FlagId;
 use crate::database::{latest_map, nation_all, nations_all};
 use crate::error::Error;
 use crate::site::directories::PUBLIC_DIR;
 use crate::site::user_data::AdminUser;
 use chrono::{TimeZone, Utc};
+use common::FlagId;
 use common::{
     ChangeType, LoadChanges, LoadMap, LoadNation, LoadNations, NationChange, NationContinentId,
     UserAndData, UserData,
@@ -20,20 +20,19 @@ use std::str::FromStr;
 
 use super::user_data::UserId;
 
-#[get("/<path..>", rank=11)]
+#[get("/<path..>", rank = 11)]
 pub async fn tools(path: PathBuf) -> Option<NamedFile> {
     let path = path.file_name().and_then(|file| file.to_str())?;
-    if matches!(path, "tools_bg.wasm" | "tools.js"){
+    if matches!(path, "tools_bg.wasm" | "tools.js") {
         NamedFile::open(PUBLIC_DIR.join(Path::new(&format!("tools/{}", path))))
-        .await
-        .ok()
-    }
-    else{
+            .await
+            .ok()
+    } else {
         None
     }
 }
 
-#[get("/tools/<_path..>", rank=10)]
+#[get("/tools/<_path..>", rank = 10)]
 pub async fn tools_dir(_path: PathBuf) -> Option<NamedFile> {
     NamedFile::open(PUBLIC_DIR.join(Path::new("tools/index.html")))
         .await

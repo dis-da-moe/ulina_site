@@ -5,6 +5,7 @@ Excluded files:
 - All of /data which includes:
 - Ulina.db
 - /maps
+- /backups
 
 .env which has the variables:
 

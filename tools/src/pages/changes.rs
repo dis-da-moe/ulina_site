@@ -1,6 +1,7 @@
 use crate::{
-    navbar, backend,
+    backend,
     loader::{LoadHandler, LoadProps, Loader},
+    navbar,
 };
 use async_trait::async_trait;
 use common::DATE_FORMAT;

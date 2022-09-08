@@ -9,7 +9,7 @@ pub struct NationDiscord {
     pub ownerDiscord: String,
 }
 
-impl Id<NationId> for NationDiscord{
+impl Id<NationId> for NationDiscord {
     fn id(&self) -> NationId {
         NationId(self.nationId)
     }

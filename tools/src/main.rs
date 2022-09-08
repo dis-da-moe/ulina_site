@@ -1,7 +1,7 @@
+use crate::components::Login;
 use async_trait::async_trait;
 use common::UserData;
 use loader::{LoadHandler, LoadProps, Loader};
-use crate::components::Login;
 use yew::prelude::*;
 use yew_router::prelude::*;
 

@@ -1,5 +1,4 @@
 use crate::database::{db, nation_change};
-use common::NationId;
 use crate::discord::commands::shared::{
     create_continent_option, get_continent, Category, CommandData, CreateCommand, Interaction,
     OptionType,
@@ -9,6 +8,7 @@ use crate::discord::ids::{CONTINENT, NAME, USER};
 use crate::error::Error;
 use crate::get_options;
 use common::ChangeType;
+use common::NationId;
 use serenity::client::Context;
 
 use sqlx::query;

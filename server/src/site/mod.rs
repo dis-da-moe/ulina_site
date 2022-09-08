@@ -5,7 +5,6 @@ use rocket::fs::FileServer;
 use rocket::Config;
 use std::net::IpAddr;
 
-
 mod auth;
 mod directories;
 mod get;
@@ -34,10 +33,7 @@ pub async fn run() {
 
     let rocket = rocket::build()
         .configure(figment)
-        .mount(
-            "/",
-            FileServer::from(PUBLIC_DIR.clone()).rank(-1),
-        )
+        .mount("/", FileServer::from(PUBLIC_DIR.clone()).rank(-1))
         .mount(
             "/",
             routes![

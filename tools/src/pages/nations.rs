@@ -3,16 +3,16 @@ use common::{LoadNations, NationContinentId};
 
 use crate::loader::{LoadHandler, Loader};
 
-use crate::util::{input_checkbox, BUTTON_CLASS, input_text};
-use crate::{navbar, backend, Route};
-use std::collections::HashMap;
-use common::Id;
-use crate::loader::LoadProps;
-use common::CONTINENTS;
-use web_sys::{HtmlInputElement, InputEvent};
-use yew::{html, Component, Context, TargetCast, Callback, Html};
-use yew_router::prelude::Link;
 use crate::components::MyNation;
+use crate::loader::LoadProps;
+use crate::util::{input_checkbox, input_text, BUTTON_CLASS};
+use crate::{backend, navbar, Route};
+use common::Id;
+use common::CONTINENTS;
+use std::collections::HashMap;
+use web_sys::{HtmlInputElement, InputEvent};
+use yew::{html, Callback, Component, Context, Html, TargetCast};
+use yew_router::prelude::Link;
 #[async_trait(?Send)]
 impl LoadHandler<LoadNations> for Loader<LoadNations, Nations> {
     async fn load() -> Result<LoadNations, String> {
@@ -117,7 +117,6 @@ impl Component for Nations {
     }
 
     fn view(&self, ctx: &yew::Context<Self>) -> yew::Html {
-
         html! {
         <>
         {navbar!()}
@@ -125,7 +124,7 @@ impl Component for Nations {
 
             <div class="row d-flex justify-content-center align-items-center align-content-center me-auto" style="margin-left: 0;">
                 <span>{"Search: "}</span>
-                
+
                 <div class="col d-flex d-lg-flex d-xl-flex justify-content-center align-items-center align-items-lg-center justify-content-xl-center" style="max-width: 100%;margin-bottom: 5px;">
                     <input class="d-grid justify-content-center align-items-md-center" style="margin-bottom: 0px;max-height: 34px; color:black;"  id="name"
                         type="text" placeholder="Enter nation name here" oninput={ctx.link().callback(|e: InputEvent| Msg::NameSearch(input_text(e)))}
@@ -133,7 +132,7 @@ impl Component for Nations {
                 </div>
 
                 {self.dropdown(ctx)}
-                
+
                 {self.removed(ctx)}
 
                 <div class={COLUMN_CLASS}>
@@ -149,9 +148,8 @@ impl Component for Nations {
     }
 }
 
-impl Nations{
-    fn table(&self, ctx: &Context<Self>) -> Html{
-
+impl Nations {
+    fn table(&self, ctx: &Context<Self>) -> Html {
         let nations: Vec<_> = self
             .searched_nations
             .as_ref()
@@ -183,7 +181,7 @@ impl Nations{
             }
         });
 
-        html!{
+        html! {
             <div class="table-responsive" style="margin-top: 13px;">
                 <table class="table table-striped table-hover table-dark table-sm">
                     <thead>
@@ -200,10 +198,10 @@ impl Nations{
         }
     }
 
-    fn removed(&self, ctx: &Context<Self>) -> Html{
+    fn removed(&self, ctx: &Context<Self>) -> Html {
         let removed_callback = ctx.link().callback(|e| Msg::Removed(input_checkbox(e)));
 
-        html!{
+        html! {
             if ctx.props().loaded.user.isAdmin{
                 <div class="col">
                     <div class="form-check">
@@ -215,7 +213,7 @@ impl Nations{
         }
     }
 
-    fn dropdown(&self, ctx: &Context<Self>) -> Html{
+    fn dropdown(&self, ctx: &Context<Self>) -> Html {
         let checkbox_input = |continent| {
             ctx.link()
                 .callback(move |e: InputEvent| Msg::Checkbox(continent, input_checkbox(e)))
@@ -230,7 +228,7 @@ impl Nations{
             }
         });
 
-        html!{
+        html! {
             <div class="col d-flex d-md-flex justify-content-center align-items-md-center" style="margin-bottom: 5px;">
                 <div class="dropdown justify-content-center align-self-center">
                     <button class="btn btn-primary dropdown-toggle align-self-center" aria-expanded="false" data-bs-toggle="dropdown" type="button">
@@ -244,8 +242,6 @@ impl Nations{
         }
     }
 }
-
-
 
 fn get_nation(ctx: &Context<Nations>, index: NationIndex) -> &NationContinentId {
     ctx.props().loaded.data.get(index.0).unwrap()

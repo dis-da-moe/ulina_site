@@ -1,6 +1,6 @@
 use super::shared::name_option;
 use crate::config::CONFIG;
-use crate::database::{NationDiscord};
+use crate::database::NationDiscord;
 use crate::discord::commands::shared::{Category, CommandData, CreateCommand, Interaction};
 use crate::discord::helper::{embed, Helper};
 use crate::error::Error;

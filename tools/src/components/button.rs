@@ -2,13 +2,12 @@ use yew::prelude::*;
 
 use crate::util::BUTTON_CLASS;
 
-
 macro_rules! button_props {
     ($name: tt, $data_name: tt, $data_type: ty) => {
         #[derive(Properties, PartialEq)]
-        pub struct $name{
+        pub struct $name {
             pub text: String,
-            pub $data_name: $data_type
+            pub $data_name: $data_type,
         }
     };
 }
@@ -17,8 +16,8 @@ button_props!(LinkButtonProps, link, String);
 button_props!(CallbackButtonProps, callback, Callback<MouseEvent>);
 
 #[function_component(LinkButton)]
-pub fn link_button(props: &LinkButtonProps) -> Html{
-    html!{
+pub fn link_button(props: &LinkButtonProps) -> Html {
+    html! {
         <a class="a-hidden" href={props.link.clone()}>
             <button class={BUTTON_CLASS} type="button">
                 {props.text.clone()}
@@ -28,8 +27,8 @@ pub fn link_button(props: &LinkButtonProps) -> Html{
 }
 
 #[function_component(CallbackButton)]
-pub fn callback_button(props: &CallbackButtonProps) -> Html{
-    html!{
+pub fn callback_button(props: &CallbackButtonProps) -> Html {
+    html! {
         <a class="a-hidden" onclick={props.callback.clone()}>
             <button class={BUTTON_CLASS} type="button">
                 {props.text.clone()}

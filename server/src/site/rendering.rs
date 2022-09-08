@@ -9,6 +9,9 @@ pub trait Render {
 
 impl Render for sycamore::view::View<SsrNode> {
     fn render(self) -> RawHtml<String> {
-        RawHtml(TEMPLATE.replace("<template></template>", &sycamore::render_to_string(|| self)))
+        RawHtml(TEMPLATE.replace(
+            "<template></template>",
+            &sycamore::render_to_string(|| self),
+        ))
     }
 }

@@ -1,13 +1,13 @@
-pub mod navbar;
+mod button;
 mod error;
 mod flag;
 mod loading;
-mod my_nation;
-mod button;
 mod login;
+mod my_nation;
+pub mod navbar;
+pub use button::{CallbackButton, LinkButton};
 pub use error::Error;
 pub use flag::Flag;
 pub use loading::Loading;
-pub use my_nation::MyNation;
-pub use button::{LinkButton, CallbackButton};
 pub use login::Login;
+pub use my_nation::MyNation;

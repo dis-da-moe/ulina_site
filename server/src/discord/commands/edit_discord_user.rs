@@ -1,11 +1,11 @@
 use crate::database::{db, nation_change};
-use common::Id;
 use crate::discord::commands::shared::{Category, CommandData, CreateCommand, Interaction};
 use crate::discord::helper::Helper;
 use crate::discord::ids::USER;
 use crate::error::Error;
 use crate::get_options;
 use common::ChangeType;
+use common::Id;
 use serenity::client::Context;
 use sqlx::query;
 

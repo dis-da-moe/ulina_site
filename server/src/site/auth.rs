@@ -17,8 +17,8 @@ use rocket::response::Redirect;
 use rocket_governor::{Quota, RocketGovernable, RocketGovernor};
 use serde::Deserialize;
 use sqlx::query;
-use sycamore::{SsrNode, view};
 use sycamore::view::View;
+use sycamore::{view, SsrNode};
 
 use super::rendering::Render;
 use super::user_data::{AdminUser, Login};
@@ -122,27 +122,30 @@ pub async fn oauth_redirect(
             )
             .execute(db())
             .await?;
-            let nation = query!("SELECT nationId FROM Nation WHERE ownerDiscord = ?", response.id)
-                .fetch_one(db())
-                .await.map(|nation| format!("/tools/nation/{}", nation.nationId));
+            let nation = query!(
+                "SELECT nationId FROM Nation WHERE ownerDiscord = ?",
+                response.id
+            )
+            .fetch_one(db())
+            .await
+            .map(|nation| format!("/tools/nation/{}", nation.nationId));
 
-            let button: View<SsrNode> =
-                if let Ok(link) = nation{
-                    view!{
-                        a(href=link){"View nation"}
-                    }
+            let button: View<SsrNode> = if let Ok(link) = nation {
+                view! {
+                    a(href=link){"View nation"}
                 }
-                else{
-                    view!{
-                        a(href="/tools/nations"){"View nations"}
-                    }
-                };
+            } else {
+                view! {
+                    a(href="/tools/nations"){"View nations"}
+                }
+            };
 
             Ok(view! {
                 p{(format!("successfully signed in as {}", response.username))}
-                
+
                 (button)
-            }.render())
+            }
+            .render())
         }
         Err(e) => Ok(message(e.to_string())),
     }
@@ -153,7 +156,8 @@ pub async fn admin(_user: AdminUser) -> RawHtml<String> {
     view! {
         div{"Logged in as admin"}
         a(href="/tools"){"Click to view tools"}
-    }.render()
+    }
+    .render()
 }
 
 #[get("/admin?<error>", rank = 2)]

@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
-use crate::navbar;
 use crate::components::Flag;
+use crate::navbar;
 use async_trait::async_trait;
 use common::{AddSocial, LoadNation, CONTINENTS};
 use web_sys::{HtmlFormElement, HtmlInputElement};
 use yew::prelude::*;
 
-use crate::components::{LinkButton, CallbackButton};
+use crate::components::{CallbackButton, LinkButton};
 
 use crate::util::{input_checkbox, input_text, BUTTON_CLASS};
 use crate::{
@@ -228,7 +228,7 @@ impl Component for Nation {
                 </table>
 
                 <CallbackButton text="Submit" callback={ctx.link().callback(|_| Msg::Submit)}/>
-                
+
                 </>
             }
         } else {

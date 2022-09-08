@@ -1,7 +1,7 @@
 use yew::prelude::*;
 
-pub fn navbar() -> Html{
-    html!{
+pub fn navbar() -> Html {
+    html! {
     <>
     <nav class="navbar navbar-light navbar-expand-md ulina-navbar" style="height: 57px;margin-top: 5px;">
         <div class="container-fluid"><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1" style="color: rgb(255,255,255);border-style: none;border-color: rgb(255,255,255);"><span class="visually-hidden">{"Toggle navigation"}</span><span class="navbar-toggler-icon" style="color: rgb(255,255,255);"></span></button>
@@ -25,6 +25,6 @@ pub fn navbar() -> Html{
 #[macro_export]
 macro_rules! navbar {
     () => {
-        crate::components::navbar::navbar()    
+        crate::components::navbar::navbar()
     };
 }

@@ -73,8 +73,6 @@ impl EventHandler for Handler {
                         {
                             handle_err_reply(&command_err, reply_err, &ctx.http, &command).await;
                         }
-
-
                     };
                 } else {
                     command
