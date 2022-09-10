@@ -7,6 +7,8 @@ Excluded files:
 - /maps
 - /backups
 
+as well as public/flags (which includes the flags)
+
 .env which has the variables:
 
 - ADMIN: the admin password for the site
