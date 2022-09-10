@@ -3,7 +3,6 @@ use common::DATE_TIME_FORMAT;
 use rocket::tokio::time::sleep;
 use rocket::{
     futures::TryFutureExt,
-    serde::json::{self, Json},
     tokio::fs,
 };
 use serde::{Deserialize, Serialize};

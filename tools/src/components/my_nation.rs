@@ -9,13 +9,13 @@ pub struct MyNationProps {
 
 #[function_component(MyNation)]
 pub fn my_nation(props: &MyNationProps) -> Html {
-    let link = if let Some(id) = props.nation {
-        format!("/tools/nation/{}", id.0)
+    let (link, text) = if let Some(id) = props.nation {
+        (format!("/tools/nation/{}", id.0), "My Nation")
     } else {
-        "/discord-login".to_string()
+        ("/discord-login".to_string(), "Login")
     };
 
     html! {
-        <LinkButton text="My Nation" {link}/>
+        <LinkButton text={text} {link}/>
     }
 }

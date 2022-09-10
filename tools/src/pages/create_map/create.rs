@@ -4,13 +4,13 @@ use async_trait::async_trait;
 use common::{LoadNations, NationContinentId};
 use gloo::file::File;
 use gloo::file::callbacks::FileReader;
-use web_sys::{Element, SvgElement, HtmlInputElement, HtmlFormElement};
+use web_sys::{HtmlInputElement, HtmlFormElement};
 use crate::components::CallbackButton;
 use yew::prelude::*;
 
 use super::nation::CreateNation;
 
-use crate::{loader::{Loader, LoadHandler, LoadProps, LoadProcessHandler}, backend, util::{log, by_id, get_vec, XMLNS, viewbox::Viewbox}};
+use crate::{loader::{Loader, LoadHandler, LoadProps}, backend, util::{by_id, get_vec, XMLNS, viewbox::Viewbox}};
 
 pub type App = Loader<LoadNations, Create>;
 
@@ -71,7 +71,7 @@ impl Component for Create{
 
     type Properties = CreateProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self{
             reader: None,
             svg: None,

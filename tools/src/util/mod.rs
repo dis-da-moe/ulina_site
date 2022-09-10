@@ -19,10 +19,10 @@ pub fn input_text(e: InputEvent) -> String {
         .map(|element| element.value())
         .unwrap_or_else(|| e.target_dyn_into::<HtmlTextAreaElement>().unwrap().value())
 }
-
+pub const INPUT_CONTAINER: &str = "flex space-x-3";
 pub fn input_field<T: ToString, Y: ToString>(name: Y, value: T, hidden: bool, required: bool) -> Html {
     html! {
-        <div>
+        <div class={INPUT_CONTAINER}>
         if !hidden{
             <label>{name.to_string()}</label>
         }
@@ -37,7 +37,6 @@ pub fn input_checkbox(e: InputEvent) -> bool {
 
 pub const XMLNS: &str = "http://www.w3.org/2000/svg";
 pub const EMPTY_DIV: &str = "grid place-items-center h-20 text-md italic";
-pub const BUTTON_CLASS: &str = "btn btn-primary text-center d-md-flex justify-content-md-center align-items-md-center btn-ulina min-w-[113px] min-h-[42px] text-[18px] h-[35px]";
 #[allow(unused)]
 pub fn log<T: ToString>(message: T) {
     web_sys::console::log_1(&message.to_string().into());

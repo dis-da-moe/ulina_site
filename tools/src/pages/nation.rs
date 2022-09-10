@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use common::{AddSocial, LoadNation, CONTINENTS};
 use web_sys::{HtmlFormElement, HtmlInputElement};
 use yew::prelude::*;
-use crate::util::input_field;
+use crate::util::{input_field, INPUT_CONTAINER};
 use crate::components::{CallbackButton, LinkButton};
 
 use crate::util::{input_checkbox, input_text};
@@ -158,7 +158,7 @@ impl Component for Nation {
                 .map(|(name, value)| {
                     let oninput = on_field_input(*name);
                     html!{
-                        <div>
+                        <div class={INPUT_CONTAINER}>
                         <label>{name.to_string()}</label>
                         <textarea class="text-input" type="text" name={name.to_string()} value={value.clone().unwrap_or("".to_string())} {oninput}/>
                         </div>
@@ -186,11 +186,12 @@ impl Component for Nation {
                 <>
                 {navbar!()}
 
+                <div class="pl-3 pt-2 mb-5">
                 if let Some(message) = self.message.clone(){
                     <p>{message}</p>
                 }
 
-                <form ref={self.form.clone()} action="/edit-nation" method="POST" enctype="multipart/form-data">
+                <form ref={self.form.clone()} action="/edit-nation" method="POST" enctype="multipart/form-data" class="grid space-y-5">
                     {input_field("id", nation.core.nationId, true, true)}
                     <input type="text" name="socials" class="text-input" value="" hidden=true ref={self.socials_field.clone()}/>
 
@@ -219,7 +220,7 @@ impl Component for Nation {
 
                 <CallbackButton text="Add Social" callback={ctx.link().callback(|_| Msg::AddSocial)}/>
 
-                <table>
+                <table class="mb-2">
                     <tr>
                         <th>{"Platform"}</th>
                         <th>{"Link"}</th>
@@ -228,6 +229,7 @@ impl Component for Nation {
                 </table>
 
                 <CallbackButton text="Submit" callback={ctx.link().callback(|_| Msg::Submit)}/>
+                </div>
 
                 </>
             }
@@ -235,7 +237,7 @@ impl Component for Nation {
             html! {
                 <>
                 {navbar!()}
-                <div class="flex">
+                <div class="grid">
                     if is_admin || self.is_mine{
                         <CallbackButton text="Edit" callback={ctx.link().callback(|_| Msg::Edit)}/>
                         <LinkButton text="Logout" link="/logout"/>
@@ -245,10 +247,11 @@ impl Component for Nation {
                     }
                     else if !self.is_mine{
                         <p>{"This is not your nation - if this is a mistake contact the admins on discord"}</p>
+                        <LinkButton text="Logout" link="/logout"/>
                     }
                 </div>
 
-                <div class="flex flex-col place-items-center">
+                <div class="flex flex-col place-items-center text-white">
                     {field_title("Name", &nation.core.name)}
                     {show_info(nation, flag_load, self.flag_loaded)}
                     {show_trivia(nation)}

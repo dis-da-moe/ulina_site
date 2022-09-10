@@ -131,7 +131,7 @@ impl Component for Infobox {
                 </div>
 
                 <div class="overflow-y-auto overflow-x-hidden bg-[#f7f7e9] p-1 max-h-[90vh]">
-                <div class="space-y-0.5 border-x-2 border-b-2 border-solid border-gray-400 bg-[#f7f7e9] p-1">
+                <div class="space-y-0.5 border-x-2 border-b-2 border-solid border-gray-400 bg-[#f7f7e9] p-1 text-black">
                   {content}
                 </div>
               </div>

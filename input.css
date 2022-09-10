@@ -5,7 +5,6 @@
 .infobox-field {
   display: block;
   word-break: break-word;
-  color: black;
 }
 
 .unselectable {
@@ -18,7 +17,6 @@ a {
   display: block;
   font-weight: bold;
   word-break: break-word;
-  color: black;
 }
 
 .text-input{

@@ -1,6 +1,6 @@
 use yew::prelude::*;
 
-use crate::util::BUTTON_CLASS;
+const BUTTON_CLASS: &str = "btn btn-primary text-center d-md-flex justify-content-md-center w-fit h-fit align-items-md-center text-[13px]";
 
 macro_rules! button_props {
     ($name: tt, $data_name: tt, $data_type: ty) => {

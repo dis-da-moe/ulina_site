@@ -5,13 +5,13 @@ use crate::loader::{LoadHandler, Loader};
 
 use crate::components::MyNation;
 use crate::loader::LoadProps;
-use crate::util::{input_checkbox, input_text, BUTTON_CLASS};
+use crate::util::{input_checkbox, input_text};
 use crate::{backend, navbar, Route};
 use common::Id;
 use common::CONTINENTS;
 use std::collections::HashMap;
-use web_sys::{HtmlInputElement, InputEvent};
-use yew::{html, Callback, Component, Context, Html, TargetCast};
+use web_sys::{InputEvent};
+use yew::{html, Component, Context, Html};
 use yew_router::prelude::Link;
 #[async_trait(?Send)]
 impl LoadHandler<LoadNations> for Loader<LoadNations, Nations> {

@@ -42,7 +42,7 @@ fn oauth_url() -> (Url, CsrfToken) {
 }
 
 #[get("/discord-login")]
-pub async fn discord_login(user_id: UserId) -> Result<RawHtml<String>, Error> {
+pub async fn discord_login(user_id: UserId) -> Result<Redirect, Error> {
     let (url, token) = oauth_url();
     let token = token.secret();
 
@@ -54,10 +54,7 @@ pub async fn discord_login(user_id: UserId) -> Result<RawHtml<String>, Error> {
     .execute(db())
     .await?;
 
-    Ok(view! {
-        a(href={url.as_str()}) {"Click here to log in"}
-    }
-    .render())
+    Ok(Redirect::temporary(url.to_string()))
 }
 
 #[derive(Deserialize)]
@@ -136,7 +133,7 @@ pub async fn oauth_redirect(
                 }
             } else {
                 view! {
-                    a(href="/tools/nations"){"View nations"}
+                    p{"You do not have a nation."}
                 }
             };
 

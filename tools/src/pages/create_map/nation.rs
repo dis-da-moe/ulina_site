@@ -18,7 +18,7 @@ impl Component for CreateNation {
 
     type Properties = CreateNationProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {
             node_ref: NodeRef::default(),
         }

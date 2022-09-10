@@ -15,7 +15,7 @@ pub enum Msg {
     Loaded,
 }
 
-const CLASS: &str = ".object-scale-down max-h-40 mx-auto p-5";
+const CLASS: &str = ".object-scale-down max-h-[40vh] mx-auto p-3";
 
 impl Component for Flag {
     type Message = Msg;
@@ -49,7 +49,7 @@ impl Component for Flag {
             (Some(flag), false) => {
                 html! {
                     <>
-                        <img class={classes!(CLASS)} src={url("assets/img/loading.svg")}/>
+                        <img class={classes!(CLASS)} src={url("loading.svg")}/>
                         <img class={classes!(CLASS)} src={flag.clone()} onload={onload} style="display:none"/>
                     </>
                 }
