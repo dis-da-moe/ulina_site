@@ -6,10 +6,10 @@ use async_trait::async_trait;
 use common::{AddSocial, LoadNation, CONTINENTS};
 use web_sys::{HtmlFormElement, HtmlInputElement};
 use yew::prelude::*;
-
+use crate::util::input_field;
 use crate::components::{CallbackButton, LinkButton};
 
-use crate::util::{input_checkbox, input_text, BUTTON_CLASS};
+use crate::util::{input_checkbox, input_text};
 use crate::{
     backend::load_nation,
     display::{field_title, show_info, show_trivia},
@@ -259,16 +259,7 @@ impl Component for Nation {
     }
 }
 
-fn input_field<T: ToString, Y: ToString>(name: Y, value: T, hidden: bool, required: bool) -> Html {
-    html! {
-        <div>
-        if !hidden{
-            <label>{name.to_string()}</label>
-        }
-        <input class="text-input" type="text" name={name.to_string()} value={value.to_string()} hidden={hidden} required={required}/>
-        </div>
-    }
-}
+
 
 pub type App = LoaderProcessor<Props, LoadNation, LoadNation, Nation>;
 

@@ -11,7 +11,6 @@ mod display;
 mod loader;
 mod pages;
 mod util;
-
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
     #[at("/tools")]
@@ -26,6 +25,13 @@ pub enum Route {
     Nation { id: i64 },
     #[at("/tools/changes")]
     Changes,
+    #[at("/tools/create-map")]
+    CreateMap,
+    #[at("/tools/create-nation")]
+    CreateNation,
+    #[not_found]
+    #[at("/404")]
+    NotFound
 }
 
 fn switch(routes: &Route) -> Html {
@@ -48,6 +54,15 @@ fn switch(routes: &Route) -> Html {
         Route::Changes => html! {
             <pages::changes::App/>
         },
+        Route::CreateMap => html! {
+            <pages::create_map::App/>
+        },
+        Route::CreateNation => html!{
+            <pages::create_nation::App/>
+        },
+        Route::NotFound => html!{
+            {"not found"}
+        }
     }
 }
 
@@ -90,6 +105,12 @@ impl Component for Home {
             if user.isAdmin{
                 <div>
                     <Link<Route> to={Route::Changes}>{"changes"}</Link<Route>>
+                </div>
+                <div>
+                    <Link<Route> to={Route::CreateMap}>{"create map"}</Link<Route>>
+                </div>
+                <div>
+                    <Link<Route> to={Route::CreateNation}>{"create nation"}</Link<Route>>
                 </div>
             }
             </>

@@ -1,15 +1,18 @@
-use common::{AddSocial, CONTINENTS};
+use std::mem::take;
+
+use chrono::Utc;
+use common::{AddSocial, CONTINENTS, DATE_TIME_FORMAT};
 use rocket::{
     form::{Form, Lenient, Strict},
     fs::TempFile,
     response::content::RawHtml,
-    serde::json::{self},
+    serde::json::{self}, tokio::fs,
 };
 use sqlx::query;
 use sycamore::view;
 
 use super::{rendering::Render, user_data::UserId};
-use crate::database::nation_change;
+use crate::{database::nation_change, site::user_data::AdminUser, internal};
 use crate::{
     database::{add_flag, db, nation_all, validate_flag},
     error::Error,
@@ -47,6 +50,41 @@ macro_rules! change {
             }
         )+
     };
+}
+
+#[post("/create-nation", data="<create_nation>")]
+pub async fn create_nation(
+    create_nation: Form<Strict<CreateNation>>,
+    _user: AdminUser
+) -> Result<RawHtml<String>, Error>{
+
+    if !CONTINENTS.contains(&create_nation.continentName.as_str()){
+        return Err(Error::NotContinent(create_nation.continentName.clone()));
+    }
+    
+    let name = create_nation.name.clone();
+
+    query!("INSERT INTO Nation (name, ownerDiscord, continentName) VALUES (?, ?, ?)", name, create_nation.ownerDiscord, create_nation.continentName)
+        .execute(db()).await?;
+    Ok(view!{
+        (format!("Created nation {}", create_nation.name))
+    }.render())
+}
+
+#[post("/create-map", data="<map>")]
+pub async fn create_map(
+    mut map: Form<Strict<CreateMap>>,
+    _user: AdminUser
+) -> Result<RawHtml<String>, Error>{
+    let now = Utc::now();
+    let file_name = format!("map-{}.svg", now.format(DATE_TIME_FORMAT));
+    fs::write(format!("./data/maps/{}", file_name), take(&mut map.svg)).await.map_err(internal!())?;
+
+    query!("INSERT INTO Map (fileName, date) VALUES (?, ?)", file_name, now).execute(db()).await?;
+
+    Ok(view!{
+        "saved map"
+    }.render())
 }
 
 #[post("/edit-nation", data = "<edit>")]
@@ -218,4 +256,17 @@ pub struct EditNation<'r> {
     removed: Option<Lenient<bool>>,
     discord: Option<String>,
     continent: Option<String>,
+}
+
+#[derive(FromForm)]
+#[allow(non_snake_case)]
+pub struct CreateNation{
+    name: String,
+    ownerDiscord: i64,
+    continentName: String,
+}
+
+#[derive(FromForm)]
+pub struct CreateMap{
+    svg: String
 }

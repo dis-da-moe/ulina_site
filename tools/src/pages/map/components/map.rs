@@ -1,4 +1,4 @@
-use super::super::viewbox::Viewbox;
+use crate::util::viewbox::Viewbox;
 use super::nation::{Nation, Rect};
 use crate::util::by_id;
 
@@ -8,6 +8,7 @@ use web_sys::{MouseEvent, WheelEvent};
 use yew::{html, Component, Html, NodeRef, Properties};
 
 use crate::util::get_vec;
+use crate::util::XMLNS;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct NationNameId {
@@ -77,7 +78,7 @@ impl Component for Map {
                     },
                 };
                 html! {
-                    <Nation inner={element.inner_html()} nation={nation_id} rect={rect}/>
+                    <Nation inner={element.inner_html()} nation={nation_id} rect={rect} dispatch={true}/>
                 }
             })
             .collect();
@@ -162,7 +163,7 @@ impl Component for Map {
 
         html! {
             <>
-            <svg ref={self.svg.clone()} xmlns="http://www.w3.org/2000/svg"
+            <svg ref={self.svg.clone()} xmlns={XMLNS}
                 {onmousedown}
                 onmousemove={mouse_move}
                 onwheel={scroll}

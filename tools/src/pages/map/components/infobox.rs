@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
+use crate::util::XMLNS;
 use common::NationAll;
 use yew::prelude::*;
 use yew_agent::{Bridge, Bridged};
@@ -48,7 +49,7 @@ impl Infobox {
 
         html! {
             <div class="col-span-2">
-            <svg class="max-h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 48">
+            <svg class="max-h-8" xmlns={XMLNS} viewBox="0 0 180 48">
                 <g onclick={tab_click(Tab::Info)}>
                     <polygon  class={info_colour} points="0 0 0 50 90 50 86 0 0 0" />
                     <text class="cls2-2" transform="translate(15.07 36.63)">

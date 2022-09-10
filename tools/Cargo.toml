@@ -24,7 +24,7 @@ async-trait = "0.1.57"
 
 [dependencies.web-sys]
 version = "0.3"
-features = ["console", "Document", "Element", "Node", "Window", "SvgElement", "HtmlCollection", "DomRect", "Event", "EventTarget", "HtmlFormElement"]
+features = ["console", "Document", "Element", "Node", "Window", "SvgElement", "HtmlCollection", "DomRect", "Event", "EventTarget", "HtmlFormElement", "DataTransfer", "DragEvent", "File", "FileList", "Blob", "FileReader"]
 
 [build]
 target = "wasm32-unknown-unknown"

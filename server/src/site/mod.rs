@@ -16,7 +16,7 @@ use crate::config::CONFIG;
 use crate::site::directories::{CURRENT_DIR, PUBLIC_DIR};
 use auth::{admin, admin_login, discord_login, login_result, logout, oauth_redirect};
 use get::{get_user_data, load_map, nation, nation_changes, nations, tools, tools_dir};
-use post::edit_nation;
+use post::{edit_nation, create_nation, create_map};
 pub async fn run() {
     initialize(&CURRENT_DIR);
 
@@ -50,7 +50,9 @@ pub async fn run() {
                 edit_nation,
                 get_user_data,
                 nation_changes,
-                logout
+                logout,
+                create_nation,
+                create_map
             ],
         )
         .ignite()

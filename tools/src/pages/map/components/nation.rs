@@ -9,7 +9,7 @@ use super::map::NationNameId;
 
 pub struct Nation {
     node_ref: NodeRef,
-    bus: Dispatcher<EventBus>,
+    bus: Option<Dispatcher<EventBus>>,
     stroke: (String, usize),
 }
 
@@ -24,6 +24,7 @@ pub struct NationProps {
     pub inner: String,
     pub nation: Option<NationNameId>,
     pub rect: Rect,
+    pub dispatch: bool,
 }
 
 pub enum Msg {
@@ -36,9 +37,13 @@ impl Component for Nation {
 
     type Properties = NationProps;
 
-    fn create(_ctx: &yew::Context<Self>) -> Self {
+    fn create(ctx: &yew::Context<Self>) -> Self {
         let node_ref = NodeRef::default();
-        let bus = EventBus::dispatcher();
+        let bus = if ctx.props().dispatch {
+            Some(EventBus::dispatcher())
+        } else {
+            None
+        };
 
         Nation {
             node_ref,
@@ -68,8 +73,9 @@ impl Component for Nation {
     fn update(&mut self, ctx: &yew::Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::Clicked(_e) => {
-                self.bus
-                    .send(ctx.props().nation.as_ref().map(|nation| nation.id));
+                if let Some(bus) = self.bus.as_mut() {
+                    bus.send(ctx.props().nation.as_ref().map(|nation| nation.id));
+                }
                 false
             }
             Msg::Hovered(hover) => {

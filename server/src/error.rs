@@ -14,6 +14,7 @@ pub enum Error {
     SocialNotFound(String),
     InternalError(String),
     InvalidPermissions(String),
+    NotContinent(String),
     ExpectedImage(String),
     TooLarge(String),
     TimeError(TimeError),
@@ -106,6 +107,9 @@ impl ToString for Error {
                     "an error occured while converting time: {}",
                     error.to_string()
                 )
+            },
+            NotContinent(continent) => {
+                format!("\"{}\" is not a continent", continent)
             }
             JsonError(e) => format!("an error occured while deserialising JSON: {}", e),
             NetworkError(e) => format!("error occured while networking: {}", e),

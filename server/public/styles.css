@@ -563,6 +563,11 @@ video {
   position: absolute;
 }
 
+.sticky {
+  position: -webkit-sticky;
+  position: sticky;
+}
+
 .top-0 {
   top: 0px;
 }
@@ -866,10 +871,6 @@ video {
   text-align: center;
 }
 
-.text-\[18px\] {
-  font-size: 18px;
-}
-
 .text-lg {
   font-size: 1.125rem;
   line-height: 1.75rem;
@@ -883,6 +884,10 @@ video {
 .text-sm {
   font-size: 0.875rem;
   line-height: 1.25rem;
+}
+
+.text-\[18px\] {
+  font-size: 18px;
 }
 
 .font-bold {
@@ -919,6 +924,7 @@ video {
 .infobox-field {
   display: block;
   word-break: break-word;
+  color: black;
 }
 
 .unselectable {
@@ -935,6 +941,7 @@ a {
   display: block;
   font-weight: bold;
   word-break: break-word;
+  color: black;
 }
 
 .text-input{
