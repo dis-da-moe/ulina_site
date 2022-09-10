@@ -22,7 +22,7 @@ async fn main() {
     initialize(&config::CONFIG);
 
     database::init().await;
-    //tokio::spawn(site::run());
-    //discord::run().await;
-    site::run().await;
+    tokio::spawn(site::run());
+    discord::run().await;
+    //site::run().await;
 }

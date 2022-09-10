@@ -1,10 +1,7 @@
 use chrono::{DateTime, Duration, Utc};
 use common::DATE_TIME_FORMAT;
 use rocket::tokio::time::sleep;
-use rocket::{
-    futures::TryFutureExt,
-    tokio::fs,
-};
+use rocket::tokio::fs;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
