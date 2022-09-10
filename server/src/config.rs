@@ -7,6 +7,8 @@ pub struct Config {
     pub discord_token: String,
     pub client_secret: String,
     pub guild_id: u64,
+    pub admin_id: u64,
+    pub admin_role_id: u64,
     pub secret_key: String,
     pub redirect: String,
     pub database_url: String,

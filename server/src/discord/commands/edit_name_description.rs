@@ -26,7 +26,7 @@ pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
 }
 
 pub async fn edit_name_description(ctx: &Context, interaction: &Interaction) -> Result<(), Error> {
-    let nation = edit_action(interaction, &DATA).await?;
+    let nation = edit_action(&ctx.http, interaction, &DATA).await?;
 
     let description: Option<String> = query!(
         "SELECT description FROM Nation WHERE nationId = ?",

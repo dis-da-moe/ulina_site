@@ -34,7 +34,7 @@ pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
 }
 
 pub async fn edit_flag(ctx: &Context, interaction: &Interaction) -> Result<(), Error> {
-    let nation = edit_action(interaction, &DATA).await?;
+    let nation = edit_action(&ctx.http, interaction, &DATA).await?;
     let flag = get_options!(interaction.data.options, FLAG, Attachment)?;
 
     let extension = validate_flag(&flag.filename, flag.size)?;
@@ -57,7 +57,7 @@ pub async fn edit_flag(ctx: &Context, interaction: &Interaction) -> Result<(), E
         &nation.name,
         extension,
         writer,
-        is_admin(&interaction.user),
+        is_admin(&ctx.http,&interaction.user).await?,
     )
     .await?;
 

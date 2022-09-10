@@ -16,7 +16,7 @@ use crate::{
 use common::NationId;
 
 pub async fn handle_modal(http: &Http, interaction: ModalSubmitInteraction) {
-    match action(&interaction).await {
+    match action(http,&interaction).await {
         Ok(name) => {
             interaction
                 .message(http, |message| {
@@ -34,7 +34,7 @@ pub async fn handle_modal(http: &Http, interaction: ModalSubmitInteraction) {
     }
 }
 
-async fn action(interaction: &ModalSubmitInteraction) -> Result<String, Error> {
+async fn action(http: &Http, interaction: &ModalSubmitInteraction) -> Result<String, Error> {
     let nation = query!(
         "SELECT ownerDiscord, nationId, name, description FROM Nation where nationId = ?",
         interaction.data.custom_id
@@ -78,7 +78,7 @@ async fn action(interaction: &ModalSubmitInteraction) -> Result<String, Error> {
     .await?;
 
     let id = NationId(nation.nationId);
-    let admin = is_admin(&interaction.user);
+    let admin = is_admin(http, &interaction.user).await?;
 
     let change = |change_type, old, new| nation_change(id, change_type, old, new, admin);
 

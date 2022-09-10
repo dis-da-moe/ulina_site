@@ -20,7 +20,7 @@ pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
 }
 
 pub async fn remove_nation(ctx: &Context, interaction: &Interaction) -> Result<(), Error> {
-    let nation = edit_action(interaction, &DATA).await?;
+    let nation = edit_action(&ctx.http, interaction, &DATA).await?;
 
     query!(
         "UPDATE Nation SET removed = true WHERE nationId = ? AND removed = false",
@@ -34,7 +34,7 @@ pub async fn remove_nation(ctx: &Context, interaction: &Interaction) -> Result<(
         ChangeType::Removed,
         Some("false".into()),
         Some("true".into()),
-        is_admin(&interaction.user),
+        is_admin(&ctx.http,&interaction.user).await?,
     )
     .await?;
 

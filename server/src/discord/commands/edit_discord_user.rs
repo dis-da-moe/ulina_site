@@ -28,7 +28,7 @@ pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
 }
 
 pub async fn edit_discord_user(ctx: &Context, interaction: &Interaction) -> Result<(), Error> {
-    let nation = edit_action(interaction, &DATA).await?;
+    let nation = edit_action(&ctx.http, interaction, &DATA).await?;
     let user = get_options!(interaction.data.options, USER, User)?
         .id
         .0

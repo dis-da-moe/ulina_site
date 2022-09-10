@@ -128,10 +128,12 @@ pub fn name_option(option: &mut CreateOption) -> &mut CreateOption {
 }
 
 pub async fn edit_action(
+    http: &Http,
     interaction: &Interaction,
     data: &CommandData,
 ) -> Result<NationDiscord, Error> {
-    if data.admin_only && !is_admin(&interaction.user) {
+    let is_admin = is_admin(http, &interaction.user).await?;
+    if data.admin_only && !is_admin {
         return Err(Error::InvalidPermissions(
             "only an admin can do this - contact one if this is desired".to_string(),
         ));
@@ -139,7 +141,7 @@ pub async fn edit_action(
 
     let nation = get_nation!(interaction, NationDiscord, "nationId, name, ownerDiscord")?;
 
-    if nation.ownerDiscord != interaction.user.id.0.to_string() && !is_admin(&interaction.user) {
+    if nation.ownerDiscord != interaction.user.id.0.to_string() && !is_admin {
         Err(Error::InvalidPermissions(
             "this nation does not belong to you - contact an admin if this is a mistake"
                 .to_string(),

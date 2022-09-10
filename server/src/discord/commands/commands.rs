@@ -49,7 +49,7 @@ pub const DATA: CommandData = CommandData {
 };
 
 pub async fn commands(ctx: &Context, interaction: &Interaction) -> Result<(), Error> {
-    let embed = if is_admin(&interaction.user) {
+    let embed = if is_admin(&ctx.http, &interaction.user).await? {
         &ADMINS_COMMANDS
     } else {
         &NORMAL_COMMANDS

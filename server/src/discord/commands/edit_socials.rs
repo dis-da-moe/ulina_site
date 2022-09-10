@@ -43,7 +43,7 @@ pub fn create(command: &mut CreateCommand) -> &mut CreateCommand {
 }
 
 pub async fn edit_socials(ctx: &Context, interaction: &Interaction) -> Result<(), Error> {
-    let nation = edit_action(interaction, &DATA).await?;
+    let nation = edit_action(&ctx.http, interaction, &DATA).await?;
     let socials = socials(nation.nationId).await?;
 
     let (platform, link) = get_options!(interaction.data.options, PLATFORM, String, LINK, String);

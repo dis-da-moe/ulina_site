@@ -6,6 +6,9 @@ use serenity::model::interactions::modal::ModalSubmitInteraction;
 use serenity::model::prelude::application_command::*;
 use serenity::model::prelude::*;
 use serenity::utils::Colour;
+use crate::error::Error;
+use crate::config::CONFIG;
+use crate::internal;
 
 type Response<'a> = CreateInteractionResponseData<'a>;
 type FollowUp<'a> = CreateInteractionResponseFollowup<'a>;
@@ -44,8 +47,8 @@ pub fn option<'a>(
         .as_ref()
 }
 
-pub fn is_admin(user: &User) -> bool {
-    user.id.0.to_string() == "368673056899596290"
+pub async fn is_admin(http: &Http, user: &User) -> Result<bool, Error> {
+    Ok(user.id.0 == CONFIG.admin_id || user.has_role(http, CONFIG.guild_id, CONFIG.admin_role_id).await.map_err(internal!())?)
 }
 
 #[async_trait]
