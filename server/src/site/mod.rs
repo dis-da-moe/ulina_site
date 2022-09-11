@@ -11,8 +11,10 @@ mod get;
 mod post;
 pub mod rendering;
 mod user_data;
+mod cors;
 
 use crate::config::CONFIG;
+use crate::site::cors::CORS;
 use crate::site::directories::{CURRENT_DIR, PUBLIC_DIR};
 use auth::{admin, admin_login, discord_login, login_result, logout, oauth_redirect};
 use get::{get_user_data, load_map, nation, nation_changes, nations, tools, tools_dir};
@@ -55,6 +57,7 @@ pub async fn run() {
                 create_map
             ],
         )
+        .attach(CORS)
         .ignite()
         .await
         .expect("Error igniting server");
