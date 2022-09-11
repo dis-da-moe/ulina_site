@@ -1,4 +1,16 @@
 use yew::prelude::*;
+use crate::Route;
+use yew_router::prelude::*;
+
+macro_rules! link {
+    ($route: tt) => {
+        html!{
+            <li class="nav-item text-center nav-ulina">
+                <Link<Route> classes="nav-link text-white" to={Route::$route}>{stringify!($route)}</Link<Route>>
+            </li>
+        }
+    };
+}
 
 pub fn navbar() -> Html {
     html! {
@@ -9,10 +21,10 @@ pub fn navbar() -> Html {
                 <ul class="navbar-nav">
                     <li class="nav-item text-center d-md-flex align-items-md-center nav-ulina"><a class="nav-link active" href="/" style="color: rgba(255,255,255,0.9);border-right-width: 0px;border-right-style: none;">{"Home"}</a></li>
                     <li class="nav-item text-center nav-ulina"><a class="nav-link active" href="/about" style="color: rgba(255,255,255,0.9);">{"About Ulina"}</a></li>
-                    <li class="nav-item text-center nav-ulina"><a class="nav-link" href="/join" style="color: rgb(255,255,255);">{"How To Join"}</a></li>
-                    <li class="nav-item text-center nav-ulina"><a class="nav-link" href="/tools/map" style="color: rgb(255,255,255);">{"Map"}</a></li>
-                    <li class="nav-item text-center nav-ulina"><a class="nav-link" href="/tools/nations" style="color: rgb(255,255,255);">{"Nations"}</a></li>
-                    <li class="nav-item text-center"><a class="nav-link" href="/tools/time" style="color: rgb(255,255,255);">{"Time"}</a></li>
+                    <li class="nav-item text-center nav-ulina"><a class="nav-link" href="/join" style="color: rgb(255,255,255);">{"How To Join"}</a></li>                    
+                    {link!(Map)}
+                    {link!(Nations)}
+                    {link!(Time)}
                 </ul>
             </div>
         </div>
