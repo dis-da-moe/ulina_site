@@ -2,7 +2,7 @@
 
 Excluded files:
 
-- All of /data which includes:
+- All of ulina_map/server/data which includes:
 - Ulina.db
 - /maps
 - /backups

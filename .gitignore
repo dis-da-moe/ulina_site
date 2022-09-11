@@ -1,9 +1,9 @@
 /target
 .idea
 **/Cargo.lock
-**/.env
-server/data
 /test-animations.html
 /tabs.svg
+
+**/.env
+server/data
 server/public/flags
-server/google_secret.json
