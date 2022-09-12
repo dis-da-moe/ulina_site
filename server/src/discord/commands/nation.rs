@@ -33,7 +33,7 @@ pub async fn nation(ctx: &Context, interaction: &Interaction) -> Result<(), Erro
         Some(flag) => Some(database::flag_link(FlagId(flag)).await?),
         _ => None,
     };
-
+    //TODO: add trivia fields
     interaction
         .message(&ctx.http, |message| {
             message.embed(|embed| {

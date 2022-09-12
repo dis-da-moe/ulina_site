@@ -15,15 +15,7 @@ impl Fairing for CORS {
     }
 
     async fn on_response<'r>(&self, _request: &'r Request<'_>, response: &mut Response<'r>) {
-        let origin = if let Some(&origin) = _request.headers().get("Origin").collect::<Vec<_>>().first(){
-            
-            match origin {
-                "https://www.ulinaworld.com" | "https://ulinaworld.com" => origin,
-                _ => current_url()
-            }
-        }
-        else{ current_url() };
-        response.set_header(Header::new("Access-Control-Allow-Origin", origin));
+        response.set_header(Header::new("Access-Control-Allow-Origin", current_url()));
         response.set_header(Header::new("Access-Control-Allow-Methods", "POST, PATCH, PUT, DELETE, HEAD, OPTIONS, GET"));
         response.set_header(Header::new("Access-Control-Allow-Headers", "server, date, content-type, transfer-encoding, connection, x-frame-options, permissions-policy, x-content-type-options, access-control-allow-origin, access-control-allow-methods, access-control-allow-credentials, x-frame-options, x-content-type-options, x-xss-protection, content-encoding"));
         response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));

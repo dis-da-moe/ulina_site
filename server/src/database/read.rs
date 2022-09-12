@@ -1,11 +1,10 @@
 pub use crate::database::models::*;
 use crate::error::Error;
-use common::{Map, Nation, NationAll, Social};
+use common::{Map, Nation, NationAll, Social, current_url};
 
 use sqlx::types::chrono::{TimeZone, Utc};
 use sqlx::{query, query_as};
 use std::fs;
-
 use super::db;
 use common::FlagId;
 const MAP_DIR: &str = "data/maps";
@@ -26,7 +25,7 @@ pub async fn flag_link(id: FlagId) -> Result<String, Error> {
     query!("SELECT flagPath FROM Flag WHERE flagId = ?", id.0)
         .fetch_one(db())
         .await
-        .map(|flag| format!("https://www.ulinaworld.com{}", flag.flagPath))
+        .map(|flag| format!("{}{}", current_url(), flag.flagPath))
         .map_err(|e| e.into())
 }
 
