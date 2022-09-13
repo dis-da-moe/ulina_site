@@ -20,16 +20,21 @@ use std::str::FromStr;
 
 use super::user_data::UserId;
 
+lazy_static!{
+    static ref ALIASES: HashMap<&'static str, &'static str> = HashMap::from([
+        ("tools_bg.wasm", "tools/tools_bg.wasm"),
+        ("tools.js", "tools/tools.js"),
+        ("index", "index.html"),
+    ]);
+}
+
 #[get("/<path..>", rank = 11)]
 pub async fn tools(path: PathBuf) -> Option<NamedFile> {
     let path = path.file_name().and_then(|file| file.to_str())?;
-    if matches!(path, "tools_bg.wasm" | "tools.js") {
-        NamedFile::open(PUBLIC_DIR.join(Path::new(&format!("tools/{}", path))))
+    let alias = *ALIASES.get(path)?;
+    NamedFile::open(PUBLIC_DIR.join(alias))
             .await
             .ok()
-    } else {
-        None
-    }
 }
 
 #[get("/tools/<_path..>", rank = 10)]

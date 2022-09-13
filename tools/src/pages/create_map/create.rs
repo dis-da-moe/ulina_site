@@ -5,12 +5,11 @@ use common::{LoadNations, NationContinentId};
 use gloo::file::File;
 use gloo::file::callbacks::FileReader;
 use web_sys::{HtmlInputElement, HtmlFormElement};
-use crate::components::CallbackButton;
 use yew::prelude::*;
 
 use super::nation::CreateNation;
 
-use crate::{loader::{Loader, LoadHandler, LoadProps}, backend, util::{by_id, get_vec, XMLNS, viewbox::Viewbox}};
+use crate::{loader::{Loader, LoadHandler, LoadProps}, backend, util::{by_id, get_vec, XMLNS, viewbox::Viewbox}, components::button};
 
 pub type App = Loader<LoadNations, Create>;
 
@@ -35,11 +34,12 @@ pub struct Create{
     svg_input: NodeRef
 }
 
+pub struct NationRegionIndex(usize);
 pub enum Msg{
     Drop(File),
     Drag,
     Loaded(String),
-    Clicked(usize),
+    Clicked(NationRegionIndex),
     Submit
 }
 
@@ -122,7 +122,7 @@ impl Component for Create{
                 })
                 .enumerate()
                 .map(|(index, element)|{
-                    let callback = ctx.link().callback(move|_: MouseEvent| Msg::Clicked(index));
+                    let callback = ctx.link().callback(move|_: MouseEvent| Msg::Clicked(NationRegionIndex(index)));
                     
                     let id = if element.id().is_empty(){ None } else{ Some(element.id()) };
 
@@ -138,7 +138,7 @@ impl Component for Create{
 
                 true
             },
-            Msg::Clicked(index) => {
+            Msg::Clicked(NationRegionIndex(index)) => {
                 let nation_id = self.next_nation_id(ctx);
 
                 let nation = self.svg.as_mut().unwrap().0.get_mut(index).unwrap();
@@ -215,7 +215,7 @@ impl Component for Create{
                     <form action="/create-map" method="POST" enctype="multipart/form-data" ref={self.form.clone()}>
                         <input type="text" name="svg" ref={self.svg_input.clone()} hidden={true}/>
                     </form>
-                    <CallbackButton text="submit" callback={ctx.link().callback(|_| Msg::Submit)}/>
+                    {button(ctx.link().callback(|_| Msg::Submit), "submit")}
                 }
             }
             else{

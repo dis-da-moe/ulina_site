@@ -1,7 +1,7 @@
 use rocket::response::content::RawHtml;
 use sycamore::SsrNode;
 
-static TEMPLATE: &str = include_str!("../../../tools/index.html");
+const TEMPLATE: &str = include_str!("./template.html");
 
 pub trait Render {
     fn render(self) -> RawHtml<String>;

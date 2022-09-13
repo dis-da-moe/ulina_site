@@ -4,7 +4,7 @@ use common::UserData;
 use loader::{LoadHandler, LoadProps, Loader};
 use yew::prelude::*;
 use yew_router::prelude::*;
-
+use crate::components::button;
 mod backend;
 mod components;
 mod display;
@@ -92,26 +92,13 @@ impl Component for Home {
             <>
             {navbar!()}
             <Login user={user.clone()}/>
-
-            <div>
-                <Link<Route> to={Route::Map}>{"map"}</Link<Route>>
-            </div>
-            <div>
-                <Link<Route> to={Route::Time}>{"time"}</Link<Route>>
-            </div>
-            <div>
-                <Link<Route> to={Route::Nations}>{"nations"}</Link<Route>>
-            </div>
+            {button(Route::Map, "map")}
+            {button(Route::Time, "time")}
+            {button(Route::Nations, "nations")}
             if user.isAdmin{
-                <div>
-                    <Link<Route> to={Route::Changes}>{"changes"}</Link<Route>>
-                </div>
-                <div>
-                    <Link<Route> to={Route::CreateMap}>{"create map"}</Link<Route>>
-                </div>
-                <div>
-                    <Link<Route> to={Route::CreateNation}>{"create nation"}</Link<Route>>
-                </div>
+                {button(Route::Changes, "change")}
+                {button(Route::CreateMap, "create map")}
+                {button(Route::CreateNation, "create nation")}
             }
             </>
         }

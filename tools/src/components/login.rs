@@ -1,6 +1,7 @@
-use crate::components::LinkButton;
 use common::UserData;
 use yew::prelude::*;
+
+use super::button;
 
 #[derive(Properties, PartialEq)]
 pub struct LoginProps {
@@ -14,8 +15,5 @@ pub fn login(props: &LoginProps) -> Html {
     } else {
         ("Login", "/discord-login")
     };
-
-    html! {
-        <LinkButton text={text} link={link}/>
-    }
+    button(link, text)
 }

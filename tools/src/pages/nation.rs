@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-
+use crate::components::button;
 use crate::components::Flag;
 use crate::navbar;
 use async_trait::async_trait;
@@ -7,7 +7,6 @@ use common::{AddSocial, LoadNation, CONTINENTS};
 use web_sys::{HtmlFormElement, HtmlInputElement};
 use yew::prelude::*;
 use crate::util::{input_field, INPUT_CONTAINER};
-use crate::components::{CallbackButton, LinkButton};
 
 use crate::util::{input_checkbox, input_text};
 use crate::{
@@ -30,13 +29,16 @@ pub struct Nation {
     edit: bool,
 }
 
+type EditField = fn(&mut AddSocial) -> &mut String;
+#[derive(Clone, Copy)]
+pub struct SocialIndex(usize);
 pub enum Msg {
     FlagLoaded,
     OptionalField(&'static str, String),
     Submit,
     AddSocial,
-    RemoveSocial(usize),
-    EditSocial(usize, String, fn(&mut AddSocial) -> &mut String),
+    RemoveSocial(SocialIndex),
+    EditSocial(SocialIndex, String, EditField),
     Removed(bool),
     Edit,
 }
@@ -100,11 +102,11 @@ impl Component for Nation {
                     platform: "".to_string(),
                 });
             }
-            Msg::RemoveSocial(index) => {
+            Msg::RemoveSocial(SocialIndex(index)) => {
                 self.socials.remove(index);
             }
             Msg::EditSocial(index, value, editor) => {
-                *editor(self.socials.get_mut(index).unwrap()) = value
+                *editor(self.socials.get_mut(index.0).unwrap()) = value
             }
             Msg::Submit => {
                 if let Some(continent_field) = &self.continent_field.cast::<HtmlInputElement>() {
@@ -171,13 +173,13 @@ impl Component for Nation {
             };
 
             let socials = self.socials.iter().enumerate().map(|(index, social)|{
-                let edit = |editor| edit_social(index, editor);
+                let edit = |editor| edit_social(SocialIndex(index), editor);
 
                 html!{
                     <tr>
                         <td><input class="text-input" value={social.platform.clone()} oninput={edit(|social| &mut social.platform)}/></td>
                         <td><input class="text-input" value={social.link.clone()} oninput={edit(|social| &mut social.link)}/></td>
-                        <td><CallbackButton text="Delete" callback={ctx.link().callback(move |_| Msg::RemoveSocial(index))}/></td>
+                        <td>{button(ctx.link().callback(move |_| Msg::RemoveSocial(SocialIndex(index))), "Delete")}</td>
                     </tr>
                 }
             });
@@ -217,8 +219,7 @@ impl Component for Nation {
                         </div>
                     }
                 </form>
-
-                <CallbackButton text="Add Social" callback={ctx.link().callback(|_| Msg::AddSocial)}/>
+                {button(ctx.link().callback(|_| Msg::AddSocial), "Add Social")}
 
                 <table class="mb-2">
                     <tr>
@@ -227,8 +228,7 @@ impl Component for Nation {
                     </tr>
                     {for socials}
                 </table>
-
-                <CallbackButton text="Submit" callback={ctx.link().callback(|_| Msg::Submit)}/>
+                {button(ctx.link().callback(|_| Msg::Submit), "Submit")}
                 </div>
 
                 </>
@@ -239,15 +239,15 @@ impl Component for Nation {
                 {navbar!()}
                 <div class="grid">
                     if is_admin || self.is_mine{
-                        <CallbackButton text="Edit" callback={ctx.link().callback(|_| Msg::Edit)}/>
-                        <LinkButton text="Logout" link="/logout"/>
+                        {button(ctx.link().callback(|_| Msg::Edit), "Edit")}
+                        {button("/logout", "Logout")}
                     }
                     else if !self.logged_in{
-                        <LinkButton text="Login to edit" link="/discord-login"/>
+                        {button("/discord-login", "Login to edit")}
                     }
                     else if !self.is_mine{
-                        <p>{"This is not your nation - if this is a mistake contact the admins on discord"}</p>
-                        <LinkButton text="Logout" link="/logout"/>
+                        <p class="text-sm">{"This is not your nation - if this is a mistake contact the admins on discord"}</p>
+                        {button("/logout", "Logout")}
                     }
                 </div>
 

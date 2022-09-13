@@ -2,11 +2,10 @@ use chrono::{Local, NaiveDate, NaiveDateTime};
 use common::{to_real, DATE_FORMAT};
 use common::{to_ulina, TimeError};
 use gloo::timers::callback::Interval;
-use web_sys::HtmlInputElement;
 use yew::prelude::*;
-use yew::TargetCast;
 
 use crate::navbar;
+use crate::util::input_text;
 
 pub struct App {
     current_real: chrono::DateTime<Local>,
@@ -52,12 +51,12 @@ impl Component for App {
             Interval::new(250, move || link.send_message(Msg::Time))
         };
         timer.forget();
-
+        let now_ulina = to_ulina(now.timestamp()).unwrap();
         App {
             current_real: now.clone(),
-            current_ulina: to_ulina(now.timestamp()).unwrap(),
-            convert_real: None,
-            convert_ulina: None,
+            current_ulina: now_ulina,
+            convert_real: Some(Ok(now.naive_local().date())),
+            convert_ulina: Some(Ok(now_ulina.date())),
         }
     }
 
@@ -95,11 +94,11 @@ impl Component for App {
             ctx.link().callback(move |e: InputEvent| {
                 Msg::Input(
                     convert,
-                    e.target_dyn_into::<HtmlInputElement>().unwrap().value(),
+                    input_text(e),
                 )
             })
         };
-
+        
         html! {
             <>
             {navbar!()}
@@ -143,10 +142,10 @@ fn time_input(
     html! {
         <div class="grid justify-center">
             <span class="italic text-sm">{name}</span>
-            <input {oninput} style="background:none" type="date" value={value}/>
+            <input {oninput} style="background:white;color:black;" type="date" value={value}/>
 
             if let Some(Err(err)) = date{
-                <p>{format!("{:?}", err)}</p>
+                <p class="italic text-sm">{format!("{:?}", err)}</p>
             }
         </div>
     }

@@ -1,38 +1,46 @@
 use yew::prelude::*;
+use crate::Route;
+use yew_router::prelude::Link;
 
 const BUTTON_CLASS: &str = "btn btn-primary text-center d-md-flex justify-content-md-center w-fit h-fit align-items-md-center text-[13px]";
 
-macro_rules! button_props {
-    ($name: tt, $data_name: tt, $data_type: ty) => {
-        #[derive(Properties, PartialEq)]
-        pub struct $name {
-            pub text: String,
-            pub $data_name: $data_type,
+pub trait MakeButton{
+    fn to_button(self, inner: Html) -> Html;
+}
+
+impl MakeButton for &str{
+    fn to_button(self, inner: Html) -> Html {
+        html!{
+            <a class="a-hidden" href={self.to_string()}>
+                {inner}
+            </a>
         }
+    }
+}
+impl MakeButton for Callback<MouseEvent>{
+    fn to_button(self, inner: Html) -> Html {
+        html!{
+            <a class="a-hidden" onclick={self}>
+                {inner}
+            </a>
+        }
+    }
+}
+impl MakeButton for Route{
+    fn to_button(self, inner: Html) -> Html {
+        html!{
+            <Link<Route> to={self}>
+                {inner}
+            </Link<Route>>
+        }
+    }
+}
+
+pub fn button(link: impl MakeButton, text: impl ToString) -> Html{
+    let inner = html!{
+        <button class={BUTTON_CLASS} type="button">
+                {text.to_string()}
+        </button>
     };
-}
-
-button_props!(LinkButtonProps, link, String);
-button_props!(CallbackButtonProps, callback, Callback<MouseEvent>);
-
-#[function_component(LinkButton)]
-pub fn link_button(props: &LinkButtonProps) -> Html {
-    html! {
-        <a class="a-hidden" href={props.link.clone()}>
-            <button class={BUTTON_CLASS} type="button">
-                {props.text.clone()}
-            </button>
-        </a>
-    }
-}
-
-#[function_component(CallbackButton)]
-pub fn callback_button(props: &CallbackButtonProps) -> Html {
-    html! {
-        <a class="a-hidden" onclick={props.callback.clone()}>
-            <button class={BUTTON_CLASS} type="button">
-                {props.text.clone()}
-            </button>
-        </a>
-    }
+    link.to_button(inner)
 }

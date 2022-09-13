@@ -1,4 +1,6 @@
-use super::LinkButton;
+use crate::{Route};
+
+use super::button::button;
 use common::NationId;
 use yew::prelude::*;
 
@@ -9,13 +11,9 @@ pub struct MyNationProps {
 
 #[function_component(MyNation)]
 pub fn my_nation(props: &MyNationProps) -> Html {
-    let (link, text) = if let Some(id) = props.nation {
-        (format!("/tools/nation/{}", id.0), "My Nation")
+    if let Some(NationId(id)) = props.nation {
+        button(Route::Nation { id }, "My Nation")
     } else {
-        ("/discord-login".to_string(), "Login")
-    };
-
-    html! {
-        <LinkButton text={text} {link}/>
+        button("/discord-login", "Login")
     }
 }
