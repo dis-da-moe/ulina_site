@@ -1,4 +1,4 @@
-pub const LOCAL_IP: &str = "192.168.100.78";
+pub const LOCAL_IP: &str = "127.0.0.1";
 pub const PORT: u16 = 8000;
 pub const URL: &str = "https://www.ulinaworld.com";
 use lazy_static::lazy_static;
