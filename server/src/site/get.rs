@@ -4,9 +4,9 @@ use crate::error::Error;
 use crate::site::directories::PUBLIC_DIR;
 use crate::site::user_data::AdminUser;
 use chrono::{TimeZone, Utc};
-use common::FlagId;
+use common::{FlagId, LoadMap, LoadResult};
 use common::{
-    ChangeType, LoadChanges, LoadMap, LoadNation, LoadNations, NationChange, NationContinentId,
+    ChangeType, LoadChanges, LoadNation, LoadNations, NationChange, NationContinentId,
     UserAndData, UserData,
 };
 use rocket::fs::NamedFile;
@@ -44,30 +44,46 @@ pub async fn tools_dir(_path: PathBuf) -> Option<NamedFile> {
         .ok()
 }
 
+// a replacement for the currently unstable try block feature to remove boiler plate
+macro_rules! json_try {
+    ($block: expr) => {
+        Json({|| async move {
+            $block
+        }}().await.map_err(|e: Error| e.to_string()))
+    };
+}
+type Load<T> = Json<LoadResult<T>>;
+
 #[get("/load-map")]
-pub async fn load_map() -> Result<Json<LoadMap>, Error> {
-    Ok(Json(LoadMap {
-        nations: nations_all().await?,
-        map: latest_map().await?,
-    }))
+pub async fn load_map() -> Load<LoadMap> {
+    json_try!({
+        Ok(LoadMap {
+            nations: nations_all().await?,
+            map: latest_map().await?,
+        })
+    })
 }
 
 #[get("/nation/<id>")]
-pub async fn nation(user: UserId, id: i64) -> Result<Json<Option<LoadNation>>, Error> {
-    let is_admin = query!("SELECT isAdmin FROM User WHERE userId = ?", user.0)
-        .fetch_one(db())
-        .await?
-        .isAdmin;
-
-    Ok(Json(match nation_all(id, is_admin).await.ok() {
-        Some(nation) => Some(user_and_data(user, nation).await?),
-        _ => None,
-    }))
+pub async fn nation(user: UserId, id: i64) -> Load<LoadNation> {
+    json_try!({
+        let is_admin = query!("SELECT isAdmin FROM User WHERE userId = ?", user.0)
+            .fetch_one(db())
+            .await?
+            .isAdmin;
+        
+        match nation_all(id, is_admin).await {
+            Ok(nation) => Ok(user_and_data(user, nation).await?),
+            Err(e) => Err(e),
+        }
+    })
 }
 
+
+
 #[get("/nations")]
-pub async fn nations(user: UserId) -> Result<Json<LoadNations>, Error> {
-    Ok(Json(
+pub async fn nations(user: UserId) -> Load<LoadNations> {
+    json_try!({
         user_and_data(
             user,
             query_as!(
@@ -77,18 +93,18 @@ pub async fn nations(user: UserId) -> Result<Json<LoadNations>, Error> {
             .fetch_all(db())
             .await?,
         )
-        .await?,
-    ))
+        .await
+    })
 }
 
 #[get("/user-data")]
-pub async fn get_user_data(user: UserId) -> Result<Json<UserData>, Error> {
-    Ok(Json(user_data(user).await?))
+pub async fn get_user_data(user: UserId) -> Load<UserData> {
+    Json(user_data(user).await.map_err(|e| e.to_string()))
 }
 
 #[get("/nation-changes")]
-pub async fn nation_changes(user: AdminUser) -> Result<Json<LoadChanges>, Error> {
-    let user = user_data(user.into()).await?;
+pub async fn nation_changes(user: AdminUser) -> Load<LoadChanges> {
+    json_try!{{let user = user_data(user.into()).await?;
 
     let queried_changes = query!("SELECT * FROM NationChange").fetch_all(db()).await?;
     let mut changes = vec![];
@@ -143,10 +159,10 @@ pub async fn nation_changes(user: AdminUser) -> Result<Json<LoadChanges>, Error>
         });
     }
 
-    Ok(Json(UserAndData {
+    Ok(UserAndData {
         data: changes,
         user,
-    }))
+    })}}
 }
 
 async fn user_data(user: UserId) -> Result<UserData, Error> {

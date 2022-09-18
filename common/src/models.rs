@@ -152,9 +152,13 @@ change_type! {
     Alliances
 }
 
-pub type LoadNations = UserAndData<Vec<NationContinentId>>;
-pub type LoadNation = UserAndData<NationAll>;
-pub type LoadChanges = UserAndData<Vec<NationChange>>;
+pub type LoadResult<T> = Result<T, String>;
+type LoadType<T> = UserAndData<T>;
+
+pub type LoadNations = LoadType<Vec<NationContinentId>>;
+pub type LoadNation = LoadType<NationAll>;
+pub type LoadChanges = LoadType<Vec<NationChange>>;
+
 pub const CONTINENTS: [&str; 5] = ["Ripiero", "Kanita", "Zapita", "Ailou", "Sivalat"];
 
 #[macro_export]

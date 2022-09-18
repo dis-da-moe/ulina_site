@@ -15,18 +15,23 @@ lazy_static! {
 
 pub async fn backup() {
     let now = Utc::now();
-    let till_update = fs::read_to_string(BACKUP_PATH)
+    let mut till_update = fs::read_to_string(BACKUP_PATH)
         .await
         .ok()
         .and_then(|contents| serde_json::from_str::<Backup>(&contents).ok())
-        .map(|json| json.last_back_up - now + *INTERVAL)
+        .map(|json| json.last_back_up + *INTERVAL - now)
         .unwrap_or_else(|| Duration::zero());
-
+    
+    if till_update.num_seconds() < 0{
+        // we should have already updated so set to 0
+        till_update = Duration::zero();
+    }
+    
     println!(
         "next backup scheduled for {}",
         (now + till_update).format(DATE_TIME_FORMAT)
     );
-
+    
     sleep(till_update.to_std().unwrap()).await;
 
     loop {

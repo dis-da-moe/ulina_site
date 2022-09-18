@@ -1,4 +1,4 @@
-use common::{current_url, LoadChanges, LoadMap, LoadNation, LoadNations, UserData};
+use common::{current_url, LoadChanges, LoadNation, LoadNations, LoadMap, UserData, LoadResult};
 use reqwasm::http::Request;
 
 use crate::debug;
@@ -7,11 +7,11 @@ pub fn url(endpoint: &str) -> String {
     format!("{}/{}", current_url(), endpoint)
 }
 
-pub async fn request<T>(endpoint: &str) -> Result<T, String>
+async fn request<T>(endpoint: &str) -> Result<LoadResult<T>, String>
 where
     for<'a> T: serde::Deserialize<'a>,
 {
-    let payload: T = Request::get(&url(endpoint))
+    let payload: LoadResult<T> = Request::get(&url(endpoint))
         .send()
         .await
         .map_err(debug!())?
@@ -25,7 +25,7 @@ where
 macro_rules! backend {
     ($(($func_name: tt, $endpoint: expr, $type: ty)),+) => {
         $(pub async fn $func_name() -> Result<$type, String>{
-            request($endpoint).await
+            request::<$type>($endpoint).await?
         })+
     };
 }
@@ -38,10 +38,5 @@ backend!(
 );
 
 pub async fn load_nation(id: i64) -> Result<LoadNation, String> {
-    let result: Result<Option<LoadNation>, String> = request(&format!("nation/{}", id)).await;
-    match result {
-        Ok(Some(x)) => Ok(x),
-        Ok(None) => Err("Nation not found".to_string()),
-        Err(e) => Err(e),
-    }
+    request::<LoadNation>(&format!("nation/{}", id)).await?
 }
