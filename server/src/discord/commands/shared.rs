@@ -12,6 +12,7 @@ use serenity::http::Http;
 use serenity::model::id::GuildId;
 use serenity::model::interactions::application_command::ApplicationCommandOptionType;
 use serenity::model::prelude::application_command::ApplicationCommandInteraction;
+use serenity::model::interactions::application_command::ApplicationCommand;
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 use std::future::Future;
@@ -153,6 +154,9 @@ pub async fn edit_action(
 
 pub async fn create_commands(guild_id: &GuildId, http: &Http) {
     let mut categorised_commands: HashMap<Category, Vec<(&CommandData, String)>> = HashMap::new();
+    
+    //remove all global commands (these were from the previous version of the bot)
+    ApplicationCommand::set_global_application_commands(http, |commands| commands).await.expect("Error overriding global commands");
 
     let commands = GuildId::set_application_commands(guild_id, http, |commands| {
         for (name, command) in COMMANDS.iter() {

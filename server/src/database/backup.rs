@@ -10,7 +10,7 @@ struct Backup {
 }
 const BACKUP_PATH: &str = "./data/backup.json";
 lazy_static! {
-    static ref INTERVAL: Duration = Duration::days(7);
+    static ref INTERVAL: Duration = Duration::days(14);
 }
 
 pub async fn backup() {
