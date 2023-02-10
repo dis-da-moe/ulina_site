@@ -99,7 +99,8 @@ pub async fn all_nations(ctx: &Context, interaction: &Interaction) -> Result<(),
         let continent = get_continent(*index)?;
         let nations = query_as!(
             NationContinent,
-            "SELECT name, ownerDiscord, continentName FROM Nation WHERE removed = false"
+            "SELECT name, ownerDiscord, continentName FROM Nation WHERE removed = false AND continentName = ?",
+            continent
         )
         .fetch_all(db())
         .await?;
