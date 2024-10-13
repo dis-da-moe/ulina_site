@@ -1,0 +1,11 @@
+/target
+.idea
+**/Cargo.lock
+/test-animations.html
+/tabs.svg
+
+**/.env
+server/data
+server/public/flags
+server/public/tools/tools.js
+server/public/tools/tools_bg.wasm

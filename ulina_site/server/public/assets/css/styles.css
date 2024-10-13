@@ -1,0 +1,63 @@
+span {
+  --bs-dark: #ffffff;
+  --bs-dark-rgb: 255,255,255;
+  --bs-body-color: #ffffff;
+}
+
+a {
+}
+
+nav-link {
+  text-decoration: underline;
+}
+
+body {
+  background: #274372;
+  color: rgb(255,255,255);
+}
+
+p {
+  font-size: 21px;
+}
+
+.btn-ulina {
+  background: rgb(21,42,78);
+  box-shadow: -1px 2px rgb(33,33,33);
+  border: none;
+  min-width: 25%;
+  min-height: 59px;
+  font-size: 27px;
+}
+
+@media (max-width: 765px) {
+  .collapse {
+    background: rgba(19,31,52,0.97);
+    border: none;
+    border-radius: 10px;
+  }
+}
+
+@media (min-width: 765px) {
+  .nav-ulina {
+    border-width: 1px;
+    border-right: 1px solid rgba(255,255,255,0.64);
+  }
+}
+
+@media (max-width: 765px) {
+  .nav-ulina {
+    border-bottom: 1px solid rgba(255,255,255,0.7);
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+}
+
+.a-hidden {
+  text-decoration: none;
+}
+
+@media (min-width:768px) {
+  .navbar-expand-md .navbar-collapse {
+  }
+}
+

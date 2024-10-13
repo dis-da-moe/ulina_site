@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/AlwaysLoaded.unity
+    guid: dc5d097918bfbf64697c38662a9c3d3f
+  - enabled: 1
+    path: Assets/Scenes/start.unity
+    guid: f6a2865e5b2acb44ab88f9c127d63981
+  - enabled: 1
+    path: Assets/Scenes/SampleScene.unity
+    guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/ripiero.unity
+    guid: bf4ff8b773f68684c91f488028c84b60
+  - enabled: 1
+    path: Assets/Scenes/ailou.unity
+    guid: 45244032fa16a354283f519fe353a87d
+  - enabled: 1
+    path: Assets/Scenes/kanita.unity
+    guid: 434dde96136c0244d903ce0a562c1afd
+  - enabled: 1
+    path: Assets/Scenes/zapita.unity
+    guid: 0ab9de30392950e4380660342489d6b4
+  - enabled: 1
+    path: Assets/Scenes/sivalat.unity
+    guid: e7949f83f80d40b408f6d84b169420ff
+  m_configObjects: {}

@@ -1,0 +1,11 @@
+/Ulina.sqbpro
+/node_modules/
+/.idea/
+/data/Ulina.db
+/data/config.json
+/public/flags
+package-lock.json
+/data/backups
+/data/map.svg
+/data/map-Wed_Mar_30_2022-19-41-10.svg
+/data/mapTue Mar 22 2022.svg

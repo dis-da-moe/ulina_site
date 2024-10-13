@@ -1,0 +1,14 @@
+extends layout
+include mixins
+
+block content
+    if(message)
+        h1 #{message}
+    a(type="button" href="#" onclick="history.back()") Back
+
+    form(action=`/add-nation` method="POST")
+        +textAttribute("name", "")(required)
+        +textAttribute("continent", "")(required)
+        +textAttribute("ownerDiscord", "")(required)
+        +removedAttribute(false)
+        button(type="submit") Submit

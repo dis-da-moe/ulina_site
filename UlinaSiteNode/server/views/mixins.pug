@@ -1,0 +1,31 @@
+mixin textAttribute(name, value)
+    div(class ="form-group row limit-width")
+        label(for=`${name}-field` class="col-auto") #{name.charAt(0).toUpperCase() + name.slice(1)}:
+        div(class="col-auto")
+            input(name=name type="text" id=`${name}-field` value=value)&attributes(attributes)
+
+
+mixin removedAttribute(removed)
+    div(class="form-check")
+        input(name="removed" class="form-check-input" type="checkbox"
+            checked=removed
+            id="nation-removed")
+        label(class="form-check-label" for="nation-removed") removed
+
+mixin tableMixin(headers, rows, tableId, noneText)
+    div(class="col-lg-5" style="margin-left:5px")
+        table(id=`${tableId}` class="table table-dark")
+            tr
+                for header in headers
+                    th(scope="col") #{header}
+            for row in rows
+                tr
+                    for value in row
+                        if value.link !== undefined
+                            td
+                                a(href=value.link) #{value.text}
+                        else
+                            td #{value.text}
+            else
+                tr
+                    th There are no #{noneText}

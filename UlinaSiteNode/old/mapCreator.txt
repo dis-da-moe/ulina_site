@@ -1,0 +1,198 @@
+
+const xmlns = "http://www.w3.org/2000/svg";
+
+interface NationIdName{
+    NationId:number,
+    Name: string
+}
+
+declare const nations: NationIdName[];
+const nationNames = nations.map(nation => nation.Name);
+
+function matchData(filterFunction, returnFunction){
+    const matches = nations.filter(filterFunction);
+    if(matches.length == 0){
+        return undefined;
+    }
+    else{
+        return returnFunction(matches[0]);
+    }
+}
+
+function nameFromId(id: string) : (string|undefined){
+    const intId = parseInt(id, 10);
+    if(isNaN(intId)) return  undefined;
+    return matchData((nation => nation.NationId == id), (nation => nation.Name));
+}
+
+function idFromName(name: string): (number|undefined){
+    return matchData((nation => nation.Name == name), (nation => nation.NationId));
+}
+
+function randomInt(minInclusive:number, maxExclusive:number){
+    return Math.floor(Math.random() * (maxExclusive-minInclusive) + minInclusive);
+}
+
+function getRandomColour(): string{
+    const base10ToHex = {
+        10: "A",
+        11: "B",
+        12: "C",
+        13: "D",
+        14: "E",
+        15: "F"
+    }
+    return  Array
+        .from({length:6}, () => {return randomInt(0,16)})
+        .reduce((previous, current) => {
+            const nextDigit:string = current >= 10 ? base10ToHex[current] : current.toString();
+            return previous + nextDigit;
+        }, "#");
+}
+
+window.onload = async () => {
+    const svg = document.getElementsByTagName("svg").item(0);
+    const landMasses = Array.from(svg.getElementsByTagName("path"));
+    const nationsParent = svg.getElementById("NATIONS") as HTMLElement;
+
+    Array.from(nationsParent.getElementsByTagName("g"))
+        .forEach(group => group.style.fill = getRandomColour());
+
+    const submitButton = document.getElementById("submit");
+    const enterNameButton = document.getElementById("enter-name");
+    const nameField = document.getElementById("name") as HTMLInputElement;
+    const mapField = document.getElementById("map-field") as HTMLInputElement;
+    const form = document.getElementById("submit-form") as HTMLFormElement;
+    const selectedNationText = document.getElementById("nation-name") as HTMLParagraphElement;
+    const nameStatus = document.getElementById("name-status") as HTMLParagraphElement;
+    const submitStatus = document.getElementById("submit-status") as HTMLParagraphElement;
+
+    let selectedGroup: HTMLElement = undefined;
+
+    landMasses.forEach(mass => {
+        mass.addEventListener("dblclick", (_) => {
+            if(mass.parentElement == nationsParent){
+                selectedGroup = undefined;
+                return;
+            }
+            selectedGroup = mass.parentElement;
+        });
+
+        mass.addEventListener("mouseover", (_) => {
+            if(mass.parentElement == nationsParent){
+                selectedNationText.textContent = "Nation: None";
+                return;
+            }
+            const name = nameFromId(mass.parentElement.id);
+            if(name == undefined){
+                selectedNationText.textContent = "Nation: Not Assigned";
+            }
+            else{
+                selectedNationText.textContent = `Nation: ${name}`;
+            }
+        });
+    });
+
+    const isEmpty = (group: HTMLElement) => {
+        return group.childElementCount == 0;
+    }
+
+    const removeElement = (element: HTMLElement) => {
+        element.parentElement.removeChild(element);
+    }
+
+    const changeElementGroup = (element: HTMLElement, changeTo: HTMLElement) => {
+        const originalGroup = element.parentElement;
+        if(originalGroup == changeTo) return;
+
+        changeTo.appendChild(element);
+
+        if(originalGroup != nationsParent && isEmpty(originalGroup)){
+            removeElement(originalGroup);
+        }
+    };
+
+    const createKeyEvent = (keyName: string, clickFunction, startFunction = undefined) => {
+        window.addEventListener("keydown", (ev) => {
+            if(ev.key != keyName || ev.repeat) return;
+
+            if(startFunction != undefined) startFunction();
+
+            const onClick = (ev) => {
+                const element:HTMLElement = ev.target as HTMLElement;
+                clickFunction(element);
+            };
+
+            landMasses.forEach(element => element.addEventListener("click", onClick));
+            const onEnd = (ev) => {
+                if(ev.key != keyName) return;
+                landMasses.forEach(element => element.removeEventListener("click", onClick));
+                window.removeEventListener("keyup", onEnd);
+            }
+
+            window.addEventListener("keyup", onEnd);
+        });
+    }
+
+    createKeyEvent("Shift", (element:HTMLElement) => {
+        if(selectedGroup){
+            changeElementGroup(element, selectedGroup);
+        }
+        else if (element.parentElement == nationsParent){
+            selectedGroup = document.createElementNS(xmlns, "g") as unknown as HTMLElement;
+            element.parentElement.prepend(selectedGroup);
+            selectedGroup.style.fill = getRandomColour();
+            selectedGroup.append(element);
+        }
+    });
+
+    createKeyEvent("Control", (element:HTMLElement) => {
+        if(element.parentElement != nationsParent){
+            changeElementGroup(element, nationsParent);
+        }
+    }, () => {selectedGroup = undefined;});
+
+    enterNameButton.onclick = () => {
+        if(selectedGroup == undefined){
+            nameStatus.textContent = "No Nation Selected";
+            return;
+        }
+        if(nameField.value == "") {
+            nameStatus.textContent = "No name entered";
+            return;
+        }
+        const id = idFromName(nameField.value);
+        if(id == undefined){
+            nameStatus.textContent = "Can not find name";
+            return;
+        }
+        selectedGroup.id = id.toString();
+        nameStatus.textContent = `Saved name ${nameField.value}`;
+    };
+
+    submitButton.onclick = async () => {
+
+        const assignedNations: string[] = landMasses.reduce((previous, current) => {
+            const name = nameFromId(current.id);
+            if(name != undefined){
+                previous.push(name);
+            }
+            return previous;
+        } ,[]);
+
+        const unassignedNations = nationNames.filter(nation => !assignedNations.includes(nation));
+
+        if(unassignedNations.length > 0){
+            submitStatus.textContent = unassignedNations.reduce((message, current) => {
+                return `${message}${current}, `;
+            }, "The following nations have no assigned regions: ");
+            return;
+        }
+
+        landMasses.forEach(mass => mass.parentElement.style.removeProperty("fill"));
+
+        const serializer = new XMLSerializer();
+        mapField.value = serializer.serializeToString(svg);
+        form.submit();
+    };
+};

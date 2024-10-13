@@ -1,0 +1,23 @@
+extends layout
+
+block content
+    if(message)
+        h1 #{message}
+    script(type="text/javascript").
+        const nations = !{JSON.stringify(data)};
+        System.import('/javascripts/client/mapCreator.js');
+
+    div(style="position: fixed")
+        span
+            button(id="submit", name="submit") Submit
+            p(id="submit-status" class="unselectable error-text")
+        form(action="/submitmap" method="POST" id="submit-form")
+            input(name="map" type="hidden" id="map-field")
+        input(type="text" id="name")
+        span
+            button(id="enter-name", name="name") Enter Name
+            p(id="name-status" class="unselectable")
+
+        p(id="nation-name" style="position:absolute;" class="unselectable")
+
+    div!= xml

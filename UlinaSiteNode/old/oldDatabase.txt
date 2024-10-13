@@ -1,0 +1,113 @@
+import {parse} from 'csv-parse/sync';
+import {Database} from "better-sqlite3";
+import path = require("path");
+const appDir = (require('app-root-path')).toString();
+
+const fs = require("fs");
+
+const sqlite = require('better-sqlite3');
+
+class Continent{
+    Name:string;
+    Description:string;
+}
+
+class OldNation{
+    Country:string;
+    Continent:string;
+    Insta:string;
+    Wiki:string;
+    Description:string;
+    ExtraSite:string;
+    LinkToExtra:string;
+}
+
+function runMany<ReturnType>(database, statements:string[]): ReturnType[]{
+    return statements.map(statement => database.prepare(statement).run());
+}
+
+function clearTable(database, table: string){
+    runMany(database, [`DELETE FROM ${table}`,`VACUUM;`]);
+}
+
+function addToTable(database: Database, table:string, values: (string|number)[][], columnNames:string[]){
+    const insert =
+        `INSERT INTO ${table} (${columnNames.toString()}) VALUES(${"?, ".repeat(columnNames.length-1)}?)`;
+    const prepared = database.prepare(insert);
+    values.forEach(value => {
+        prepared.run(value);
+    });
+}
+
+function readCsv<RecordType>(path: string): RecordType[]{
+    const fileContent = fs.readFileSync(path);
+    return parse(fileContent, {columns:true});
+}
+
+export function migrateFromLegacy(dataBasePath: string, nationsPath: string, resetContinents:boolean){
+    const db = sqlite(dataBasePath);
+
+    clearTable(db, "Socials");
+    clearTable(db, "Nations");
+
+    if(resetContinents){
+        const continentPath = "/data/original/continents.csv";
+        const continents = readCsv<Continent>(__dirname+continentPath)
+            .map(continent => {return [continent.Name, continent.Description]});
+
+        clearTable(db, "Continents");
+        addToTable(db, "Continents", continents, ["Name", "Description"]);
+    }
+
+    const oldNations = readCsv<OldNation>(__dirname+nationsPath);
+    const socials: (string|number)[][] = [];
+
+    const nations = oldNations.map((oldRecord,) => {
+        [[oldRecord.Wiki, "Wiki"], [oldRecord.Insta, "Insta"], [oldRecord.LinkToExtra, oldRecord.ExtraSite]]
+            .forEach((social) => {
+                if  (social[0] !== ''){
+                    socials.push([oldRecord.Country, social[0], social[1]]);
+                }
+            });
+        return [null, oldRecord.Continent, oldRecord.Country, oldRecord.Description];
+    });
+
+    addToTable(db, "Nations", nations,
+        ["NationId", "Continent", "Name", "Description"]);
+
+    const socialsWithNationId = socials.map(
+        value => {
+            const countryName = value[0].toString();
+            const statement = db.prepare(
+                `SELECT ROWID FROM Nations WHERE Name = ?;`);
+            const id = statement.get(countryName).NationId;
+            return [null, id, value[1], value[2]];
+        }
+    );
+
+    addToTable(db, "Socials", socialsWithNationId,
+        ["SocialsId", "Nation", "Link", "Platform"]);
+}
+
+const mainDatabase = sqlite(path.join(appDir, "data/Ulina.db"));
+
+interface NationIdName{
+    NationId:number,
+    Name: string
+}
+
+export function getIdsAndNames(): NationIdName[]{
+    const statement = `SELECT NationId, Name FROM Nations;`;
+    return mainDatabase.prepare(statement).all();
+}
+
+interface NationIdNameContinent{
+    NationId: number,
+    Name: string,
+    Continent: string
+}
+
+export function getIdsNamesContinents(): NationIdNameContinent[] {
+    const statement = `SELECT NationId, Name, Continent FROM Nations;`;
+    return mainDatabase.prepare(statement).all();
+}

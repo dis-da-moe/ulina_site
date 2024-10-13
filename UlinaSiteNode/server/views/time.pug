@@ -1,0 +1,12 @@
+extends layout
+
+block content
+    script(type="text/javascript").
+        System.import('/javascripts/client/time.js');
+
+    h1 Time Converter
+    p Real Time:
+    p(id="real-time") DD/MM/YYYY
+    p Ulina Time:
+    p(id="ulina-time") DD/MM/YYYY
+

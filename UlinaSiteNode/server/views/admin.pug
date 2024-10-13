@@ -1,0 +1,9 @@
+extends layout
+
+block content
+    form(action = "/creator" method="GET")
+        button(type="submit") Create Map
+    form(action = "/manage-nations" method="GET")
+        button(type="submit") Manage Nations
+    form(action = "/nation-changes" method="GET")
+        button(type="submit") See Changes

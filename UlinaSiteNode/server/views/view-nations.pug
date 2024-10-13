@@ -1,0 +1,39 @@
+extends layout
+include mixins
+block content
+    if(message)
+        h1 #{message}
+
+    a(type="button" href="#" onclick="history.back()") Back
+
+    script(type="text/javascript").
+        const newNations = !{newNations.length > 0};
+        const oldNations = !{oldNations.length > 0};
+        System.import('/javascripts/client/manageNations.js');
+
+
+    if(admin)
+        a(href="/add-nation")
+            div(class="button") Add nation
+
+    div(class="row limit-width")
+        input(type="text" id="search-field" class="col-auto" placeholder="search names")
+        button(id="search-button" type="button" class="col-auto") Search
+        button(id="clear-button" type="button" class="col-auto") clear
+
+    div(class="row limit-width")
+        for nationCollection in [["Current Nations", newNations, "current"], ["Old Nations", oldNations, "old"]]
+            div(class="col-lg-5" style="margin-left:5px")
+                -
+                    const rows = []
+                    for(const nation of nationCollection[1]){
+                        const nationName = {
+                            link: `/${action}/?id=${nation.nationId}`,
+                            text: nation.name
+                        };
+                        const continent = {text: nation.continent.name};
+                        rows.push([nationName, continent]);
+                    }
+
+                +tableMixin(["Name", "Continent"], rows, `nations-${nationCollection[2]}`, nationCollection[0])
+

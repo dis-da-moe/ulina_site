@@ -1,0 +1,12 @@
+export const DESCRIPTION_INPUT_ID = "nationDescription"
+export const NAME_INPUT_ID = "nationName";
+export const PREVIOUS_ID = "previous";
+export const NEXT_ID = "next";
+export const USER_ID = "user";
+export const NAME_ID = "name";
+export const FLAG_ID = "flag";
+export const PLATFORM_ID = "platform";
+export const LINK_ID = "link";
+export const MODE_ID = "mode";
+export const CONTINENT_ID = "continent";
+export const GUIDE_ID = "guide";

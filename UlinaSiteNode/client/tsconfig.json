@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "System",
+    "target": "es6",
+    "sourceMap": true,
+    "outDir": "../public/javascripts/",
+    "rootDir": "../"
+  },
+  "include": [
+    "../client",
+    "../shared"
+  ]
+}

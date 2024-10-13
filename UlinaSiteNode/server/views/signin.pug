@@ -1,0 +1,12 @@
+extends layout
+
+block content
+    html
+        head
+            title Signin
+        body
+            if(message)
+                h4 #{message}
+                form(action = "/signin" method = "POST")
+                    input(name = "password" type = "password" required placeholder = "Password")
+                    input(type = "submit", name = "submit", value = "submit")
