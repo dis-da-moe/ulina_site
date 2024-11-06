@@ -1,6 +1,6 @@
 # ulina_site
 
-This is the repository for the discord bot and website of the Ulina project: https://www.ulinaworld.com
+This is the repository for the archived discord bot and website of the Ulina project: https://www.ulinaworld.com
 
 It's open source to allow people from the community to contribute and to provide an example for others making a site/bot with rocket/yew/serenity, since I haven't found many other examples of this.
 
