@@ -1,3 +1,3 @@
-# ulina_site_old
+# Interactive Map
 
-all attempts at making the ulina website previously.
+previous attempt at making an interactive map
