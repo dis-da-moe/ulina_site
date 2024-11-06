@@ -1,1 +1,0 @@
-npx tailwindcss -i "./input.css" -o "./server/public/styles.css" -w
